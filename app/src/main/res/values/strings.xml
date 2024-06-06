@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MI-DatingApp</string>
+    <string name="app_login_title">Login to Chat&amp;Meet</string>
+    <string name="app_login_subtitle">Welcome back! Sign in using your social account or email to continue us</string>
 </resources>

@@ -15,18 +15,25 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.MI.DatingApp.R
+import com.MI.DatingApp.ui.theme.ComposeBottomNavigationExampleTheme
 import com.MI.DatingApp.viewModel.LoginViewModel
 import com.MI.DatingApp.viewModel.LoginState
 
@@ -52,15 +59,10 @@ fun Login(navController: NavController, viewModel: LoginViewModel = viewModel())
             modifier = Modifier.fillMaxSize()
         ) {
             LoginHeader()
-            Spacer(modifier = Modifier.height(16.dp))
-            EmailInput(email, viewModel::onEmailChange)
-            Spacer(modifier = Modifier.height(16.dp))
-            PasswordInput(password, viewModel::onPasswordChange)
-            Spacer(modifier = Modifier.height(16.dp))
-            LoginButton { viewModel.login() }
-            Spacer(modifier = Modifier.height(16.dp))
-            SignUpText(navController)
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(32.dp))
+            TextFieldInput(email,password, viewModel::onEmailChange, viewModel::onPasswordChange)
+            Spacer(modifier = Modifier.height(32.dp))
+            LoginButtonAndSignUpText ({ viewModel.login() }, navController)
             LoginStateHandler(loginState)
         }
     }
@@ -75,24 +77,24 @@ fun LoginHeader() {
             .fillMaxWidth()
             .padding(top = 150.dp)
     ) {
-        val painter = rememberImagePainter("https://www.figma.com/design/lYUFkzubr6iXc0oOu9HMn7/Untitled?node-id=51-45&t=ZLOQrGiVup9wiAam-4")
 
         Icon(
-            painter = painter,
+            painter = painterResource(id = R.drawable.logo),
             contentDescription = null,
             tint = Color.Red,
             modifier = Modifier
                 .size(100.dp)
                 .clip(MaterialTheme.shapes.large)
         )
+
         Text(
-            text = "Log in to Chat&Meet",
+            text = stringResource(R.string.app_login_title),
             style = MaterialTheme.typography.titleLarge,
             color = Color.White,
             modifier = Modifier.padding(top = 16.dp)
         )
         Text(
-            text = "Welcome back! Sign in using your social account or email to continue us",
+            text = stringResource(R.string.app_login_subtitle),
             style = MaterialTheme.typography.labelSmall,
             textAlign = TextAlign.Center,
             modifier = Modifier
@@ -103,88 +105,119 @@ fun LoginHeader() {
 }
 
 @Composable
-fun EmailInput(email: String, onEmailChange: (String) -> Unit) {
-    BasicTextField(
-        value = email,
-        onValueChange = onEmailChange,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .background(Color.Transparent)
-            .border(1.dp, Color.White, RoundedCornerShape(8.dp))
-            .padding(16.dp),
-        textStyle = TextStyle(color = Color.White),
-        decorationBox = { innerTextField ->
-            if (email.isEmpty()) {
-                Text(
-                    text = "Your email",
-                    style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier.padding(start = 4.dp)
-                )
-            }
-            innerTextField()
-        }
-    )
-}
-
-@Composable
-fun PasswordInput(password: String, onPasswordChange: (String) -> Unit) {
-    BasicTextField(
-        value = password,
-        onValueChange = onPasswordChange,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .background(Color.Transparent)
-            .border(1.dp, Color.White, RoundedCornerShape(8.dp))
-            .padding(16.dp),
-        textStyle = TextStyle(color = Color.White),
-        visualTransformation = PasswordVisualTransformation(),
-        decorationBox = { innerTextField ->
-            if (password.isEmpty()) {
-                Text(
-                    text = "Password",
-                    style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier.padding(start = 4.dp)
-                )
-            }
-            innerTextField()
-        }
-    )
-}
-
-@Composable
-fun LoginButton(onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp)
-            .padding(horizontal = 16.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+fun TextFieldInput(email: String,
+                   password: String,
+                   onEmailChange: (String) -> Unit,
+                   onPasswordChange: (String) -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth()
+            .padding(top = 60.dp)
     ) {
-        Text(
-            text = "Log In",
-            style = MaterialTheme.typography.labelSmall,
-            color = Color.Black
+        BasicTextField(
+            value = email,
+            onValueChange = onEmailChange,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .background(Color.Transparent)
+                .border(1.dp, Color.White, RoundedCornerShape(8.dp))
+                .padding(16.dp),
+            textStyle = TextStyle(color = Color.White),
+            decorationBox = { innerTextField ->
+                if (email.isEmpty()) {
+                    Text(
+                        text = "Your email",
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.padding(start = 4.dp)
+                    )
+                }
+                innerTextField()
+            }
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        BasicTextField(
+            value = password,
+            onValueChange = onPasswordChange,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .background(Color.Transparent)
+                .border(1.dp, Color.White, RoundedCornerShape(8.dp))
+                .padding(16.dp),
+            textStyle = TextStyle(color = Color.White),
+            visualTransformation = PasswordVisualTransformation(),
+            decorationBox = { innerTextField ->
+                if (password.isEmpty()) {
+                    Text(
+                        text = "Password",
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.padding(start = 4.dp)
+                    )
+                }
+                innerTextField()
+            }
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Text(
+                text = "Forgot password?",
+                style = MaterialTheme.typography.labelSmall,
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .clickable { /* Handle click */ }
+            )
+        }
     }
 }
 
+
 @Composable
-fun SignUpText(navController: NavController) {
-    ClickableText(
-        text = buildAnnotatedString {
-            append("Don’t have account? ")
-            withStyle(style = SpanStyle(textDecoration = TextDecoration.Underline, color = Color.White)) {
-                append("Signup")
-            }
-        },
-        style = MaterialTheme.typography.labelSmall,
-        onClick = {
-            navController.navigate("registrieren")
+fun LoginButtonAndSignUpText(onClick: () -> Unit, navController: NavController) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Bottom,
+        modifier = Modifier.fillMaxHeight()
+            .padding( top= 40.dp)
+    ) {
+        Button(
+            onClick = onClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .padding(horizontal = 16.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+        ) {
+            Text(
+                text = "Log In",
+                fontSize = 20.sp,
+                lineHeight = 16.sp,
+                color = Color.Black,
+                fontWeight = FontWeight.Medium
+            )
         }
-    )
+        Spacer(modifier = Modifier.height(16.dp))
+        ClickableText(
+            text = buildAnnotatedString {
+                append("Don’t have account? ")
+                withStyle(style = SpanStyle(textDecoration = TextDecoration.Underline, color = Color.White)) {
+                    append("Signup")
+                }
+            },
+            style = MaterialTheme.typography.labelSmall,
+            onClick = {
+                navController.navigate("registrieren")
+            }
+        )
+    }
 }
 
 @Composable
@@ -194,6 +227,17 @@ fun LoginStateHandler(loginState: LoginState) {
         is LoginState.Success -> Text(text = "Login Successful", color = Color.White)
         is LoginState.Error -> Text(text = (loginState as LoginState.Error).message, color = Color.Red)
         else -> {}
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+    val navController = rememberNavController()
+    ComposeBottomNavigationExampleTheme {
+        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+            MainScreen(navController)
+        }
     }
 }
 

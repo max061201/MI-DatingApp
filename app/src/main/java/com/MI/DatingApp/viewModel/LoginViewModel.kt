@@ -28,6 +28,7 @@ class LoginViewModel : ViewModel() {
     fun login() {
         viewModelScope.launch {
             // Verbingung Logisch
+
             _loginState.value = LoginState.Loading
             kotlinx.coroutines.delay(2000)
             _loginState.value = LoginState.Success

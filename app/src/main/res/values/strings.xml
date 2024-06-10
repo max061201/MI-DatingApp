@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MI-DatingApp</string>
+    <string name="title_activity_registering">RegisteringActivity</string>
 </resources>

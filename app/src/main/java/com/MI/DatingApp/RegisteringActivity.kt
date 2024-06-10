@@ -6,24 +6,34 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+
 import androidx.compose.ui.Modifier
+
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.rememberNavController
-import com.MI.DatingApp.view.MainScreen
 import com.MI.DatingApp.ui.theme.ComposeBottomNavigationExampleTheme
+
+import com.MI.DatingApp.view.registieren.Registrieren
 import com.MI.DatingApp.viewModel.registering.RegisteringVM
 
-class MainActivity : ComponentActivity() {
+class RegisteringActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val viewModule = ViewModelProvider(this)[RegisteringVM::class.java]
+
         setContent {
             val navController = rememberNavController()
             ComposeBottomNavigationExampleTheme {
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    MainScreen(navController,this)
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    Registrieren(navController,viewModule)
                 }
             }
         }
     }
 }
+
+
 

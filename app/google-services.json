@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:247127346690:android:6b1ec4a67b6e839250211b",
+        "mobilesdk_app_id": "1:247127346690:android:e2cbcba3e9d6037850211b",
         "android_client_info": {
-          "package_name": "com.MIDatingApp"
+          "package_name": "com.MI.DatingApp"
         }
       },
       "oauth_client": [],

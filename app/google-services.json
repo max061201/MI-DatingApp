@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "247127346690",
+    "project_id": "datingapp-9f758",
+    "storage_bucket": "datingapp-9f758.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:247127346690:android:6b1ec4a67b6e839250211b",
+        "android_client_info": {
+          "package_name": "com.MIDatingApp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdhEfA8x6A7yXvDXGbMl_NianAVNXCA5Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

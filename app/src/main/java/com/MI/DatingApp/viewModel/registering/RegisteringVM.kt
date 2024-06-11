@@ -126,7 +126,7 @@ data class User(
     var confirmedPassword: String = "",
     var date: String = "",
     var gander: String = "",
-    var image: Uri? = null
+    var image: Bitmap? = null
 ) {
     fun emptyFields(): List<String> {
         val emptyFields = mutableListOf<String>()

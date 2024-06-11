@@ -50,14 +50,17 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
+import com.MI.DatingApp.R
 import com.MI.DatingApp.viewModel.registering.Error
 import com.MI.DatingApp.viewModel.registering.RegisteringVM
 import com.MI.DatingApp.viewModel.registering.User
@@ -99,12 +102,14 @@ fun Text(textUnit: TextUnit, text: String, color: Color) {
     Text(
         fontSize = textUnit,
         text = text,
-        color = color
+        color = color,
+        style = MaterialTheme.typography.titleLarge
     )
 }
 
 @Composable
 fun RegistFirstItems(fullCycle: Int = 1) {
+    AppIcon()
     Text(textUnit = 20.sp, text = RegisteringTexts.title, color = Color.White)
     Text(textUnit = 16.sp, text = RegisteringTexts.subTitle, color = Color.White)
     Circles(fullCycle)
@@ -206,7 +211,7 @@ fun ButtonCompose(onClick: () -> Unit) {
             .padding(vertical = 50.dp)
             .width(300.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.White,
+            containerColor = Color.Black,
             contentColor = Color.Black
         )
     ) {
@@ -385,7 +390,7 @@ fun GanderDialog(registeringViewModel: RegisteringVM, onDismissRequest: () -> Un
     }
 }
 @Composable
-fun UserImage(){
+fun UserImage(registeringViewModel: RegisteringVM) {
     var imageUri by remember {
         mutableStateOf<Uri?>(null)
     }
@@ -396,7 +401,7 @@ fun UserImage(){
         imageUri = uri
     }
     AsyncImage(
-        model = imageUri,
+        model =  imageUri,
         contentDescription = null,
         modifier = Modifier
             .padding(4.dp)
@@ -410,4 +415,16 @@ fun UserImage(){
     }) {
         Text(text = "select image")
     }
+}
+
+@Composable
+fun AppIcon(){
+    Icon(
+        painter = painterResource(id = R.drawable.logo),
+        contentDescription = null,
+        tint = Color.Red,
+        modifier = Modifier
+            .size(100.dp)
+            .clip(MaterialTheme.shapes.large)
+    )
 }

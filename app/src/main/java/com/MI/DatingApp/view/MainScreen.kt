@@ -20,7 +20,7 @@ import com.MI.DatingApp.bottomNavigationItems
 
 
 @Composable
-fun MainScreen(navController: NavHostController,mainContext: Context) {
+fun MainScreen(navController: NavHostController) {
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -48,7 +48,7 @@ fun MainScreen(navController: NavHostController,mainContext: Context) {
             }
         }
     ) { innerPadding ->
-        AppNavigation(navController, Modifier.padding(innerPadding),mainContext)
+        AppNavigation(navController, Modifier.padding(innerPadding))
     }
 }
 

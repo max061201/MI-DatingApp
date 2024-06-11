@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             ComposeBottomNavigationExampleTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    MainScreen(navController,this)
+                    MainScreen(navController)
                 }
             }
         }
@@ -35,7 +35,7 @@ fun GreetingPreview() {
     val navController = rememberNavController()
     ComposeBottomNavigationExampleTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-          //  MainScreen(navController,this)
+            //MainScreen(navController)
         }
     }
 }

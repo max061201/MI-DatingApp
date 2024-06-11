@@ -1,8 +1,5 @@
 package com.MI.DatingApp.view.registieren
 
-import android.content.Context
-import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,11 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.MI.DatingApp.view.registieren.recyclable.BasicOutlineText
 import com.MI.DatingApp.view.registieren.recyclable.ButtonCompose
 import com.MI.DatingApp.view.registieren.recyclable.DatePickerTextField
@@ -40,9 +38,10 @@ import com.MI.DatingApp.viewModel.registering.User
 import java.util.Date
 
 @Composable
-fun Registrieren(navController: NavHostController, viewModel: ViewModel,context:Context) {
-    val uservalue by (viewModel as RegisteringVM).user.observeAsState()
-    val errorfield1 by (viewModel as RegisteringVM).errorField.observeAsState()
+fun Registrieren(navController: NavHostController, viewModel: RegisteringVM = viewModel()) {
+    val uservalue by viewModel .user.observeAsState()
+    val errorfield1 by viewModel .errorField.observeAsState()
+    val registerNavController = rememberNavController()
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -60,13 +59,13 @@ fun Registrieren(navController: NavHostController, viewModel: ViewModel,context:
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ){
-            NavHost(navController = navController, startDestination = "firstPage") {
+            NavHost(navController = registerNavController, startDestination = "firstPage") {
                 composable("firstPage") {
-                    FirstPage(navController = navController, uservalue, (viewModel as RegisteringVM),errorfield1)
+                    FirstPage(navController = registerNavController, uservalue, (viewModel as RegisteringVM),errorfield1)
 
                 }
                 composable("secondRPage") {
-                    secondRPage(navController,uservalue,(viewModel as RegisteringVM),context)
+                    secondRPage(registerNavController,uservalue,(viewModel as RegisteringVM))
                 }
 
                 composable("third") {
@@ -134,14 +133,15 @@ fun FirstPage(
     }
 }
 @Composable
-fun secondRPage(navController: NavHostController, uservalue: User?, registeringViewModel: RegisteringVM,context: Context) {
+fun secondRPage(navController: NavHostController, uservalue: User?, registeringViewModel: RegisteringVM) {
 
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             RegistFirstItems(2)
-            UserImage()
+
+            UserImage(registeringViewModel)
             DatePickerTextField(Date(), mutableListOf<OutletAttribute>(outletAttributeRegisPage2[0])[0], value = uservalue!!,registeringViewModel)
             Gander(mutableListOf<OutletAttribute>(outletAttributeRegisPage2[0])[0],registeringViewModel)
             ButtonCompose {

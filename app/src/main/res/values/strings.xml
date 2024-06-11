@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">MI-DatingApp</string>
+<<<<<<< HEAD
     <string name="title_activity_registering">RegisteringActivity</string>
+=======
+    <string name="app_login_title">Login to Chat&amp;Meet</string>
+    <string name="app_login_subtitle">Welcome back! Sign in using your social account or email to continue us</string>
+>>>>>>> login
 </resources>

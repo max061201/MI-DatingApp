@@ -1,5 +1,6 @@
 package com.MI.DatingApp.view.registieren
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -39,7 +40,7 @@ import com.MI.DatingApp.viewModel.registering.User
 import java.util.Date
 
 @Composable
-fun Registrieren(navController: NavHostController, viewModel: ViewModel) {
+fun Registrieren(navController: NavHostController, viewModel: ViewModel,context:Context) {
     val uservalue by (viewModel as RegisteringVM).user.observeAsState()
     val errorfield1 by (viewModel as RegisteringVM).errorField.observeAsState()
     Box(
@@ -65,7 +66,7 @@ fun Registrieren(navController: NavHostController, viewModel: ViewModel) {
 
                 }
                 composable("secondRPage") {
-                    secondRPage(navController,uservalue,(viewModel as RegisteringVM))
+                    secondRPage(navController,uservalue,(viewModel as RegisteringVM),context)
                 }
 
                 composable("third") {
@@ -133,7 +134,7 @@ fun FirstPage(
     }
 }
 @Composable
-fun secondRPage(navController: NavHostController, uservalue: User?, registeringViewModel: RegisteringVM) {
+fun secondRPage(navController: NavHostController, uservalue: User?, registeringViewModel: RegisteringVM,context: Context) {
 
         Column(
             verticalArrangement = Arrangement.Center,

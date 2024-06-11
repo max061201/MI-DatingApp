@@ -28,7 +28,7 @@ class RegisteringActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Registrieren(navController,viewModule)
+                    Registrieren(navController,viewModule,this)
                 }
             }
         }

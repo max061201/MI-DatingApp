@@ -1,6 +1,9 @@
 package com.MI.DatingApp.viewModel.registering
 
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -22,6 +25,11 @@ class RegisteringVM : ViewModel() {
         MutableLiveData<MutableList<Error>>().apply { value = emptyList<Error>().toMutableList() }
     val errorField: LiveData<MutableList<Error>> = _errorField
 
+    private var context: Context? = null
+
+    fun setContext(context: Context){
+        this.context=context
+    }
     fun setName(name: String) {
         val updatedUser = _user.value?.copy(name = name)
         _user.value = updatedUser
@@ -83,20 +91,24 @@ class RegisteringVM : ViewModel() {
 
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun checkErrorForSecondPage(): Boolean {
 
+    fun checkErrorForSecondPage(): Boolean {
         val check = _user.value!!.date != "" && _user.value!!.date != ""
         if (!check) {
             setError(mutableListOf(Error(errorType = "check Date or Gander", error = true)))
-            return  false
+            return false
         }
-        return checkDate(_user.value!!.date)
+        return true
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun checkDate(date: String): Boolean {
-        return (Date.from(Instant.now()) > DateTimeFormatter.ofPattern())
+    private fun checkDate(date: String) {
+        // TODO check if date in future
+        //  return (Date.from(Instant.now()) > DateTimeFormatter.ofPattern())
+    }
+
+    fun Uri.uriToBitmap() : Bitmap {
+    return   BitmapFactory.decodeStream( context!!.contentResolver.openInputStream(this))
     }
 
 }
@@ -137,14 +149,14 @@ data class User(
         return password == confirmedPassword
     }
 }
+
 data class Error(
     var errorType: String = "",
     var error: Boolean
 )
+
 fun Date.formatAndToString(): String {
-    // TODO check if date in future
+
     return SimpleDateFormat("dd.MM.yyy", Locale.getDefault()).format(this)
 }
-fun Uri.uriToBitmap() {
-    //TODO
-}
+

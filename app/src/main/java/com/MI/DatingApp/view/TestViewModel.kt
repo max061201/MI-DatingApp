@@ -28,6 +28,10 @@ fun TestViewModel(navController: NavController) {
     val mainViewModel: MainViewModel = viewModel()
     val count by mainViewModel.number.observeAsState(0)
     val text by mainViewModel.text.observeAsState("")
+    val name by mainViewModel.name.observeAsState("")
+    val password by mainViewModel.password.observeAsState("")
+
+    val statusMessage by mainViewModel.statusMessage.observeAsState("")
 
     Column(
         modifier = Modifier
@@ -38,14 +42,31 @@ fun TestViewModel(navController: NavController) {
     ) {
         Text("This is registrieren", color = Color.Black)
 
-        Button(onClick = { navController.navigate("home") }) {
-            Text("Go to Home")
-        }
+        // Eingabefeld für Name
+        OutlinedTextField(
+            value = name,
+            onValueChange = { mainViewModel.onNameChanged(it) },
+            label = { Text("Name", color = Color.Black) },
+            textStyle = LocalTextStyle.current.copy(color = Color.Black)
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = { mainViewModel.incCount() }) {
-            Text("Klick mich")
+        // Eingabefeld für Passwort
+        OutlinedTextField(
+            value = password,
+            onValueChange = { mainViewModel.onPasswordChanged(it) },
+            label = { Text("Passwort", color = Color.Black) },
+            textStyle = LocalTextStyle.current.copy(color = Color.Black)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Button zum Senden der Daten
+        Button(onClick = {
+            mainViewModel.saveData()
+        }) {
+            Text("Daten senden")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -54,15 +75,12 @@ fun TestViewModel(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        OutlinedTextField(
-            value = text,
-            onValueChange = { mainViewModel.onTextChanged(it) },
-            label = { Text("Enter some text", color = Color.Black) },
-            textStyle = LocalTextStyle.current.copy(color = Color.Black)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
         Text("Eingegebener Text: $text", color = Color.Black)
+
+        // Statusnachricht anzeigen
+        if (statusMessage.isNotEmpty()) {
+            Text(statusMessage, color = Color.Red)
+        }
     }
 }
+

@@ -251,7 +251,7 @@ fun GreetingPreview() {
     val navController = rememberNavController()
     ComposeBottomNavigationExampleTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-            //MainScreen(navController)
+            MainScreen(navController)
         }
     }
 }

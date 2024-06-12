@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,13 +26,17 @@ import androidx.navigation.compose.rememberNavController
 import com.MI.DatingApp.view.registieren.recyclable.BasicOutlineText
 import com.MI.DatingApp.view.registieren.recyclable.ButtonCompose
 import com.MI.DatingApp.view.registieren.recyclable.DatePickerTextField
+import com.MI.DatingApp.view.registieren.recyclable.DescribesYouSection
 import com.MI.DatingApp.view.registieren.recyclable.Gander
+import com.MI.DatingApp.view.registieren.recyclable.Interests
+import com.MI.DatingApp.view.registieren.recyclable.LookingForSection
 import com.MI.DatingApp.view.registieren.recyclable.OutletAttribute
 import com.MI.DatingApp.view.registieren.recyclable.RegistFirstItems
 import com.MI.DatingApp.view.registieren.recyclable.UserImage
 import com.MI.DatingApp.view.registieren.recyclable.errorMessage
 import com.MI.DatingApp.view.registieren.recyclable.outletAttributeRegisPage1
 import com.MI.DatingApp.view.registieren.recyclable.outletAttributeRegisPage2
+import com.MI.DatingApp.view.registieren.recyclable.outletAttributeRegisPage3
 import com.MI.DatingApp.viewModel.registering.Error
 import com.MI.DatingApp.viewModel.registering.RegisteringVM
 import com.MI.DatingApp.viewModel.registering.User
@@ -39,8 +44,8 @@ import java.util.Date
 
 @Composable
 fun Registrieren(navController: NavHostController, viewModel: RegisteringVM = viewModel()) {
-    val uservalue by viewModel .user.observeAsState()
-    val errorfield1 by viewModel .errorField.observeAsState()
+    val uservalue by viewModel.user.observeAsState()
+    val errorfield1 by viewModel.errorField.observeAsState()
     val registerNavController = rememberNavController()
     Box(
         modifier = Modifier
@@ -58,18 +63,23 @@ fun Registrieren(navController: NavHostController, viewModel: RegisteringVM = vi
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
-        ){
+        ) {
             NavHost(navController = registerNavController, startDestination = "firstPage") {
                 composable("firstPage") {
-                    FirstPage(navController = registerNavController, uservalue, (viewModel as RegisteringVM),errorfield1)
+                    FirstPage(
+                        navController = registerNavController,
+                        uservalue,
+                        (viewModel as RegisteringVM),
+                        errorfield1
+                    )
 
                 }
                 composable("secondRPage") {
-                    secondRPage(registerNavController,uservalue,(viewModel as RegisteringVM))
+                    secondRPage(registerNavController, uservalue, (viewModel as RegisteringVM))
                 }
 
                 composable("third") {
-                    Text(text ="third")
+                    ThirdPage(navController = navController, uservalue = uservalue, registeringViewModel =viewModel )
                 }
 
 
@@ -86,12 +96,10 @@ fun FirstPage(
     uservalue: User?,
     registeringViewModel: RegisteringVM,
     error: MutableList<Error>?
-              ) {
+) {
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier = Modifier.width(300.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -120,7 +128,7 @@ fun FirstPage(
             )
         }
         ButtonCompose(onClick = {
-            val moveToSecondPage =registeringViewModel.checkErrorForFirstPage()
+            val moveToSecondPage = registeringViewModel.checkErrorForFirstPage()
             if (moveToSecondPage) {
                 navController.navigate("secondRPage")
             }
@@ -132,25 +140,63 @@ fun FirstPage(
         }
     }
 }
+
 @Composable
-fun secondRPage(navController: NavHostController, uservalue: User?, registeringViewModel: RegisteringVM) {
+fun secondRPage(
+    navController: NavHostController,
+    uservalue: User?,
+    registeringViewModel: RegisteringVM
+) {
 
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            RegistFirstItems(2)
+    Column(
+        modifier = Modifier.width(300.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        RegistFirstItems(2)
 
-            UserImage(registeringViewModel)
-            DatePickerTextField(Date(), mutableListOf<OutletAttribute>(outletAttributeRegisPage2[0])[0], value = uservalue!!,registeringViewModel)
-            Gander(mutableListOf<OutletAttribute>(outletAttributeRegisPage2[0])[0],registeringViewModel)
-            ButtonCompose {
+        UserImage(registeringViewModel)
+        DatePickerTextField(
+            Date(),
+            mutableListOf<OutletAttribute>(outletAttributeRegisPage2[0])[0],
+            value = uservalue!!,
+            registeringViewModel
+        )
+        Gander(
+            mutableListOf<OutletAttribute>(outletAttributeRegisPage2[0])[0],
+            registeringViewModel
+        )
+        ButtonCompose({
 
-                if (registeringViewModel.checkErrorForSecondPage()) {
-                    navController.navigate("third")
-                }
+            if (registeringViewModel.checkErrorForSecondPage()) {
+                navController.navigate("third")
             }
+        })
 
-        }
+    }
 
+}
+
+@Composable
+fun ThirdPage(
+    navController: NavHostController,
+    uservalue: User?,
+    registeringViewModel: RegisteringVM
+) {
+    Column(
+        modifier = Modifier.width(300.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        RegistFirstItems(3)
+        LookingForSection(registeringViewModel, outletAttributeRegisPage3[0])
+        DescribesYouSection( registeringViewModel,outletAttributeRegisPage3[1])
+        Interests(registeringViewModel =  registeringViewModel)
+        ButtonCompose({
+
+            if (registeringViewModel.checkErrorForSecondPage()) {
+                registeringViewModel.saveUserInFirebaseAuth()
+            }
+        }, text = "Create Account")
+    }
 }

@@ -4,9 +4,13 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -16,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -57,6 +62,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
@@ -204,18 +211,18 @@ fun Circles(stepByStep: Int = 1) {
 }
 
 @Composable
-fun ButtonCompose(onClick: () -> Unit) {
+fun ButtonCompose(onClick: () -> Unit, text: String = "Next") {
     Button(
         onClick = onClick,
         modifier = Modifier
             .padding(vertical = 50.dp)
             .width(300.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Black,
+            containerColor = Color.White,
             contentColor = Color.Black
         )
     ) {
-        Text(text = "Next")
+        Text(text = text, color = Color.Black)
     }
 }
 
@@ -230,6 +237,7 @@ fun DatePickerTextField(
     val context = LocalContext.current
 
     OutlinedTextField(
+        modifier = Modifier.fillMaxWidth(),
         value = value.date,
         onValueChange = { /* Ignoring manual input for now */ },
         label = { Text("Date", color = Color.White) },
@@ -309,6 +317,7 @@ fun Gander(
 
 
     OutlinedTextField(
+        modifier = Modifier.fillMaxWidth(),
         value = registeringViewModel.user.value!!.gander,
         onValueChange = { /* Ignoring manual input for now */ },
         label = { Text("Your Gander", color = Color.White) },
@@ -337,51 +346,111 @@ fun Gander(
             )
     )
     if (showDialog) {
-        GanderDialog(registeringViewModel) {
+        GanderDialog({
+            registeringViewModel.setGander(it)
+        }, {
             showDialog = false;
-        }
+        })
     }
 
 }
 
 @Composable
-fun GanderDialog(registeringViewModel: RegisteringVM, onDismissRequest: () -> Unit) {
+fun LookingForSection(
+    registeringViewModel: RegisteringVM,
+    outletAttribute: OutletAttribute
+) {
+    var showDialog by remember { mutableStateOf(false) }
+    OutlinedTextField(
+        modifier = Modifier.fillMaxWidth(),
+        value = registeringViewModel.user.value!!.ganderLookingFor,
+        onValueChange = { /* Ignoring manual input for now */ },
+        label = { Text("Your are looking for", color = Color.White) },
+        readOnly = true, // Prevents manual input
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                showDialog = true
+            }
+        ),
+        trailingIcon = {
+            Icon(
+                imageVector = Icons.Default.ArrowDropDown,
+                contentDescription = null,
+                modifier = Modifier.clickable { showDialog = true }
+            )
+        },
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = outletAttribute.textFieldColors.focusedBorderColor, // Change border color when focused
+            cursorColor = outletAttribute.textFieldColors.cursorColor, // Change cursor color
+            textColor = outletAttribute.textFieldColors.textColor, // Change text color
+            unfocusedBorderColor = Color.White,
+
+            )
+    )
+    if (showDialog) {
+        GanderDialog(
+            setGander = { registeringViewModel.setGanderLookingFor(it) },
+            onDismissRequest = { showDialog = false }, mutableListOf("Women", "Man")
+        )
+    }
+}
+
+@Composable
+fun DescribesYouSection(registeringViewModel: RegisteringVM, outletAttribute: OutletAttribute) {
+    OutlinedTextField(
+        value = registeringViewModel.user.value!!.describes,
+        onValueChange = {
+            registeringViewModel.describe(it)
+        },
+        modifier = Modifier
+            .height(150.dp)
+            .fillMaxWidth()
+            .padding(16.dp),
+        label = { Text(text = "Describes you") },
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = outletAttribute.textFieldColors.focusedBorderColor, // Change border color when focused
+            cursorColor = outletAttribute.textFieldColors.cursorColor, // Change cursor color
+            textColor = outletAttribute.textFieldColors.textColor, // Change text color
+            unfocusedBorderColor = Color.White,
+
+            )
+    )
+
+}
+
+@Composable
+fun GanderDialog(
+    setGander: (String) -> Unit,
+    onDismissRequest: () -> Unit,
+    containt: MutableList<String> = mutableListOf("Male", "Female")
+) {
     Dialog(onDismissRequest = onDismissRequest) {
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
-                .padding(16.dp),
             shape = RoundedCornerShape(16.dp),
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(),
+                modifier = Modifier.width(300.dp)
+                    .height(300.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "Male",
-                    modifier = Modifier
-                        .clickable {
-                            registeringViewModel.setGander("Male")
-                            onDismissRequest()
-                        }
-                        .padding(8.dp)
+                containt.forEach {
+                    Text(
+                        text = it,
+                        color = Color.Black,
+                        modifier = Modifier
+                            .clickable {
+                                setGander(it)
+                                onDismissRequest()
+                            }
+                            .padding(8.dp)
 
-                )
-                Spacer(modifier = Modifier.height(8.dp)) // Add some space between the texts
-                Text(
-                    text = "Female",
-                    modifier = Modifier
-                        .clickable {
-                            registeringViewModel.setGander("Female")
-                            onDismissRequest()
-                        }
-                        .padding(8.dp)
-
-                )
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
             }
 
         }
@@ -389,6 +458,7 @@ fun GanderDialog(registeringViewModel: RegisteringVM, onDismissRequest: () -> Un
 
     }
 }
+
 @Composable
 fun UserImage(registeringViewModel: RegisteringVM) {
     var imageUri by remember {
@@ -401,7 +471,7 @@ fun UserImage(registeringViewModel: RegisteringVM) {
         imageUri = uri
     }
     AsyncImage(
-        model =  imageUri,
+        model = imageUri,
         contentDescription = null,
         modifier = Modifier
             .padding(4.dp)
@@ -418,7 +488,7 @@ fun UserImage(registeringViewModel: RegisteringVM) {
 }
 
 @Composable
-fun AppIcon(){
+fun AppIcon() {
     Icon(
         painter = painterResource(id = R.drawable.logo),
         contentDescription = null,
@@ -427,4 +497,57 @@ fun AppIcon(){
             .size(100.dp)
             .clip(MaterialTheme.shapes.large)
     )
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun Interests(interestsMap: Map<String, Int> = userInterests, registeringViewModel: RegisteringVM) {
+    var interests: String =
+        registeringViewModel.user.value!!.interest.joinToString(separator = "  ")
+
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Text(text = "your interests")
+        BasicTextField(
+            value = interests,
+            onValueChange = { registeringViewModel.setInterestes(it )},
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .background(Color.Transparent)
+                .border(1.dp, Color.White, RoundedCornerShape(8.dp))
+                .padding(16.dp),
+            textStyle = TextStyle(color = Color.White),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next
+            ),
+        )
+        FlowRow (
+            modifier = Modifier.fillMaxWidth(),
+        ){
+            interestsMap.forEach { (key, value) ->
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(  onClick = {
+                    registeringViewModel.setInterestes(key)
+
+                }) {
+                    Row {
+                        Text(text = key)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Icon(
+                            painter = painterResource(id = value), // Replace with your icon resource
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+
+                }
+            }
+
+        }
+
+    }
 }

@@ -10,9 +10,8 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.MI.DatingApp.model.registieren.FirebaseIm
 import java.text.SimpleDateFormat
-import java.time.Instant
-import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 
@@ -25,11 +24,14 @@ class RegisteringVM : ViewModel() {
         MutableLiveData<MutableList<Error>>().apply { value = emptyList<Error>().toMutableList() }
     val errorField: LiveData<MutableList<Error>> = _errorField
 
+    var firebaseIm = FirebaseIm()
+
     private var context: Context? = null
 
-    fun setContext(context: Context){
-        this.context=context
+    fun setContext(context: Context) {
+        this.context = context
     }
+
     fun setName(name: String) {
         val updatedUser = _user.value?.copy(name = name)
         _user.value = updatedUser
@@ -50,9 +52,39 @@ class RegisteringVM : ViewModel() {
         _user.value = updatedUser
     }
 
+    fun setGanderLookingFor(gander: String) {
+        val updatedUser = _user.value?.copy(ganderLookingFor = gander)
+        _user.value = updatedUser
+    }
+
+    fun describe(describe: String) {
+        val updatedUser = _user.value?.copy(describes = describe)
+        _user.value = updatedUser
+    }
+
     fun setConfirmedPassword(confirmedPassword: String) {
         val updatedUser = _user.value?.copy(confirmedPassword = confirmedPassword)
         _user.value = updatedUser
+    }
+
+    fun setInterestes(interest: String) {
+        _user.value?.let { currentUser ->
+            val updatedInterests = currentUser.interest.toMutableSet().apply {
+                if (this.contains(interest)) {
+                    this.remove(interest)
+                } else {
+                    add(interest)
+                }
+
+            }
+
+            // Create a new User object with updated interests
+            val updatedUser = currentUser.copy(interest = updatedInterests)
+
+            // Update the state
+            _user.value = updatedUser
+        }
+
     }
 
     fun setError(error: MutableList<Error>) {
@@ -107,9 +139,15 @@ class RegisteringVM : ViewModel() {
         //  return (Date.from(Instant.now()) > DateTimeFormatter.ofPattern())
     }
 
-    fun Uri.uriToBitmap() : Bitmap {
-    return   BitmapFactory.decodeStream( context!!.contentResolver.openInputStream(this))
+    fun Uri.uriToBitmap(): Bitmap {
+        return BitmapFactory.decodeStream(context!!.contentResolver.openInputStream(this))
     }
+
+    fun saveUserInFirebaseAuth() {
+        firebaseIm.saveUserAuth(_user.value!!)
+    }
+
+
 
 }
 
@@ -126,7 +164,10 @@ data class User(
     var confirmedPassword: String = "",
     var date: String = "",
     var gander: String = "",
-    var image: Bitmap? = null
+    var image: Bitmap? = null,
+    var ganderLookingFor: String = "",
+    var describes: String = "",
+    var interest: MutableSet<String> = mutableSetOf(),
 ) {
     fun emptyFields(): List<String> {
         val emptyFields = mutableListOf<String>()

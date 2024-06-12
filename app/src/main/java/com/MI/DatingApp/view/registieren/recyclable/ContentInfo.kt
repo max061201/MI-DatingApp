@@ -1,6 +1,7 @@
 package com.MI.DatingApp.view.registieren.recyclable
 
 import androidx.compose.ui.graphics.Color
+import com.MI.DatingApp.R
 
 data class TextRegistering(val title: String = "", val subTitle: String)
 
@@ -100,4 +101,36 @@ var outletAttributeRegisPage2 = mutableListOf(
             textStyle = Color.White
         )
     ),
+)
+
+var outletAttributeRegisPage3 = mutableListOf(
+    OutletAttribute(
+        text = "",
+        OutLineTextColor(
+            focusedBorderColor = Color.White, // Change border color when focused
+            cursorColor = Color.White, // Change cursor color
+            textColor = Color.Black, // Change text color
+            errorBorderColor = Color.Red,
+            textStyle = Color.White
+
+        )
+    ),
+    OutletAttribute(
+        text = "Gender",
+        OutLineTextColor(
+            focusedBorderColor = Color.White, // Change border color when focused
+            cursorColor = Color.White, // Change cursor color
+            textColor = Color.Black, // Change text color
+            errorBorderColor = Color.Red,
+            textStyle = Color.White
+        )
+    ),
+)
+
+var userInterests:Map<String,Int> = mapOf(
+    "Travel" to R.drawable.baseline_airplanemode_active_24,
+    "Sprot" to R.drawable.baseline_sports_handball_24,
+    "Cinma" to R.drawable.baseline_local_movies_24,
+    "Shoping" to R.drawable.baseline_shopping_cart_24,
+
 )

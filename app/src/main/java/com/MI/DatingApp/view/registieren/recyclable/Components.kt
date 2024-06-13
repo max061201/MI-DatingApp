@@ -513,6 +513,7 @@ fun Interests(interestsMap: Map<String, Int> = userInterests, registeringViewMod
         BasicTextField(
             value = interests,
             onValueChange = { registeringViewModel.setInterestes(it )},
+            readOnly = true,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)

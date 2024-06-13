@@ -1,7 +1,6 @@
 package com.MI.DatingApp
 
-import android.content.Context
-import android.content.Intent
+
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Favorite
@@ -9,8 +8,6 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MailOutline
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.core.content.ContextCompat.startActivity
-import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -31,7 +28,7 @@ import com.MI.DatingApp.view.registieren.Registrieren
 
 @Composable
 fun AppNavigation(navController: NavHostController, modifier: Modifier = Modifier,) {
-    NavHost(navController = navController, startDestination = "registrieren") {
+    NavHost(navController = navController, startDestination = "login") {
         composable("login") { Login(navController) }
 
         composable("registrieren") {

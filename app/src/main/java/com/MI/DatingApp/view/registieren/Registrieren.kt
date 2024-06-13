@@ -194,9 +194,9 @@ fun ThirdPage(
         Interests(registeringViewModel =  registeringViewModel)
         ButtonCompose({
 
-            if (registeringViewModel.checkErrorForSecondPage()) {
+
                 registeringViewModel.saveUserInFirebaseAuth()
-            }
+            navController.navigate("login")
         }, text = "Create Account")
     }
 }

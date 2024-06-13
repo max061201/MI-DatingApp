@@ -1,5 +1,7 @@
 package com.MI.DatingApp
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Favorite
@@ -7,6 +9,8 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MailOutline
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.core.content.ContextCompat.startActivity
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -21,14 +25,18 @@ import com.MI.DatingApp.view.Screen3
 import com.MI.DatingApp.view.Screen4
 import com.MI.DatingApp.view.Login
 import com.MI.DatingApp.view.Profile
-import com.MI.DatingApp.view.Registrieren
 import com.MI.DatingApp.view.TestViewModel
+import com.MI.DatingApp.view.registieren.Registrieren
+
 
 @Composable
-fun AppNavigation(navController: NavHostController, modifier: Modifier = Modifier) {
-    NavHost(navController = navController, startDestination = "login") {
+fun AppNavigation(navController: NavHostController, modifier: Modifier = Modifier,) {
+    NavHost(navController = navController, startDestination = "registrieren") {
         composable("login") { Login(navController) }
-        composable("registrieren") { TestViewModel(navController) }
+
+        composable("registrieren") {
+          Registrieren(navController = navController)
+        }
 
         composable("home") { Home(navController) }
         composable("likes") { Likes(navController) }

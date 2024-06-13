@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,7 +21,10 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
@@ -68,10 +72,12 @@ fun Login(navController: NavController, viewModel: Login2ViewModel = viewModel()
         ) {
             LoginHeader()
             Spacer(modifier = Modifier.height(32.dp))
+
             TextFieldInput(name,password, viewModel::onNameChanged, viewModel::onPasswordChanged)
             Spacer(modifier = Modifier.height(32.dp))
             LoginButtonAndSignUpText ({ viewModel.verifyData() }, navController)
             LoginStateHandler(loginState)
+
         }
     }
 }
@@ -133,6 +139,10 @@ fun TextFieldInput(email: String,
                 .border(1.dp, Color.White, RoundedCornerShape(8.dp))
                 .padding(16.dp),
             textStyle = TextStyle(color = Color.White),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next
+            ),
             decorationBox = { innerTextField ->
                 if (email.isEmpty()) {
                     Text(
@@ -158,6 +168,9 @@ fun TextFieldInput(email: String,
                 .padding(16.dp),
             textStyle = TextStyle(color = Color.White),
             visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Done
+            ),
             decorationBox = { innerTextField ->
                 if (password.isEmpty()) {
                     Text(
@@ -216,7 +229,11 @@ fun LoginButtonAndSignUpText(onClick: () -> Unit, navController: NavController) 
         ClickableText(
             text = buildAnnotatedString {
                 append("Don’t have account? ")
-                withStyle(style = SpanStyle(textDecoration = TextDecoration.Underline, color = Color.White)) {
+                withStyle(style = SpanStyle(
+                    textDecoration = TextDecoration.Underline,
+                    color = Color.White,
+                    fontWeight = FontWeight.SemiBold
+                )) {
                     append("Signup")
                 }
             },

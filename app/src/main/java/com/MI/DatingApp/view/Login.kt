@@ -38,15 +38,23 @@ import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.MI.DatingApp.R
 import com.MI.DatingApp.ui.theme.ComposeBottomNavigationExampleTheme
+import com.MI.DatingApp.viewModel.Login2ViewModel
 import com.MI.DatingApp.viewModel.LoginViewModel
 import com.MI.DatingApp.viewModel.LoginState
 
 @Composable
-fun Login(navController: NavController, viewModel: LoginViewModel = viewModel()) {
+fun Login(navController: NavController, viewModel: Login2ViewModel = viewModel()) {
     val email by viewModel.email.collectAsState()
+    val name by viewModel.name.collectAsState()
+
     val password by viewModel.password.collectAsState()
     val loginState by viewModel.loginState.collectAsState()
 
+    LaunchedEffect(loginState) {
+        if (loginState is LoginState.Success) {
+            navController.navigate("home")
+        }
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -64,10 +72,12 @@ fun Login(navController: NavController, viewModel: LoginViewModel = viewModel())
         ) {
             LoginHeader()
             Spacer(modifier = Modifier.height(32.dp))
-            TextFieldInput(email,password, viewModel::onEmailChange, viewModel::onPasswordChange)
-            LoginStateHandler(loginState)
+
+            TextFieldInput(name,password, viewModel::onNameChanged, viewModel::onPasswordChanged)
             Spacer(modifier = Modifier.height(32.dp))
-            LoginButtonAndSignUpText ({ viewModel.login() }, navController)
+            LoginButtonAndSignUpText ({ viewModel.verifyData() }, navController)
+            LoginStateHandler(loginState)
+
         }
     }
 }

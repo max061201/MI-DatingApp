@@ -1,5 +1,6 @@
 package com.MI.DatingApp.viewModel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,17 +24,23 @@ class LoginViewModel : ViewModel() {
 
     fun onPasswordChange(newPassword: String) {
         _password.value = newPassword
+        Log.d("Login", "Login gestartet")
+
     }
 
     fun login() {
         viewModelScope.launch {
-            // Verbingung Logisch
-
+            Log.d("Login", "Login gestartet")
             _loginState.value = LoginState.Loading
-            kotlinx.coroutines.delay(2000)
+            Log.d("Login", "Status: Loading")
+
+            kotlinx.coroutines.delay(2000) // Simuliert eine Verzögerung für den Login-Prozess
+
             _loginState.value = LoginState.Success
+            Log.d("Login", "Status: Success")
         }
     }
+
 }
 
 sealed class LoginState {

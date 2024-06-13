@@ -160,7 +160,7 @@ fun FirstPage(
                 navController.navigate("secondRPage")
             }
         })
-        errorMessage(error!!)
+
 
     }
 }

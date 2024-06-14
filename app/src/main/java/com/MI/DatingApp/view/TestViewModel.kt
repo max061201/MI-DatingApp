@@ -21,11 +21,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.MI.DatingApp.view.registieren.recyclable.ButtonCompose
 import com.MI.DatingApp.viewModel.MainViewModel
+import com.MI.DatingApp.viewModel.registering.RegisteringVM
 
 @Composable
 fun TestViewModel(navController: NavController) {
     val mainViewModel: MainViewModel = viewModel()
+    val registeringVM: RegisteringVM = viewModel()
+
     val count by mainViewModel.number.observeAsState(0)
     val text by mainViewModel.text.observeAsState("")
     val name by mainViewModel.name.observeAsState("")
@@ -64,7 +68,7 @@ fun TestViewModel(navController: NavController) {
 
         // Button zum Senden der Daten
         Button(onClick = {
-            mainViewModel.saveData()
+            mainViewModel.saveRegData()
         }) {
             Text("Daten senden")
         }
@@ -81,6 +85,12 @@ fun TestViewModel(navController: NavController) {
         if (statusMessage.isNotEmpty()) {
             Text(statusMessage, color = Color.Red)
         }
+        ButtonCompose({
+
+
+            //registeringVM.saveUserInFirebaseAuth()
+            navController.navigate("login")
+        }, text = "Create Account reg VM")
     }
 }
 

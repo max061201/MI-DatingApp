@@ -34,6 +34,7 @@ fun AppNavigation(navController: NavHostController, modifier: Modifier = Modifie
         composable("registrieren") {
           Registrieren(navController = navController)
         }
+        composable("test") { TestViewModel(navController) }
 
         composable("home") { Home(navController) }
         composable("likes") { Likes(navController) }

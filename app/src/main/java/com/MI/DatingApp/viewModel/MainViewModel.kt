@@ -70,4 +70,35 @@ class MainViewModel : ViewModel() {
                 _statusMessage.value = "Fehler beim Speichern der Daten: ${it.message}"
             }
     }
+    data class User2(
+        var name: String = "",
+        var email: String = "",
+        var password: String = "",
+        var confirmedPassword: String = "",
+        var date: String = "",
+        var gander: String = "",
+        //var image: Bitmap? = null,
+        var ganderLookingFor: String = "",
+        var describes: String = "",
+        // var interest: MutableSet<String> = mutableSetOf(),
+    )
+    private var firebaseRefUsers: DatabaseReference = FirebaseDatabase.getInstance().getReference("Users")
+
+    fun saveRegData() {
+        var user = User2("max","max@gmail.com","123456","123456","01.06.2021","Male","Woman","Der King")
+
+
+        // Erstellen eines Kontaktobjekts
+        val contactId = firebaseRefUsers.push().key ?: ""
+        //val contact = Contact(contactId, nameValue, passwordValue)
+
+        // Daten in Firebase speichern
+        firebaseRefUsers.child(contactId).setValue(user)
+            .addOnCompleteListener {
+                _statusMessage.value = "Daten erfolgreich gespeichert."
+            }
+            .addOnFailureListener {
+                _statusMessage.value = "Fehler beim Speichern der Daten: ${it.message}"
+            }
+    }
 }

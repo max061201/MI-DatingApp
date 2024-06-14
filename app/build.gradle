@@ -60,8 +60,9 @@ dependencies {
 
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     implementation ('com.google.firebase:firebase-auth')
-
-
+   // pager
+    implementation ("com.google.accompanist:accompanist-pager:0.21.3-beta")
+    implementation ("com.google.accompanist:accompanist-pager-indicators:0.21.3-beta")
     
     implementation libs.androidx.core.ktx
 

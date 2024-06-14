@@ -52,7 +52,7 @@ fun Login(navController: NavController, viewModel: Login2ViewModel = viewModel()
 
     LaunchedEffect(loginState) {
         if (loginState is LoginState.Success) {
-            navController.navigate("registrieren")
+            navController.navigate("home")
         }
     }
     Box(

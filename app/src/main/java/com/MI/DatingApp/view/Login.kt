@@ -52,6 +52,12 @@ fun Login(navController: NavController, viewModel: LoginViewModel = viewModel())
     val loginState by viewModel.loginState.collectAsState()
 
 
+    LaunchedEffect(loginState) {
+        if (loginState is LoginState.Success) {
+            navController.navigate("home")
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()

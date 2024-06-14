@@ -1,13 +1,14 @@
 package com.MI.DatingApp.model
 
 data class User(
-    val name: String,
-    val email: String,
-    val password: String,
-    val yearOfBirth: String,
-    val gender: Gender,
-    val lookingFor: LookingFor,
-    val description: String,
-    val interests: List<Interest>,
-    val photos: List<String>
+    var name: String = "",
+    var email: String = "",
+    var password: String = "",
+    var confirmedPassword: String = "",
+    var date: String = "",
+    var gander: String = "",
+    var imageUrl: String? = null,  // Ändere das hier
+    var ganderLookingFor: String = "",
+    var describes: String = "",
+    var interest: MutableList<String> = mutableListOf()
 )

@@ -1,11 +1,16 @@
 package com.MI.DatingApp.viewModel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.MI.DatingApp.model.Contact
+import com.MI.DatingApp.model.User
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 class MainViewModel : ViewModel() {
 
@@ -100,5 +105,26 @@ class MainViewModel : ViewModel() {
             .addOnFailureListener {
                 _statusMessage.value = "Fehler beim Speichern der Daten: ${it.message}"
             }
+    }
+
+    fun getAllUsersData() {
+        firebaseRefUsers.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val userList = mutableListOf<User>()
+                for (userSnapshot in dataSnapshot.children) {
+                    val user = userSnapshot.getValue(User::class.java)
+                    if (user != null) {
+                        userList.add(user)
+                    }
+                }
+                Log.d("Login", userList.toString())
+
+                //_users.value = userList
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                _statusMessage.value = "Fehler beim Abrufen der Daten: ${databaseError.message}"
+            }
+        })
     }
 }

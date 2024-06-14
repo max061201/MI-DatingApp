@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.MI.DatingApp.view.registieren.recyclable.ButtonCompose
+import com.MI.DatingApp.view.registieren.recyclable.UserImage
 import com.MI.DatingApp.viewModel.MainViewModel
 import com.MI.DatingApp.viewModel.registering.RegisteringVM
 
@@ -46,36 +47,43 @@ fun TestViewModel(navController: NavController) {
     ) {
         Text("This is registrieren", color = Color.Black)
 
-        // Eingabefeld für Name
-        OutlinedTextField(
-            value = name,
-            onValueChange = { mainViewModel.onNameChanged(it) },
-            label = { Text("Name", color = Color.Black) },
-            textStyle = LocalTextStyle.current.copy(color = Color.Black)
-        )
+//        // Eingabefeld für Name
+//        OutlinedTextField(
+//            value = name,
+//            onValueChange = { mainViewModel.onNameChanged(it) },
+//            label = { Text("Name", color = Color.Black) },
+//            textStyle = LocalTextStyle.current.copy(color = Color.Black)
+//        )
+//
+//        Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
+//        // Eingabefeld für Passwort
+//        OutlinedTextField(
+//            value = password,
+//            onValueChange = { mainViewModel.onPasswordChanged(it) },
+//            label = { Text("Passwort", color = Color.Black) },
+//            textStyle = LocalTextStyle.current.copy(color = Color.Black)
+//        )
 
-        // Eingabefeld für Passwort
-        OutlinedTextField(
-            value = password,
-            onValueChange = { mainViewModel.onPasswordChanged(it) },
-            label = { Text("Passwort", color = Color.Black) },
-            textStyle = LocalTextStyle.current.copy(color = Color.Black)
-        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Button zum Senden der Daten
         Button(onClick = {
-            mainViewModel.saveRegData()
+            //mainViewModel.saveRegData()
+            mainViewModel.getAllUsersData()
         }) {
-            Text("Daten senden")
+            Text("get all user")
+        }
+        Button(onClick = {
+            //mainViewModel.saveRegData()
+        }) {
+            Text("next")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text("Anzahl der Klicks: $count", color = Color.Black)
+        //Text("Anzahl der Klicks: $count", color = Color.Black)
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -85,12 +93,12 @@ fun TestViewModel(navController: NavController) {
         if (statusMessage.isNotEmpty()) {
             Text(statusMessage, color = Color.Red)
         }
-        ButtonCompose({
-
-
-            //registeringVM.saveUserInFirebaseAuth()
-            navController.navigate("login")
-        }, text = "Create Account reg VM")
+//        ButtonCompose({
+//
+//
+//            //registeringVM.saveUserInFirebaseAuth()
+//            navController.navigate("login")
+//        }, text = "Create Account reg VM")
     }
 }
 

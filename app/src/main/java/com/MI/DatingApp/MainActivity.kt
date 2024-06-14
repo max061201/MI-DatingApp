@@ -13,6 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import com.MI.DatingApp.view.MainScreen
 import com.MI.DatingApp.ui.theme.ComposeBottomNavigationExampleTheme
 
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +35,7 @@ fun GreetingPreview() {
     val navController = rememberNavController()
     ComposeBottomNavigationExampleTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-            MainScreen(navController)
+            //MainScreen(navController)
         }
     }
 }

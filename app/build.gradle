@@ -79,4 +79,10 @@ dependencies {
     implementation('com.google.firebase:firebase-storage-ktx:20.3.0')
     implementation('com.google.firebase:firebase-database-ktx')
 
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.4.0"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0"
+    implementation "androidx.compose.runtime:runtime-livedata:1.0.5"
+    implementation "androidx.activity:activity-compose:1.4.0"
+
+
 }

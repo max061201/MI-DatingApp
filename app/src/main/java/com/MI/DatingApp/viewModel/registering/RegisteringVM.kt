@@ -113,7 +113,14 @@ class RegisteringVM : ViewModel() {
             return false
         } else {
             if (!_user.value!!.matchPassword()) {
-                setError(mutableListOf(Error(errorType = "passowrd not match", error = true)))
+                setError(
+                    mutableListOf(
+                        Error(
+                            errorType = "passowrd not match or less than 6 char",
+                            error = true
+                        )
+                    )
+                )
                 return false
             } else {
                 setError(
@@ -169,6 +176,7 @@ class RegisteringVM : ViewModel() {
         }
     }
 
+
     private fun saveUserToDatabase(user: User, imageUrl: String?) {
         val userWithImage = user.copy(imageUrl = imageUrl)
         val contactId = firebaseRef.push().key ?: ""
@@ -180,6 +188,7 @@ class RegisteringVM : ViewModel() {
                 Log.d("Firebase", "Error saving user: ${it.message}")
             }
     }
+
 }
 
 private fun findErrorTextAndRemove(mutableList: MutableList<Error>, error: String) {
@@ -205,8 +214,11 @@ data class User(
         if (name.isEmpty()) {
             emptyFields.add("name")
         }
-        if (email.isEmpty()) {
-            emptyFields.add("email")
+        if (email.isEmpty()||!checkEmailPattern(email)) {
+
+                emptyFields.add("email")
+
+
         }
         if (password.isEmpty()) {
             emptyFields.add("password")
@@ -218,7 +230,13 @@ data class User(
     }
 
     fun matchPassword(): Boolean {
-        return password == confirmedPassword
+        return password == confirmedPassword && password.length >= 6
+    }
+
+    private fun checkEmailPattern(email: String): Boolean {
+        val emailPattern = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$".toRegex()
+        var s= email.matches(emailPattern)
+        return s
     }
 }
 

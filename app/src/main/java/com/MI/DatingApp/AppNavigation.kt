@@ -28,12 +28,13 @@ import com.MI.DatingApp.view.registieren.Registrieren
 
 @Composable
 fun AppNavigation(navController: NavHostController, modifier: Modifier = Modifier,) {
-    NavHost(navController = navController, startDestination = "login") {
+    NavHost(navController = navController, startDestination = "test") {
         composable("login") { Login(navController) }
 
         composable("registrieren") {
           Registrieren(navController = navController)
         }
+        composable("test") { TestViewModel(navController) }
 
         composable("home") { Home(navController) }
         composable("likes") { Likes(navController) }

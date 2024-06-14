@@ -147,7 +147,6 @@ fun secondRPage(
     uservalue: User?,
     registeringViewModel: RegisteringVM
 ) {
-
     Column(
         modifier = Modifier.width(300.dp),
         verticalArrangement = Arrangement.Center,
@@ -167,15 +166,13 @@ fun secondRPage(
             registeringViewModel
         )
         ButtonCompose({
-
             if (registeringViewModel.checkErrorForSecondPage()) {
                 navController.navigate("third")
             }
         })
-
     }
-
 }
+
 
 @Composable
 fun ThirdPage(

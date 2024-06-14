@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.MI.DatingApp.model.Contact
+import com.MI.DatingApp.model.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -59,7 +60,7 @@ class Login2ViewModel : ViewModel() {
         }
     }
     // Firebase-Referenz
-    private var firebaseRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("contacts")
+    private var firebaseRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("Users")
 
     fun verifyData() {
         val nameValue = _name.value ?: ""
@@ -82,7 +83,7 @@ class Login2ViewModel : ViewModel() {
                 if (dataSnapshot.exists()) {
                     // Es gibt mindestens einen Kontakt mit dem angegebenen Namen
                     for (contactSnapshot in dataSnapshot.children) {
-                        val contact = contactSnapshot.getValue(Contact::class.java)
+                        val contact = contactSnapshot.getValue(User::class.java)
                         if (contact != null && contact.password == passwordValue) {
 
                             // Passwort stimmt überein

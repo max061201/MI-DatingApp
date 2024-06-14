@@ -176,7 +176,7 @@ class RegisteringVM : ViewModel() {
         }
     }
 
-<<<<<<< HEAD
+
     private fun saveUserToDatabase(user: User, imageUrl: String?) {
         val userWithImage = user.copy(imageUrl = imageUrl)
         val contactId = firebaseRef.push().key ?: ""
@@ -188,9 +188,7 @@ class RegisteringVM : ViewModel() {
                 Log.d("Firebase", "Error saving user: ${it.message}")
             }
     }
-=======
 
->>>>>>> Registieren
 }
 
 private fun findErrorTextAndRemove(mutableList: MutableList<Error>, error: String) {

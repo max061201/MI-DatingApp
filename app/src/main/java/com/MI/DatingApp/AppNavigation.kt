@@ -23,18 +23,22 @@ import com.MI.DatingApp.view.Screen4
 import com.MI.DatingApp.view.Login
 
 import com.MI.DatingApp.view.Profile
+import com.MI.DatingApp.view.TestViewModel
 
 import com.MI.DatingApp.view.registieren.Registrieren
 
 
 @Composable
 fun AppNavigation(navController: NavHostController, modifier: Modifier = Modifier,) {
-    NavHost(navController = navController, startDestination = "screen2") {
+
+    NavHost(navController = navController, startDestination = "login") {
+
         composable("login") { Login(navController) }
 
         composable("registrieren") {
           Registrieren(navController = navController)
         }
+        composable("test") { TestViewModel(navController) }
 
         composable("home") { Home(navController) }
         composable("likes") { Likes(navController) }

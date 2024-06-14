@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -465,11 +464,15 @@ fun UserImage(registeringViewModel: RegisteringVM) {
         mutableStateOf<Uri?>(null)
     }
     val launcher = rememberLauncherForActivityResult(
-        contract =
-        ActivityResultContracts.GetContent()
+        contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         imageUri = uri
+        uri?.let {
+            val imagePath = it.toString() // Convert Uri to String here
+            registeringViewModel.setImagePath(imagePath) // Pass the imagePath String
+        }
     }
+
     AsyncImage(
         model = imageUri,
         contentDescription = null,
@@ -480,12 +483,14 @@ fun UserImage(registeringViewModel: RegisteringVM) {
             .clip(RoundedCornerShape(50.dp)),
         contentScale = ContentScale.Crop,
     )
+
     Button(onClick = {
         launcher.launch("image/*")
     }) {
         Text(text = "select image")
     }
 }
+
 
 @Composable
 fun AppIcon() {

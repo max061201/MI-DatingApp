@@ -2,15 +2,17 @@ package com.MI.DatingApp.viewModel.registering
 
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.MI.DatingApp.model.registieren.FirebaseIm
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -20,11 +22,8 @@ class RegisteringVM : ViewModel() {
     private val _user = MutableLiveData<User>().apply { value = User() }
     val user: LiveData<User> = _user
 
-    private val _errorField =
-        MutableLiveData<MutableList<Error>>().apply { value = emptyList<Error>().toMutableList() }
+    private val _errorField = MutableLiveData<MutableList<Error>>().apply { value = emptyList<Error>().toMutableList() }
     val errorField: LiveData<MutableList<Error>> = _errorField
-
-    var firebaseIm = FirebaseIm()
 
     private var context: Context? = null
 
@@ -67,15 +66,21 @@ class RegisteringVM : ViewModel() {
         _user.value = updatedUser
     }
 
+
+    fun setImagePath(imagePath: String) {
+        val updatedUser = _user.value?.copy(imageUrl = imagePath)
+        _user.value = updatedUser
+    }
+
+
     fun setInterestes(interest: String) {
         _user.value?.let { currentUser ->
-            val updatedInterests = currentUser.interest.toMutableSet().apply {
+            val updatedInterests = currentUser.interest.toMutableList().apply {
                 if (this.contains(interest)) {
                     this.remove(interest)
                 } else {
                     add(interest)
                 }
-
             }
 
             // Create a new User object with updated interests
@@ -84,7 +89,6 @@ class RegisteringVM : ViewModel() {
             // Update the state
             _user.value = updatedUser
         }
-
     }
 
     fun setError(error: MutableList<Error>) {
@@ -126,10 +130,7 @@ class RegisteringVM : ViewModel() {
             }
             return true
         }
-
-
     }
-
 
     fun checkErrorForSecondPage(): Boolean {
         val check = _user.value!!.date != "" && _user.value!!.date != ""
@@ -146,22 +147,55 @@ class RegisteringVM : ViewModel() {
         //  return (Date.from(Instant.now()) > DateTimeFormatter.ofPattern())
     }
 
-    fun Uri.uriToBitmap(): Bitmap {
-        return BitmapFactory.decodeStream(context!!.contentResolver.openInputStream(this))
-    }
+    private var firebaseRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("Users")
+    private var storageRef: StorageReference = FirebaseStorage.getInstance().getReference("UsersImages")
 
     fun saveUserInFirebaseAuth() {
-        firebaseIm.saveUserAuth(_user.value!!)
+        val user = _user.value!!
+        val imageUri = user.imageUrl
+
+        if (imageUri != null) {
+            // Convert the imageUrl String back to Uri
+            val uri = Uri.parse(imageUri)
+
+            // Upload the image
+            val imageRef = storageRef.child("images/${user.email}.jpg")
+
+            val uploadTask = imageRef.putFile(uri)
+            uploadTask.addOnFailureListener {
+                Log.d("Firebase", "Image upload failed: ${it.message}")
+            }.addOnSuccessListener { taskSnapshot ->
+                taskSnapshot.metadata?.reference?.downloadUrl?.addOnSuccessListener { uri ->
+                    val imageUrl = uri.toString()
+                    saveUserToDatabase(user, imageUrl)
+                }
+            }
+        } else {
+            // Save user without image
+            saveUserToDatabase(user, null)
+        }
     }
 
+
+    private fun saveUserToDatabase(user: User, imageUrl: String?) {
+        val userWithImage = user.copy(imageUrl = imageUrl)
+        val contactId = firebaseRef.push().key ?: ""
+        firebaseRef.child(contactId).setValue(userWithImage)
+            .addOnCompleteListener {
+                Log.d("Firebase", "User saved successfully")
+            }
+            .addOnFailureListener {
+                Log.d("Firebase", "Error saving user: ${it.message}")
+            }
+    }
 
 }
 
 private fun findErrorTextAndRemove(mutableList: MutableList<Error>, error: String) {
-    mutableList.remove(mutableList.find {
-        it.errorType == error
-    })
+    mutableList.remove(mutableList.find { it.errorType == error })
 }
+
+
 
 data class User(
     var name: String = "",
@@ -170,10 +204,10 @@ data class User(
     var confirmedPassword: String = "",
     var date: String = "",
     var gander: String = "",
-    var image: Bitmap? = null,
+    var imageUrl: String? = null,  // Ändere das hier
     var ganderLookingFor: String = "",
     var describes: String = "",
-    var interest: MutableSet<String> = mutableSetOf(),
+    var interest: MutableList<String> = mutableListOf()
 ) {
     fun emptyFields(): List<String> {
         val emptyFields = mutableListOf<String>()
@@ -205,6 +239,19 @@ data class User(
         return s
     }
 }
+
+
+data class User2(
+    var name: String = "",
+    var email: String = "",
+    var password: String = "",
+    var confirmedPassword: String = "",
+    var date: String = "",
+    var gander: String = "",
+    //var image: Bitmap? = null,
+    var ganderLookingFor: String = "",
+    var describes: String = "",
+)
 
 data class Error(
     var errorType: String = "",

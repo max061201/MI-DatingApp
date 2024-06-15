@@ -44,7 +44,7 @@ fun AppNavigation(navController: NavHostController, modifier: Modifier = Modifie
         composable("home") { Home(navController) }
         composable("likes") { Likes(navController) }
         composable("chat") { Chat(navController) }
-        composable("profile") { ProfileScreen() }
+        composable("profile") { ProfileScreen(navController) }
 
         composable("screen2") { Detail(navController) }
         composable("screen3") { Screen3(navController) }

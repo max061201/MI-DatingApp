@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,8 +26,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -40,6 +43,7 @@ import com.MI.DatingApp.R
 import com.MI.DatingApp.model.UserFirebase
 import com.MI.DatingApp.viewModel.profile.ProfileVM
 import com.MI.DatingApp.viewModel.profile.UserEdit
+import kotlin.io.path.Path
 
 @Composable
 fun ProfileScreen(
@@ -74,35 +78,48 @@ fun ProfileScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF2F2F2))
+
+
     ) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF2F2F2))
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(Color(0xFFFCF7F7), Color(0xFFAA3FEC))
+                    ))
 
         ) {
+
+
+
             item {
-                Box(
-                    modifier =
-                    Modifier
-                        .clickable(
-                            onClick = { navController.navigate("home") })
-                        .padding(5.dp)
+                CurvedBox{
+                    Box(
+                        modifier =
+                        Modifier
+                            .clickable(
+                                onClick = { navController.navigate("home") })
 
-                )
-                {
+                            .background(Color.White)
 
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.baseline_arrow_back_24),
-                        contentDescription = "Back",
-                        tint = androidx.compose.ui.graphics.Color.Black,
-                        modifier = Modifier.size(24.dp)
                     )
+                    {
+
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.baseline_arrow_back_24),
+                            contentDescription = "Back",
+                            tint = androidx.compose.ui.graphics.Color.Black,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        ProfileHeader(userEdit, viewModle, firebase = userFirebase)
+                    }
                 }
+
+
             }
 
-            item { ProfileHeader(userEdit, viewModle, firebase = userFirebase) }
+
             item { Spacer(modifier = Modifier.height(16.dp)) }
             item { AccountSettings(userEdit, viewModle) }
             item { Spacer(modifier = Modifier.height(16.dp)) }
@@ -228,7 +245,9 @@ fun DiscoverySettings(viewModle: ProfileVM) {
 @Composable
 fun LogoutButton(navController: NavController, viweModle: ProfileVM) {
     Box(
-        Modifier.fillMaxWidth(),
+        Modifier.fillMaxWidth()
+
+
         contentAlignment = Alignment.Center
     ) {
         Button(
@@ -236,7 +255,7 @@ fun LogoutButton(navController: NavController, viweModle: ProfileVM) {
                 viweModle.updateDataFirebase()
                 navController.navigate("home")
             },
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Gray),
+            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFAA3FEC)),
             modifier = Modifier
                 .width(300.dp)
                 .height(50.dp),
@@ -253,20 +272,21 @@ fun DeleteAccountButton(navController: NavController,viewModle: ProfileVM) {
     Box(
         Modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
+
     ) {
         Button(
             onClick = { //TODO delete Data from firebase
                 viewModle.deleteAccount()
                 navController.navigate("login")
             },
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red),
+            colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
             modifier = Modifier
                 .width(300.dp)
                 .height(50.dp)
 
         ) {
 
-            Text("Delete Account", color = Color.White)
+            Text("Delete Account", color = Color.Red)
         }
     }
 
@@ -310,4 +330,43 @@ fun Images(viewModle: ProfileVM,image:String=""){
         )
     }
 
+}
+
+@Composable
+fun CurvedBox(content: @Composable BoxScope.() -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.Transparent)
+    ) {
+        Canvas(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(150.dp)
+        ) {
+            val width = size.width
+            val height = size.height
+
+            val path = androidx.compose.ui.graphics.Path().apply {
+                moveTo(0f, 0f)
+                lineTo(0f, height - 50) // Adjust to control curve height
+                cubicTo(
+                    width / 2, height + 50, // Control point 1
+                    width / 2, height + 50, // Control point 2
+                    width, height - 50
+                )
+                lineTo(width, 0f)
+                close()
+            }
+
+            drawPath(path, color = Color.White, style = Fill)
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 50.dp) // Adjust to match curve height
+        ) {
+            content()
+        }
+    }
 }

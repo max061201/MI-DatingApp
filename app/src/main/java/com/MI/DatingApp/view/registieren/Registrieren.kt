@@ -78,7 +78,7 @@ fun Registrieren(navController: NavHostController, viewModel: RegisteringVM = vi
                     FirstPage(
                         navController = registerNavController,
                         uservalue,
-                        (viewModel as RegisteringVM),
+                        viewModel ,
                         errorfield1
                     )
 

@@ -1,6 +1,7 @@
 package com.MI.DatingApp
 
 
+import Detail
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Favorite
@@ -17,18 +18,22 @@ import com.MI.DatingApp.view.Chat
 import com.MI.DatingApp.view.Home
 import com.MI.DatingApp.view.Likes
 import com.MI.DatingApp.view.NavigationItem
-import com.MI.DatingApp.view.Screen2
 import com.MI.DatingApp.view.Screen3
 import com.MI.DatingApp.view.Screen4
 import com.MI.DatingApp.view.Login
+
 import com.MI.DatingApp.view.Profile
 import com.MI.DatingApp.view.TestView
+import com.MI.DatingApp.view.TestViewModel
+import com.MI.DatingApp.view.profile.ProfileScreen
+
 import com.MI.DatingApp.view.registieren.Registrieren
 
 
 @Composable
 fun AppNavigation(navController: NavHostController, modifier: Modifier = Modifier,) {
-    NavHost(navController = navController, startDestination = "login") {
+    NavHost(navController = navController, startDestination = "profile") {
+
         composable("login") { Login(navController) }
 
         composable("registrieren") {
@@ -41,6 +46,8 @@ fun AppNavigation(navController: NavHostController, modifier: Modifier = Modifie
         composable("chat") { Chat(navController) }
         composable("profile") { Profile(navController) }
         composable("screen2") { Screen2(navController) }
+        composable("profile") { ProfileScreen(navController) }
+        composable("screen2") { Detail(navController) }
         composable("screen3") { Screen3(navController) }
         composable("screen4/{data}", arguments = listOf(navArgument("data") { type = NavType.StringType })) { backStackEntry ->
             Screen4(navController, backStackEntry.arguments?.getString("data") ?: "")

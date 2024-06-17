@@ -1,8 +1,10 @@
 package com.MI.DatingApp.viewModel.profile
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.MI.DatingApp.model.CurrentUser
 
 class ProfileVM() : ViewModel() {
 
@@ -61,11 +63,14 @@ class ProfileVM() : ViewModel() {
     }
 
     fun updateDataFirebase() {
-        TODO("send data to firebase")
+        //TODO("send data to firebase")
+
+        Log.d("updateDataFirebase CurrentUser", CurrentUser.getUser().toString())
+
     }
 
     fun deleteAccount() {
-        TODO("delete Account firebase")
+       // TODO("delete Account firebase")
     }
 
 }

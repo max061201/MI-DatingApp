@@ -12,4 +12,9 @@ data class User(
     var ganderLookingFor: String = "",
     var describes: String = "",
     var interest: MutableList<String> = mutableListOf()
-)
+){
+    fun isValid(): Boolean {
+        // Beispiel für eine einfache Validierungslogik
+        return name.isNotBlank() && email.isNotBlank() && describes.isNotBlank()
+    }
+}

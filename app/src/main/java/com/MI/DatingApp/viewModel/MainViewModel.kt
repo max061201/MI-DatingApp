@@ -141,6 +141,7 @@ class MainViewModel : ViewModel() {
                     val user = userSnapshot.getValue(User::class.java)
                     if (user != null) {
                         userList.add(user)
+
                     }
                 }
                 Log.d("Login", userList.toString())

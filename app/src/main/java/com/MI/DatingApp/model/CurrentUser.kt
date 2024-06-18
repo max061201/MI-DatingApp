@@ -17,17 +17,19 @@ object CurrentUser {
 
     fun getTestUser(): User {
         return User(
-            id = "-O-_ISsp8d4zdQvVYkTm",
-            name = "max",
-            email = "max@gmail.com",
+            id = "-O-gTyIykyVTlqOSEkli",
+            name = "Usertest",
+            email = "user@gmail.com",
             password = "123456789",
             confirmedPassword = "123456789",
-            yearOfBirth = "06.12.2001",
+            yearOfBirth = "02.06.2024",
             gender = "Male",
-            //imageUrls = "https://firebasestorage.googleapis.com/v0/b/datingapp-9f758.appspot.com/o/UsersImages%2Fimages%2Fmax%40gmail.com.jpg?alt=media&token=4b7a3f94-05f1-4ff8-bd63-6407a19eeacf",
+            imageUrls = mutableListOf("https://firebasestorage.googleapis.com/v0/b/datingapp-9f758.appspot.com/o/UsersImages%2Fimages%2F-O-gTyIykyVTlqOSEkli%2Fmsf%3A62?alt=media&token=b171b59b-62f8-496b-94c4-810b7aad7f69"),
             genderLookingFor = "Women",
-            description = "Der Firebase master",
-            interest = mutableListOf("Travel", "Sport")
+            description = "usertest",
+            interest = mutableListOf("Travel"),
+            likes = mutableListOf(),
+            dislikes = mutableListOf()
         )
     }
 }

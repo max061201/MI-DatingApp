@@ -125,7 +125,6 @@ fun TestView(navController: NavController) {
 
     }
 }
-
 @Composable
 fun UserRow(user: User) {
     Row(
@@ -135,14 +134,19 @@ fun UserRow(user: User) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        user.imageUrls?.let {
-            Image(
-                painter = rememberImagePainter(data = it),
-                contentDescription = null,
-                modifier = Modifier.size(48.dp) // Größe des Bildes anpassen
-            )
+        user.imageUrls?.let { imageUrls ->
+            Row {
+                imageUrls.forEach { imageUrl ->
+                    Image(
+                        painter = rememberImagePainter(data = imageUrl),
+                        contentDescription = null,
+                        modifier = Modifier.size(48.dp) // Größe des Bildes anpassen
+                    )
+                    Spacer(modifier = Modifier.width(4.dp)) // Abstand zwischen Bildern
+                }
+            }
         }
-        Spacer(modifier = Modifier.width(2.dp))
+        Spacer(modifier = Modifier.width(8.dp))
         Column {
             Text(text = user.name, color = Color.Black)
             Text(text = user.email, color = Color.Black)

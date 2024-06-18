@@ -11,7 +11,10 @@ data class User(
     var genderLookingFor: String = "",
     var imageUrls: MutableList<String>? = mutableListOf(),
     var description: String = "",
-    var interest: MutableList<String> = mutableListOf()
+    var interest: MutableList<String> = mutableListOf(),
+    var likes: MutableList<String> = mutableListOf(),      // IDs der Nutzer, die geliked wurden
+    var dislikes: MutableList<String> = mutableListOf()    // IDs der Nutzer, die disliked wurden
+
 ){
     fun emptyFields(): List<String> {
         val emptyFields = mutableListOf<String>()

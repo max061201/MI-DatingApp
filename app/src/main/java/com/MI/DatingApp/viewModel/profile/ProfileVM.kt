@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.MI.DatingApp.model.CurrentUser
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 
@@ -65,6 +66,7 @@ class ProfileVM() : ViewModel() {
         _userchanges.value = uservalue
     }
     private var firebaseRefRealTime: DatabaseReference = FirebaseDatabase.getInstance().getReference("Users")
+    private var auth: FirebaseAuth = FirebaseAuth.getInstance()
 
     fun updateDataFirebase() {
         val currentUser = CurrentUser.getTestUser()
@@ -101,6 +103,19 @@ class ProfileVM() : ViewModel() {
             firebaseRefRealTime.child(userId).updateChildren(changes)
                 .addOnCompleteListener {
                     Log.d("Firebase", "User updated successfully")
+
+//                    // Update email in Firebase Authentication if email changed
+//                    if (changes.containsKey("email")) {
+//                        val newEmail = changes["email"].toString()
+//                        auth.currentUser?.updateEmail(newEmail)
+//                            ?.addOnCompleteListener { emailUpdateTask ->
+//                                if (emailUpdateTask.isSuccessful) {
+//                                    Log.d("Firebase", "Email updated successfully in Authentication")
+//                                } else {
+//                                    Log.d("Firebase", "Failed to update email in Authentication: ${emailUpdateTask.exception?.message}")
+//                                }
+//                            }
+//                    }
                 }
                 .addOnFailureListener {
                     Log.d("Firebase", "Error updating user: ${it.message}")

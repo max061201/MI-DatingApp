@@ -2,7 +2,7 @@ package com.MI.DatingApp.model.registieren
 
 import android.util.Log
 import com.MI.DatingApp.model.Contact
-import com.MI.DatingApp.viewModel.registering.User
+import com.MI.DatingApp.model.User
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference

@@ -68,9 +68,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import com.MI.DatingApp.R
+import com.MI.DatingApp.model.User
 import com.MI.DatingApp.viewModel.registering.Error
 import com.MI.DatingApp.viewModel.registering.RegisteringVM
-import com.MI.DatingApp.viewModel.registering.User
 import com.MI.DatingApp.viewModel.registering.formatAndToString
 import java.util.Date
 
@@ -238,7 +238,7 @@ fun DatePickerTextField(
 
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
-        value = value.date,
+        value = value.yearOfBirth,
         onValueChange = { /* Ignoring manual input for now */ },
         label = { Text("Date", color = Color.White) },
         readOnly = true, // Prevents manual input
@@ -318,7 +318,7 @@ fun Gander(
 
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
-        value = registeringViewModel.user.value!!.gander,
+        value = registeringViewModel.user.value!!.gender,
         onValueChange = { /* Ignoring manual input for now */ },
         label = { Text("Your Gander", color = Color.White) },
         readOnly = true, // Prevents manual input
@@ -363,7 +363,7 @@ fun LookingForSection(
     var showDialog by remember { mutableStateOf(false) }
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
-        value = registeringViewModel.user.value!!.ganderLookingFor,
+        value = registeringViewModel.user.value!!.genderLookingFor,
         onValueChange = { /* Ignoring manual input for now */ },
         label = { Text("Your are looking for", color = Color.White) },
         readOnly = true, // Prevents manual input
@@ -401,7 +401,7 @@ fun LookingForSection(
 @Composable
 fun DescribesYouSection(registeringViewModel: RegisteringVM, outletAttribute: OutletAttribute) {
     OutlinedTextField(
-        value = registeringViewModel.user.value!!.describes,
+        value = registeringViewModel.user.value!!.description,
         onValueChange = {
             registeringViewModel.describe(it)
         },

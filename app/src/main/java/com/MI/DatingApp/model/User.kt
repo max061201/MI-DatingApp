@@ -8,13 +8,35 @@ data class User(
     var confirmedPassword: String = "",
     var yearOfBirth: String = "",
     var gender: String = "",
-    var imageUrl: String? = null,  // Ändere das hier
-    var ganderLookingFor: String = "",
+    var genderLookingFor: String = "",
+    var imageUrls: MutableList<String>? = mutableListOf(),
     var description: String = "",
     var interest: MutableList<String> = mutableListOf()
 ){
-    fun isValid(): Boolean {
-        // Beispiel für eine einfache Validierungslogik
-        return name.isNotBlank() && email.isNotBlank() && description.isNotBlank()
+    fun emptyFields(): List<String> {
+        val emptyFields = mutableListOf<String>()
+        if (name.isEmpty()) {
+            emptyFields.add("name")
+        }
+        if (email.isEmpty() || !checkEmailPattern(email)) {
+            emptyFields.add("email")
+        }
+        if (password.isEmpty()) {
+            emptyFields.add("password")
+        }
+        if (confirmedPassword.isEmpty()) {
+            emptyFields.add("confirmedPassword")
+        }
+        return emptyFields
+    }
+
+    fun matchPassword(): Boolean {
+        return password == confirmedPassword && password.length >= 6
+    }
+
+    private fun checkEmailPattern(email: String): Boolean {
+        val emailPattern = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$".toRegex()
+        return email.matches(emailPattern)
     }
 }
+

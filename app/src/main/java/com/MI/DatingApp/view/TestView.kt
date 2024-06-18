@@ -135,7 +135,7 @@ fun UserRow(user: User) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        user.imageUrl?.let {
+        user.imageUrls?.let {
             Image(
                 painter = rememberImagePainter(data = it),
                 contentDescription = null,

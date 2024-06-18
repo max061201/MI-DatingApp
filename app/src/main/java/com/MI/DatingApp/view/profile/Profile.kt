@@ -6,14 +6,12 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 
 import androidx.compose.material.*
@@ -28,11 +26,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -40,39 +36,31 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.MI.DatingApp.R
-import com.MI.DatingApp.model.UserFirebase
+import com.MI.DatingApp.model.CurrentUser
+import com.MI.DatingApp.model.User
 import com.MI.DatingApp.viewModel.profile.ProfileVM
 import com.MI.DatingApp.viewModel.profile.UserEdit
-import kotlin.io.path.Path
 
 @Composable
 fun ProfileScreen(
     navController: NavController,
-    userFirebase: UserFirebase = UserFirebase(
-        name = "test",
-        yearOfBirth = "50",
-        description = "hallo i am test ",
-        interests = mutableSetOf("s", "f", "a"),
-        email = "aaa",
-        gender = "male",
-        id = 123L,
-        lookingFor = "woman",
-        photos = mutableListOf(R.drawable.heart, R.drawable.delete)
-    ),
+
+
     viewModle: ProfileVM = viewModel()
 ) {
 
+    val testUser = CurrentUser.getTestUser()
 
-    val userEdit by viewModle.user.observeAsState()
+    val userEdit by viewModle.userchanges.observeAsState()
 
     viewModle.setUserValue(
         UserEdit(
-            name = userFirebase.name,
-            email = userFirebase.email,
-            date = userFirebase.yearOfBirth,
-            gander = userFirebase.gender,
+            name = testUser.name,
+            email = testUser.email,
+            date = testUser.yearOfBirth,
+            gander = testUser.gender,
             imageUrl = mutableSetOf(),
-            describes = userFirebase.description
+            describes = testUser.description
         )
     )
     Box(
@@ -112,7 +100,7 @@ fun ProfileScreen(
                             tint = androidx.compose.ui.graphics.Color.Black,
                             modifier = Modifier.size(24.dp)
                         )
-                        ProfileHeader(userEdit, viewModle, firebase = userFirebase)
+                        ProfileHeader(userEdit, viewModle, firebase = testUser)
                     }
                 }
 
@@ -141,7 +129,7 @@ fun ProfileScreen(
 }
 
 @Composable
-fun ProfileHeader(userEdit: UserEdit?, viewModle: ProfileVM,firebase: UserFirebase) {
+fun ProfileHeader(userEdit: UserEdit?, viewModle: ProfileVM, firebase: User) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth()

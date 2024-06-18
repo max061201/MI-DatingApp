@@ -27,24 +27,6 @@ class FirebaseIm : RegistierenSaveData {
     }
     private var firebaseRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("Users")
 
-    fun saveUserInRealtime(user: User) {
-
-        // Erstellen eines Kontaktobjekts
-        val contactId = firebaseRef.push().key ?: ""
-
-        //user.image = null
-
-        Log.d("_user", user.toString())
-        // Daten in Firebase speichern
-        firebaseRef.child(contactId).setValue(user)  // Speichere _user.value direkt
-            .addOnCompleteListener {
-                //_statusMessage.value = "Daten erfolgreich gespeichert."
-            }
-            .addOnFailureListener {
-                // _statusMessage.value = "Fehler beim Speichern der Daten: ${it.message}"
-            }
-
-    }
 
     override fun saveUserInfo(user: User) {
         TODO("Not yet implemented")

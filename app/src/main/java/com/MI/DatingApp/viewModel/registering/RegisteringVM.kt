@@ -34,6 +34,11 @@ class RegisteringVM : ViewModel() {
         this.context = context
     }
 
+    fun setId(id: String) {
+        val updatedUser = _user.value?.copy(id = id)
+        _user.value = updatedUser
+    }
+
     fun setName(name: String) {
         val updatedUser = _user.value?.copy(name = name)
         _user.value = updatedUser
@@ -157,12 +162,14 @@ class RegisteringVM : ViewModel() {
         val user = _user.value!!
         val imageUri = user.imageUrl
 
+        val contactId = firebaseRef.push().key ?: ""
+        setId(contactId)
         if (imageUri != null) {
             // Convert the imageUrl String back to Uri
             val uri = Uri.parse(imageUri)
 
             // Upload the image
-            val imageRef = storageRef.child("images/${user.email}.jpg")
+            val imageRef = storageRef.child("images/$contactId.jpg")
 
             val uploadTask = imageRef.putFile(uri)
             uploadTask.addOnFailureListener {
@@ -170,21 +177,25 @@ class RegisteringVM : ViewModel() {
             }.addOnSuccessListener { taskSnapshot ->
                 taskSnapshot.metadata?.reference?.downloadUrl?.addOnSuccessListener { uri ->
                     val imageUrl = uri.toString()
-                    saveUserToDatabase(user, imageUrl)
+                    saveUserToDatabase(imageUrl, contactId)
                 }
             }
         } else {
             // Save user without image
-            saveUserToDatabase(user, null)
+            saveUserToDatabase( null,contactId)
         }
 
         firebaseIm.saveUserAuth(user)
     }
 
 
-    private fun saveUserToDatabase(user: User, imageUrl: String?) {
+    private fun saveUserToDatabase( imageUrl: String?,contactId: String) {
+
+        val user = _user.value!!
         val userWithImage = user.copy(imageUrl = imageUrl)
-        val contactId = firebaseRef.push().key ?: ""
+
+        Log.d("userIDTest", user.toString())
+
         firebaseRef.child(contactId).setValue(userWithImage)
             .addOnCompleteListener {
                 Log.d("Firebase", "User saved successfully")
@@ -203,6 +214,7 @@ private fun findErrorTextAndRemove(mutableList: MutableList<Error>, error: Strin
 
 
 data class User(
+    val id: String ="",
     var name: String = "",
     var email: String = "",
     var password: String = "",

@@ -6,15 +6,15 @@ data class User(
     var email: String = "",
     var password: String = "",
     var confirmedPassword: String = "",
-    var date: String = "",
-    var gander: String = "",
+    var yearOfBirth: String = "",
+    var gender: String = "",
     var imageUrl: String? = null,  // Ändere das hier
     var ganderLookingFor: String = "",
-    var describes: String = "",
+    var description: String = "",
     var interest: MutableList<String> = mutableListOf()
 ){
     fun isValid(): Boolean {
         // Beispiel für eine einfache Validierungslogik
-        return name.isNotBlank() && email.isNotBlank() && describes.isNotBlank()
+        return name.isNotBlank() && email.isNotBlank() && description.isNotBlank()
     }
 }

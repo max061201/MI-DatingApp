@@ -82,11 +82,15 @@ class ProfileVM : ViewModel() {
 
     }
 
+    //Set für welches images würde bearbeitet
+
     private var firebaseRefRealTime: DatabaseReference = FirebaseDatabase.getInstance().getReference("Users")
-    private var auth: FirebaseAuth = FirebaseAuth.getInstance()
+   // private var auth: FirebaseAuth = FirebaseAuth.getInstance()
     private var storageRef: StorageReference = FirebaseStorage.getInstance().getReference("UsersImages")
     val changes = mutableMapOf<String, Any>()
 
+
+   // UpdateUSer in DB
     fun updateDataFirebase() {
 
         _userchanges.value?.let { userChanges ->

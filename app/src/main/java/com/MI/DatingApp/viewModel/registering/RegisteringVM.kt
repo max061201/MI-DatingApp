@@ -167,6 +167,7 @@ class RegisteringVM : ViewModel() {
         val imageUris = user.imageUrls?.map { Uri.parse(it) } ?: emptyList()
 
         val contactId = firebaseRef.push().key ?: ""
+
         setId(contactId)
         if (imageUris.isNotEmpty()) {
             uploadImagesAndSaveUser(imageUris, contactId)
@@ -179,8 +180,10 @@ class RegisteringVM : ViewModel() {
 
     private fun uploadImagesAndSaveUser(imageUris: List<Uri>, contactId: String) {
         val uploadedImageUrls = mutableListOf<String>()
+        val timestamp = System.currentTimeMillis() // Zeitstempel hinzufügen
+
         imageUris.forEach { uri ->
-            val imageRef = storageRef.child("images/$contactId/${uri.lastPathSegment}")
+            val imageRef = storageRef.child("images/$contactId/${timestamp}_${uri.lastPathSegment}") // Zeitstempel vor dem Dateinamen
             val uploadTask = imageRef.putFile(uri)
             uploadTask.addOnFailureListener {
                 Log.d("Firebase", "Image upload failed: ${it.message}")

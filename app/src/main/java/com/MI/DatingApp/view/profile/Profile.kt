@@ -1,6 +1,5 @@
 package com.MI.DatingApp.view.profile
 
-
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,7 +12,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.foundation.shape.RoundedCornerShape
-
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,35 +37,33 @@ import com.MI.DatingApp.R
 import com.MI.DatingApp.model.CurrentUser
 import com.MI.DatingApp.model.User
 import com.MI.DatingApp.viewModel.profile.ProfileVM
-import com.MI.DatingApp.viewModel.profile.UserEdit
 
 @Composable
 fun ProfileScreen(
     navController: NavController,
-
-
-    viewModle: ProfileVM = viewModel()
+    viewModel: ProfileVM = viewModel()
 ) {
-
     val testUser = CurrentUser.getTestUser()
 
-    val userEdit by viewModle.userchanges.observeAsState()
+    val userEdit by viewModel.userchanges.observeAsState()
 
-    viewModle.setUserValue(
-        UserEdit(
+    viewModel.setUserValue(
+        User(
+            id = testUser.id,
             name = testUser.name,
             email = testUser.email,
-            date = testUser.yearOfBirth,
-            gander = testUser.gender,
-            imageUrl = mutableSetOf(),
-            describes = testUser.description
+            yearOfBirth = testUser.yearOfBirth,
+            gender = testUser.gender,
+            imageUrls = testUser.imageUrls,
+            description = testUser.description,
+            interest = testUser.interest,
+            likes = testUser.likes,
+            dislikes = testUser.dislikes
         )
     )
     Box(
         modifier = Modifier
             .fillMaxSize()
-
-
     ) {
         LazyColumn(
             modifier = Modifier
@@ -75,223 +71,180 @@ fun ProfileScreen(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(Color(0xFFFCF7F7), Color(0xFFAA3FEC))
-                    ))
-
-        ) {
-
-
-
-            item {
-                CurvedBox{
-                    Box(
-                        modifier =
-                        Modifier
-                            .clickable(
-                                onClick = { navController.navigate("home") })
-
-                            .background(Color.White)
-
                     )
-                    {
-
+                )
+        ) {
+            item {
+                CurvedBox {
+                    Box(
+                        modifier = Modifier
+                            .clickable(onClick = { navController.navigate("home") })
+                            .background(Color.White)
+                    ) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.baseline_arrow_back_24),
                             contentDescription = "Back",
                             tint = androidx.compose.ui.graphics.Color.Black,
                             modifier = Modifier.size(24.dp)
                         )
-                        ProfileHeader(userEdit, viewModle, firebase = testUser)
+                        ProfileHeader(userEdit, viewModel, firebase = testUser)
                     }
                 }
-
-
             }
 
-
             item { Spacer(modifier = Modifier.height(16.dp)) }
-            item { AccountSettings(userEdit, viewModle) }
+            item { AccountSettings(userEdit, viewModel) }
             item { Spacer(modifier = Modifier.height(16.dp)) }
-            item { AboutMe(userEdit, viewModle) }
+            item { AboutMe(userEdit, viewModel) }
             item { Spacer(modifier = Modifier.height(16.dp)) }
-            item { DiscoverySettings(viewModle) }
+            item { DiscoverySettings(viewModel) }
             item { Spacer(modifier = Modifier.height(16.dp)) }
-            item { LogoutButton(navController, viewModle) }
+            item { LogoutButton(navController, viewModel) }
             item { Spacer(modifier = Modifier.height(16.dp)) }
-            item { DeleteAccountButton(navController, viewModle) }
+            item { DeleteAccountButton(navController, viewModel) }
             item { Spacer(modifier = Modifier.height(100.dp)) }
-
-
-
         }
     }
-
-
 }
 
 @Composable
-fun ProfileHeader(userEdit: UserEdit?, viewModle: ProfileVM, firebase: User) {
+fun ProfileHeader(userEdit: User?, viewModel: ProfileVM, firebase: User) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth()
     ) {
-
-        Images(viewModle)
+        Images(viewModel)
         Spacer(modifier = Modifier.height(8.dp))
-        Text(firebase.name+" ,"+firebase.yearOfBirth, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        Text(firebase.name + " ," + firebase.yearOfBirth, fontSize = 24.sp, fontWeight = FontWeight.Bold)
     }
 }
 
 @Composable
-fun AccountSettings(userEdit: UserEdit?, viewModle: ProfileVM) {
+fun AccountSettings(userEdit: User?, viewModel: ProfileVM) {
     Card(
         shape = RoundedCornerShape(16.dp),
         backgroundColor = Color.White,
         elevation = 4.dp
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text("Account Settings", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-
             }
             Spacer(modifier = Modifier.height(8.dp))
             TextField(value = userEdit!!.name, onValueChange = {
-                viewModle.setName(it)
-
+                viewModel.setName(it)
             }, label = { Text("Name") })
             Spacer(modifier = Modifier.height(8.dp))
-            TextField(value = userEdit.date, onValueChange = {
-                viewModle.setDate(it)
-
+            TextField(value = userEdit.yearOfBirth, onValueChange = {
+                viewModel.setDate(it)
             }, label = { Text("Date of Birth") })
             Spacer(modifier = Modifier.height(8.dp))
             TextField(value = userEdit.email, onValueChange = {
-                viewModle.setEmail(it)
-
+                viewModel.setEmail(it)
             }, label = { Text("Email") })
         }
     }
 }
 
 @Composable
-fun AboutMe(userEdit: UserEdit?, viewModle: ProfileVM) {
+fun AboutMe(userEdit: User?, viewModel: ProfileVM) {
     Card(
         shape = RoundedCornerShape(16.dp),
         backgroundColor = Color.White,
         elevation = 4.dp
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text("About me", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-
             }
             Spacer(modifier = Modifier.height(8.dp))
-            TextField(value = userEdit!!.describes, onValueChange = {
-                viewModle.setDesc(it)
-
+            TextField(value = userEdit!!.description, onValueChange = {
+                viewModel.setDesc(it)
             }, label = { Text("Description") })
             Spacer(modifier = Modifier.height(8.dp))
-            TextField(value = userEdit.gander, onValueChange = {
-                viewModle.setGander(it)
-
+            TextField(value = userEdit.gender, onValueChange = {
+                viewModel.setGender(it)
             }, label = { Text("Gender") })
         }
     }
 }
 
 @Composable
-fun DiscoverySettings(viewModle: ProfileVM) {
+fun DiscoverySettings(viewModel: ProfileVM) {
     Card(
         shape = RoundedCornerShape(16.dp),
         backgroundColor = Color.White,
         elevation = 4.dp
     ) {
-        Column(   modifier = Modifier.padding(16.dp)) {
-            Text("add Images", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-            Row(
-                modifier = Modifier.padding(16.dp)
-            ) {
-
-                Images(viewModle)
-                Images(viewModle)
-                Images(viewModle)
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text("Add Images", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Row(modifier = Modifier.padding(16.dp)) {
+                Images(viewModel)
+                Images(viewModel)
+                Images(viewModel)
             }
         }
-
     }
 }
 
 @Composable
-fun LogoutButton(navController: NavController, viweModle: ProfileVM) {
+fun LogoutButton(navController: NavController, viewModel: ProfileVM) {
     Box(
         Modifier.fillMaxWidth(),
-
-
-                contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center
     ) {
         Button(
             onClick = {
-                viweModle.updateDataFirebase()
+                viewModel.updateDataFirebase()
                 navController.navigate("home")
             },
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFAA3FEC)),
             modifier = Modifier
                 .width(300.dp)
-                .height(50.dp),
-
-            ) {
-            Text("save", color = Color.White)
+                .height(50.dp)
+        ) {
+            Text("Save", color = Color.White)
         }
     }
-
 }
 
 @Composable
-fun DeleteAccountButton(navController: NavController,viewModle: ProfileVM) {
+fun DeleteAccountButton(navController: NavController, viewModel: ProfileVM) {
     Box(
         Modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
-
     ) {
         Button(
-            onClick = { //TODO delete Data from firebase
-                viewModle.deleteAccount()
+            onClick = {
+                viewModel.deleteAccount()
                 navController.navigate("login")
             },
             colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
             modifier = Modifier
                 .width(300.dp)
                 .height(50.dp)
-
         ) {
-
             Text("Delete Account", color = Color.Red)
         }
     }
-
-
 }
+
 @Composable
-fun Images(viewModle: ProfileVM,image:String=""){
-    var imageUri by remember {
-        mutableStateOf<Uri?>(null)
-    }
+fun Images(viewModel: ProfileVM, image: String = "") {
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         imageUri = uri
         uri?.let {
             val imagePath = it.toString() // Convert Uri to String here
-            viewModle.setImage(imagePath)
+            viewModel.setImage(imagePath)
         }
     }
     Box(
@@ -302,12 +255,11 @@ fun Images(viewModle: ProfileVM,image:String=""){
             .padding(4.dp)
             .width(100.dp)
             .height(100.dp)
-            .border(BorderStroke(2.dp, Color.Gray), shape = RoundedCornerShape(50.dp)
-            )
+            .border(BorderStroke(2.dp, Color.Gray), shape = RoundedCornerShape(50.dp))
             .clip(RoundedCornerShape(50.dp))
-    ){
+    ) {
         AsyncImage(
-            model = if (imageUri == null) image else imageUri ,
+            model = if (imageUri == null) image else imageUri,
             contentDescription = null,
             modifier = Modifier
                 .padding(4.dp)
@@ -317,7 +269,6 @@ fun Images(viewModle: ProfileVM,image:String=""){
             contentScale = ContentScale.Crop,
         )
     }
-
 }
 
 @Composable

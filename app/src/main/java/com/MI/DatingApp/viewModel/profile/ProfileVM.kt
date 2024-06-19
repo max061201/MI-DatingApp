@@ -7,7 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.MI.DatingApp.model.CurrentUser
 import com.MI.DatingApp.model.User
-import com.google.firebase.auth.FirebaseAuth
+import com.MI.DatingApp.model.registieren.FirebaseIm
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
@@ -88,6 +88,7 @@ class ProfileVM : ViewModel() {
    // private var auth: FirebaseAuth = FirebaseAuth.getInstance()
     private var storageRef: StorageReference = FirebaseStorage.getInstance().getReference("UsersImages")
     val changes = mutableMapOf<String, Any>()
+    var firebaseIm = FirebaseIm()
 
 
    // UpdateUSer in DB
@@ -126,7 +127,7 @@ class ProfileVM : ViewModel() {
                 //updateUserToDatabase()
 
             } else {
-                updateUserToDatabase()
+                firebaseIm.updateUserToDatabase(changes)
             }
         }
     }
@@ -155,7 +156,6 @@ class ProfileVM : ViewModel() {
     }
 
     private fun updateUserImgDatabase(imageUrls: List<String>, contactId: String) {
-        val userId = currentUser.id
         val currentImageUrls = currentUser.imageUrls?.toMutableList() ?: mutableListOf()
         currentImageUrls.addAll(imageUrls)
 
@@ -172,17 +172,17 @@ class ProfileVM : ViewModel() {
     }
 
 
-    private fun updateUserToDatabase() {
-        val userId = currentUser.id
-        firebaseRefRealTime.child(userId).updateChildren(changes)
-            .addOnCompleteListener {
-                Log.d("Firebase", "User updated successfully")
-
-            }
-            .addOnFailureListener {
-                Log.d("Firebase", "Error updating user: ${it.message}")
-            }
-    }
+//    private fun updateUserToDatabase() {
+//        val userId = currentUser.id
+//        firebaseRefRealTime.child(userId).updateChildren(changes)
+//            .addOnCompleteListener {
+//                Log.d("Firebase", "User updated successfully")
+//
+//            }
+//            .addOnFailureListener {
+//                Log.d("Firebase", "Error updating user: ${it.message}")
+//            }
+//    }
     fun deleteSameImages() {
         val currentImageUrls = currentUser.imageUrls?.toMutableList()
         val newImageUrls = _userchanges.value?.imageUrls?.toMutableList()

@@ -1,7 +1,7 @@
 package com.MI.DatingApp.model.registieren
 
 import android.util.Log
-import com.MI.DatingApp.model.Contact
+import com.MI.DatingApp.model.CurrentUser
 import com.MI.DatingApp.model.User
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,9 +26,25 @@ class FirebaseIm : RegistierenSaveData {
 
     }
     private var firebaseRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("Users")
+    private var firebaseRefRealTime: DatabaseReference = FirebaseDatabase.getInstance().getReference("Users")
 
+    val currentUser = CurrentUser.getTestUser()
+
+
+    fun updateUserToDatabase(changes: MutableMap<String, Any>) {
+        val userId = currentUser.id
+        firebaseRefRealTime.child(userId).updateChildren(changes)
+            .addOnCompleteListener {
+                Log.d("Firebase", "User updated successfully")
+
+            }
+            .addOnFailureListener {
+                Log.d("Firebase", "Error updating user: ${it.message}")
+            }
+    }
 
     override fun saveUserInfo(user: User) {
         TODO("Not yet implemented")
     }
+
 }

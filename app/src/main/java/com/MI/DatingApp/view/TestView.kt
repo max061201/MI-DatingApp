@@ -22,8 +22,6 @@ import com.MI.DatingApp.viewModel.MainViewModel
 import com.MI.DatingApp.viewModel.registering.RegisteringVM
 
 
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import coil.compose.rememberImagePainter
 import com.MI.DatingApp.model.User
 
@@ -37,7 +35,7 @@ fun TestView(navController: NavController) {
     val name by mainViewModel.name.observeAsState("")
     val password by mainViewModel.password.observeAsState("")
     val users by mainViewModel.users.observeAsState(emptyList())
-    val currentUser by mainViewModel.currentUser.observeAsState()
+    val currentUser by mainViewModel.currentShownUser.observeAsState()
 
     val statusMessage by mainViewModel.statusMessage.observeAsState("")
 
@@ -113,6 +111,19 @@ fun TestView(navController: NavController) {
             }
             Button(onClick = { mainViewModel.showNextUser() }) {
                 Text("Next")
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Button(onClick = { mainViewModel.Dislike() }) {
+                Text("Dislike")
+            }
+            Button(onClick = { mainViewModel.Like() }) {
+                Text("Like")
             }
         }
 //        ButtonCompose({

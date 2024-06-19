@@ -145,20 +145,34 @@ class MainViewModel : ViewModel() {
 
         // Prüfen, ob der aktuelle Benutzer angezeigt wird und wenn ja, Änderungen hinzufügen
         _currentShownUser.value?.let { currentUser ->
-            if (!momentanerUser.dislikes.contains(currentUser.id)) {
-                momentanerUser.dislikes.add(currentUser.id)
+            if (!momentanerUser.likes.contains(currentUser.id) && !momentanerUser.dislikes.contains(currentUser.id)) {                momentanerUser.dislikes.add(currentUser.id)
                 changes["dislikes"] = momentanerUser.dislikes // Änderungen hinzufügen
                 firebaseIm.updateUserToDatabase(changes) // Datenbank aktualisieren
                 Log.d("changes", changes.toString())
                 Log.d("momentanerUser", momentanerUser.toString())
                // CurrentUser.setUser(momentanerUser) updated current userdata
+            }else{
+                Log.d("User", "User wurde schon geliked oder gedisliked $currentUser.id")
             }
         }
     }
     fun Like() {
 
         Log.d("Like", "Like")
+        // Prüfen, ob der aktuelle Benutzer angezeigt wird und wenn ja, Änderungen hinzufügen
+        _currentShownUser.value?.let { currentUser ->
+            if (!momentanerUser.likes.contains(currentUser.id) && !momentanerUser.dislikes.contains(currentUser.id)) {
+                momentanerUser.likes.add(currentUser.id)
+                changes["likes"] = momentanerUser.likes // Änderungen hinzufügen
+                firebaseIm.updateUserToDatabase(changes) // Datenbank aktualisieren
+                Log.d("changes", changes.toString())
+                Log.d("momentanerUser", momentanerUser.toString())
+                // CurrentUser.setUser(momentanerUser) updated current userdata
+            } else{
+                Log.d("User", "User wurde schon geliked oder gedisliked $currentUser.id")
+            }
 
+        }
     }
     fun getAllUsersData() {
         firebaseRefUsers.addValueEventListener(object : ValueEventListener {

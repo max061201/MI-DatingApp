@@ -11,5 +11,5 @@ data class User(
     var imageUrl: String? = null,  // Ändere das hier
     var ganderLookingFor: String = "",
     var describes: String = "",
-    var interest: MutableList<String> = mutableListOf()
+    var interest: MutableList<String> = mutableListOf(),
 )

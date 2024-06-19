@@ -1,21 +1,22 @@
 package com.MI.DatingApp.viewModel.registering
 
-
 import android.content.Context
 import android.net.Uri
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.MI.DatingApp.model.registieren.FirebaseIm
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import com.google.android.gms.location.LocationServices
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import android.Manifest
+import android.content.pm.PackageManager
+import java.util.*
 
 class RegisteringVM : ViewModel() {
 
@@ -24,6 +25,8 @@ class RegisteringVM : ViewModel() {
 
     private val _errorField = MutableLiveData<MutableList<Error>>().apply { value = emptyList<Error>().toMutableList() }
     val errorField: LiveData<MutableList<Error>> = _errorField
+
+    var firebaseIm = FirebaseIm()
 
     private var context: Context? = null
 
@@ -66,12 +69,10 @@ class RegisteringVM : ViewModel() {
         _user.value = updatedUser
     }
 
-
     fun setImagePath(imagePath: String) {
         val updatedUser = _user.value?.copy(imageUrl = imagePath)
         _user.value = updatedUser
     }
-
 
     fun setInterestes(interest: String) {
         _user.value?.let { currentUser ->
@@ -82,11 +83,7 @@ class RegisteringVM : ViewModel() {
                     add(interest)
                 }
             }
-
-            // Create a new User object with updated interests
             val updatedUser = currentUser.copy(interest = updatedInterests)
-
-            // Update the state
             _user.value = updatedUser
         }
     }
@@ -101,7 +98,6 @@ class RegisteringVM : ViewModel() {
     }
 
     fun checkErrorForFirstPage(): Boolean {
-
         val check = _user.value!!.emptyFields().isEmpty()
         val mutableListOfError: MutableList<Error> = emptyList<Error>().toMutableList()
         if (!check) {
@@ -113,31 +109,30 @@ class RegisteringVM : ViewModel() {
             return false
         } else {
             if (!_user.value!!.matchPassword()) {
-                setError(mutableListOf(Error(errorType = "passowrd not match", error = true)))
+                setError(
+                    mutableListOf(
+                        Error(
+                            errorType = "password not match or less than 6 char",
+                            error = true
+                        )
+                    )
+                )
                 return false
             } else {
-                setError(
-                    emptyList<Error>().toMutableList()
-                )
-
+                setError(emptyList<Error>().toMutableList())
             }
             return true
         }
     }
 
+
     fun checkErrorForSecondPage(): Boolean {
-        val check = _user.value!!.date != "" && _user.value!!.date != ""
+        val check = _user.value!!.date.isNotEmpty() && _user.value!!.gander.isNotEmpty()
         if (!check) {
-            setError(mutableListOf(Error(errorType = "check Date or Gander", error = true)))
+            setError(mutableListOf(Error(errorType = "check Date or Gender", error = true)))
             return false
         }
         return true
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun checkDate(date: String) {
-        // TODO check if date in future
-        //  return (Date.from(Instant.now()) > DateTimeFormatter.ofPattern())
     }
 
     private var firebaseRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("Users")
@@ -148,12 +143,8 @@ class RegisteringVM : ViewModel() {
         val imageUri = user.imageUrl
 
         if (imageUri != null) {
-            // Convert the imageUrl String back to Uri
             val uri = Uri.parse(imageUri)
-
-            // Upload the image
             val imageRef = storageRef.child("images/${user.email}.jpg")
-
             val uploadTask = imageRef.putFile(uri)
             uploadTask.addOnFailureListener {
                 Log.d("Firebase", "Image upload failed: ${it.message}")
@@ -164,9 +155,9 @@ class RegisteringVM : ViewModel() {
                 }
             }
         } else {
-            // Save user without image
             saveUserToDatabase(user, null)
         }
+        firebaseIm.saveUserAuth(user)
     }
 
     private fun saveUserToDatabase(user: User, imageUrl: String?) {
@@ -175,19 +166,33 @@ class RegisteringVM : ViewModel() {
         firebaseRef.child(contactId).setValue(userWithImage)
             .addOnCompleteListener {
                 Log.d("Firebase", "User saved successfully")
+                // Update user location after saving user data
+                updateUserLocation(contactId)
             }
             .addOnFailureListener {
                 Log.d("Firebase", "Error saving user: ${it.message}")
             }
     }
+
+    fun updateUserLocation(userId: String) {
+        if (context != null) {
+            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context!!)
+            if (ContextCompat.checkSelfPermission(context!!, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                    if (location != null) {
+                        val userUpdates = mapOf(
+                            "lat" to location.latitude,
+                            "lng" to location.longitude
+                        )
+                        firebaseRef.child(userId).updateChildren(userUpdates)
+                    }
+                }
+            } else {
+                // Handle permission not granted
+            }
+        }
+    }
 }
-
-private fun findErrorTextAndRemove(mutableList: MutableList<Error>, error: String) {
-    mutableList.remove(mutableList.find { it.errorType == error })
-}
-
-
-
 data class User(
     var name: String = "",
     var email: String = "",
@@ -195,45 +200,31 @@ data class User(
     var confirmedPassword: String = "",
     var date: String = "",
     var gander: String = "",
-    var imageUrl: String? = null,  // Ändere das hier
+    var imageUrl: String? = null,
     var ganderLookingFor: String = "",
     var describes: String = "",
-    var interest: MutableList<String> = mutableListOf()
+    var interest: MutableList<String> = mutableListOf(),
+    var lat: Double = 0.0,
+    var lng: Double = 0.0
 ) {
     fun emptyFields(): List<String> {
         val emptyFields = mutableListOf<String>()
-        if (name.isEmpty()) {
-            emptyFields.add("name")
-        }
-        if (email.isEmpty()) {
-            emptyFields.add("email")
-        }
-        if (password.isEmpty()) {
-            emptyFields.add("password")
-        }
-        if (confirmedPassword.isEmpty()) {
-            emptyFields.add("confirmedPassword")
-        }
+        if (name.isEmpty()) emptyFields.add("name")
+        if (email.isEmpty() || !checkEmailPattern(email)) emptyFields.add("email")
+        if (password.isEmpty()) emptyFields.add("password")
+        if (confirmedPassword.isEmpty()) emptyFields.add("confirmedPassword")
         return emptyFields
     }
 
     fun matchPassword(): Boolean {
-        return password == confirmedPassword
+        return password == confirmedPassword && password.length >= 6
+    }
+
+    private fun checkEmailPattern(email: String): Boolean {
+        val emailPattern = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$".toRegex()
+        return email.matches(emailPattern)
     }
 }
-
-
-data class User2(
-    var name: String = "",
-    var email: String = "",
-    var password: String = "",
-    var confirmedPassword: String = "",
-    var date: String = "",
-    var gander: String = "",
-    //var image: Bitmap? = null,
-    var ganderLookingFor: String = "",
-    var describes: String = "",
-)
 
 data class Error(
     var errorType: String = "",
@@ -241,7 +232,10 @@ data class Error(
 )
 
 fun Date.formatAndToString(): String {
-
     return SimpleDateFormat("dd.MM.yyy", Locale.getDefault()).format(this)
+}
+
+private fun findErrorTextAndRemove(mutableList: MutableList<Error>, error: String) {
+    mutableList.remove(mutableList.find { it.errorType == error })
 }
 

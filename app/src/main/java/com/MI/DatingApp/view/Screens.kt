@@ -8,12 +8,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.MI.DatingApp.R
 import com.MI.DatingApp.model.User
 import com.MI.DatingApp.ui.theme.ComposeBottomNavigationExampleTheme
 import com.MI.DatingApp.view.home.HomeScreen
@@ -104,8 +107,8 @@ fun Home(navController: NavController, viewModel: LoginViewModel = viewModel()) 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xE5E5E5))
-            .padding(32.dp)
+            .background(colorResource(R.color.AppBackground))
+            .padding(20.dp)
     ){
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -114,15 +117,6 @@ fun Home(navController: NavController, viewModel: LoginViewModel = viewModel()) 
         ) {
             HomeScreen()
 
-            Text(
-                "Welcome to Screen 1! ${user?.email}" +
-                        "Click the button below for nested navigation. The bottom navigation bar will be hidden.",
-                style = MaterialTheme.typography.headlineSmall.copy(fontSize = 18.sp)
-            )
-
-            Button(onClick = { navController.navigate("screen2") }) {
-                Text("Go to Screen 2")
-            }
         }
     }
 

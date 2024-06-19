@@ -38,8 +38,8 @@ class LoginViewModel : ViewModel() {
     }
 
     fun login() {
-        val emailValue = email.value
-        val passwordValue = password.value
+        val emailValue = email.value.trim()
+        val passwordValue = password.value.trim()
 
         _loginState.value = LoginState.Loading
 

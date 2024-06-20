@@ -64,7 +64,8 @@ fun CardContent(item: Item) {
 
         Column(
             modifier = Modifier
-                // .align(Alignment.BottomStart)
+                .align(Alignment.BottomStart)
+                .fillMaxWidth()
                 .background(Color.Black.copy(alpha = 0.5f))
                 .padding(8.dp)
         ) {
@@ -216,6 +217,13 @@ fun ControlButtons(
 @Composable
 fun SwipeCardDemoList(accounts: List<Item>) {
     var currentIndex by rememberSaveable  { mutableIntStateOf(0) }
+    val screenWidth = with(LocalDensity.current) {
+        LocalConfiguration.current.screenWidthDp.dp.toPx()
+    }
+
+    val screenHeight = with(LocalDensity.current) {
+        LocalConfiguration.current.screenHeightDp.dp.toPx()
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (currentIndex < accounts.size) {
@@ -256,7 +264,7 @@ fun SwipeCardDemoList(accounts: List<Item>) {
        Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 70.dp)
+                .padding(top = (screenHeight/3.9).dp)
         ) {
             ControlButtons(
                 onLeftSwipe = {

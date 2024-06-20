@@ -23,6 +23,7 @@ import com.MI.DatingApp.viewModel.registering.RegisteringVM
 
 
 import coil.compose.rememberImagePainter
+import com.MI.DatingApp.model.CurrentUser
 import com.MI.DatingApp.model.User
 
 @Composable
@@ -35,10 +36,11 @@ fun TestView(navController: NavController) {
     val name by mainViewModel.name.observeAsState("")
     val password by mainViewModel.password.observeAsState("")
     val users by mainViewModel.users.observeAsState(emptyList())
+    // Beobachte die LiveData des aktuellen Benutzers
+    val statusMessage by mainViewModel.statusMessage.observeAsState("")
     val currentUser by mainViewModel.currentShownUser.observeAsState()
 
-    val statusMessage by mainViewModel.statusMessage.observeAsState("")
-
+    val currentUserLive by mainViewModel.currentUserLiveData.observeAsState()
 
     Column(
         modifier = Modifier
@@ -129,9 +131,9 @@ fun TestView(navController: NavController) {
         }
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text("${mainViewModel.momentanerUser2?.name}", color = Color.Black)
-        Text(" ${mainViewModel.momentanerUser2?.description}", color = Color.Black)
-        Text("  ${mainViewModel.momentanerUser2?.yearOfBirth}", color = Color.Black)
+        Text("${currentUserLive?.name}", color = Color.Black)
+        Text("${currentUserLive?.description}", color = Color.Black)
+        Text("${currentUserLive?.yearOfBirth}", color = Color.Black)
 
 //        ButtonCompose({
 //

@@ -33,7 +33,8 @@ object CurrentUser {
     fun setUser(newUser: User) {
         user = newUser
         saveUserToPreferences(newUser)
-        listenToUserChanges(newUser.id) // Start the listener when the user is set
+        _userLiveData.postValue(newUser)
+      //  listenToUserChanges(newUser.id) // Start the listener when the user is set
     }
     
 
@@ -61,8 +62,8 @@ object CurrentUser {
                             if (user == null || user != updatedUser) {
                                 // Aktualisiere den LiveData des aktuellen Benutzers
                                 _userLiveData.postValue(updatedUser)
-                                user = updatedUser
-                                saveUserToPreferences(updatedUser)
+                                setUser(updatedUser)
+
                                 Log.d("CurrentUserUpdate", updatedUser.toString())
                             }
                         }

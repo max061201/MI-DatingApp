@@ -1,6 +1,8 @@
 package com.MI.DatingApp.viewModel
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -39,6 +41,8 @@ class MainViewModel : ViewModel() {
 
     private val _currentShownUser = MutableLiveData<User?>()
     val currentShownUser: LiveData<User?> get() = _currentShownUser
+
+    val currentUserLiveData: LiveData<User?> = CurrentUser.userLiveData
 
 
     fun incCount(){

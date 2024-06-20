@@ -22,25 +22,24 @@ import com.MI.DatingApp.view.Screen3
 import com.MI.DatingApp.view.Screen4
 import com.MI.DatingApp.view.Login
 import com.MI.DatingApp.view.Profile
-import com.MI.DatingApp.view.TestViewModel
+import com.MI.DatingApp.view.TestView
 import com.MI.DatingApp.view.registieren.Registrieren
 
 
 @Composable
 fun AppNavigation(navController: NavHostController, modifier: Modifier = Modifier,) {
-    NavHost(navController = navController, startDestination = "test") {
+    NavHost(navController = navController, startDestination = "login") {
         composable("login") { Login(navController) }
 
         composable("registrieren") {
           Registrieren(navController = navController)
         }
-        composable("test") { TestViewModel(navController) }
+        composable("test") { TestView(navController) }
 
         composable("home") { Home(navController) }
         composable("likes") { Likes(navController) }
         composable("chat") { Chat(navController) }
         composable("profile") { Profile(navController) }
-
         composable("screen2") { Screen2(navController) }
         composable("screen3") { Screen3(navController) }
         composable("screen4/{data}", arguments = listOf(navArgument("data") { type = NavType.StringType })) { backStackEntry ->

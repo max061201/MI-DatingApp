@@ -29,6 +29,17 @@ class MainViewModel : ViewModel() {
     private val _statusMessage = MutableLiveData<String>()
     val statusMessage: LiveData<String> get() = _statusMessage
 
+    private val _users = MutableLiveData<List<User>>()
+    val users: LiveData<List<User>> get() = _users
+
+    private val _currentUserIndex = MutableLiveData(0)
+    val currentUserIndex: LiveData<Int> get() = _currentUserIndex
+
+    private val _currentUser = MutableLiveData<User?>()
+    val currentUser: LiveData<User?> get() = _currentUser
+
+
+
     fun incCount(){
         _number.value = _number.value?.plus(1)
     }
@@ -106,7 +117,22 @@ class MainViewModel : ViewModel() {
                 _statusMessage.value = "Fehler beim Speichern der Daten: ${it.message}"
             }
     }
+    fun showNextUser() {
+        val usersList = _users.value ?: return
+        val nextIndex = (_currentUserIndex.value ?: 0) + 1
+        if (nextIndex < usersList.size) {
+            _currentUserIndex.value = nextIndex
+            _currentUser.value = usersList[nextIndex]
+        }
+    }
 
+    fun showPreviousUser() {
+        val prevIndex = (_currentUserIndex.value ?: 0) - 1
+        if (prevIndex >= 0) {
+            _currentUserIndex.value = prevIndex
+            _currentUser.value = _users.value?.get(prevIndex)
+        }
+    }
     fun getAllUsersData() {
         firebaseRefUsers.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -119,7 +145,7 @@ class MainViewModel : ViewModel() {
                 }
                 Log.d("Login", userList.toString())
 
-                //_users.value = userList
+                _users.value = userList
             }
 
             override fun onCancelled(databaseError: DatabaseError) {

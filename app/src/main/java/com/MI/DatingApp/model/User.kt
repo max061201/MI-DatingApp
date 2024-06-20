@@ -1,6 +1,7 @@
 package com.MI.DatingApp.model
 
 data class User(
+    val id: String ="",
     var name: String = "",
     var email: String = "",
     var password: String = "",

@@ -2,26 +2,22 @@ package com.MI.DatingApp.view
 
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.MI.DatingApp.model.User
 import com.MI.DatingApp.ui.theme.ComposeBottomNavigationExampleTheme
+import com.MI.DatingApp.view.home.HomeScreen
+import com.MI.DatingApp.viewModel.LoginViewModel
 
 //@Composable
 //fun Screen1(navController: NavController) {
@@ -98,25 +94,38 @@ fun Screen4(navController: NavController, data: String) {
     }
 }
 
+
 @Composable
-fun Home(navController: NavController) {
-    Column(
+fun Home(navController: NavController, viewModel: LoginViewModel = viewModel()) {
+
+    // Collect user state from the ViewModel
+    val user by viewModel.user.collectAsState()
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(20.dp)
-            .background(MaterialTheme.colorScheme.surface),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            "Welcome to Screen 1! Click the button below for nested navigation. The bottom navigation bar will be hidden.",
-            style = MaterialTheme.typography.headlineSmall.copy(fontSize = 18.sp)
-        )
+            .background(Color(0xE5E5E5))
+            .padding(32.dp)
+    ){
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ) {
+            HomeScreen()
 
-        Button(onClick = { navController.navigate("screen2") }) {
-            Text("Go to Screen 2")
+            Text(
+                "Welcome to Screen 1! ${user?.email}" +
+                        "Click the button below for nested navigation. The bottom navigation bar will be hidden.",
+                style = MaterialTheme.typography.headlineSmall.copy(fontSize = 18.sp)
+            )
+
+            Button(onClick = { navController.navigate("screen2") }) {
+                Text("Go to Screen 2")
+            }
         }
     }
+
 }
 
 @Composable
@@ -164,5 +173,18 @@ fun Profile(navController: NavController) {
         )
     }
 }
+
+
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+    val navController = rememberNavController()
+    ComposeBottomNavigationExampleTheme {
+        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+            Home(navController)
+        }
+    }
+}
+
 
 

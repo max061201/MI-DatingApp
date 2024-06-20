@@ -4,7 +4,6 @@ package com.MI.DatingApp.viewModel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.MI.DatingApp.model.Contact
 import com.MI.DatingApp.model.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -83,8 +82,8 @@ class Login2ViewModel : ViewModel() {
                 if (dataSnapshot.exists()) {
                     // Es gibt mindestens einen Kontakt mit dem angegebenen Namen
                     for (contactSnapshot in dataSnapshot.children) {
-                        val contact = contactSnapshot.getValue(User::class.java)
-                        if (contact != null && contact.password == passwordValue) {
+                        val currentUser = contactSnapshot.getValue(User::class.java)
+                        if (currentUser != null && currentUser.password == passwordValue) {
 
                             // Passwort stimmt überein
                             _statusMessage.value = "Login erfolgreich"

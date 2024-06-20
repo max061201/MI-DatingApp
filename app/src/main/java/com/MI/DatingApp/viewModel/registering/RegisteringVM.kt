@@ -9,6 +9,7 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.MI.DatingApp.model.registieren.FirebaseIm
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
@@ -24,6 +25,8 @@ class RegisteringVM : ViewModel() {
 
     private val _errorField = MutableLiveData<MutableList<Error>>().apply { value = emptyList<Error>().toMutableList() }
     val errorField: LiveData<MutableList<Error>> = _errorField
+
+    var firebaseIm = FirebaseIm()
 
     private var context: Context? = null
 
@@ -174,6 +177,8 @@ class RegisteringVM : ViewModel() {
             // Save user without image
             saveUserToDatabase(user, null)
         }
+
+        firebaseIm.saveUserAuth(user)
     }
 
 

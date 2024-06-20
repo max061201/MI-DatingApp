@@ -7,14 +7,20 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -34,27 +40,24 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
 import com.MI.DatingApp.R
 import com.MI.DatingApp.ui.theme.ComposeBottomNavigationExampleTheme
-import com.MI.DatingApp.viewModel.Login2ViewModel
 import com.MI.DatingApp.viewModel.LoginViewModel
 import com.MI.DatingApp.viewModel.LoginState
 
 @Composable
-fun Login(navController: NavController, viewModel: Login2ViewModel = viewModel()) {
+fun Login(navController: NavController, viewModel: LoginViewModel = viewModel()) {
     val email by viewModel.email.collectAsState()
-    val name by viewModel.name.collectAsState()
-
     val password by viewModel.password.collectAsState()
     val loginState by viewModel.loginState.collectAsState()
+
 
     LaunchedEffect(loginState) {
         if (loginState is LoginState.Success) {
             navController.navigate("home")
         }
     }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -71,14 +74,13 @@ fun Login(navController: NavController, viewModel: Login2ViewModel = viewModel()
             modifier = Modifier.fillMaxSize()
         ) {
             LoginHeader()
-            Spacer(modifier = Modifier.height(32.dp))
-
-            TextFieldInput(name,password, viewModel::onNameChanged, viewModel::onPasswordChanged)
-            Spacer(modifier = Modifier.height(32.dp))
-            LoginButtonAndSignUpText ({ viewModel.verifyData() }, navController)
-            LoginStateHandler(loginState)
-
+            Spacer(modifier = Modifier.height(25.dp))
+            TextFieldInput(email, password, viewModel::onEmailChange, viewModel::onPasswordChange)
+            LoginStateHandler(loginState, navController)
+            Spacer(modifier = Modifier.height(25.dp))
+            LoginButtonAndSignUpText ({ viewModel.login() }, navController)
         }
+
     }
 }
 
@@ -89,7 +91,7 @@ fun LoginHeader() {
         verticalArrangement = Arrangement.Top,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 150.dp)
+            .padding(top = 100.dp)
     ) {
 
         Icon(
@@ -127,7 +129,7 @@ fun TextFieldInput(email: String,
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth()
-            .padding(top = 60.dp)
+            .padding(top = 50.dp)
     ) {
         BasicTextField(
             value = email,
@@ -207,7 +209,7 @@ fun LoginButtonAndSignUpText(onClick: () -> Unit, navController: NavController) 
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom,
         modifier = Modifier.fillMaxHeight()
-            .padding( top= 40.dp)
+            .padding( top= 60.dp)
     ) {
         Button(
             onClick = onClick,
@@ -246,23 +248,11 @@ fun LoginButtonAndSignUpText(onClick: () -> Unit, navController: NavController) 
 }
 
 @Composable
-fun LoginStateHandler(loginState: LoginState) {
+fun LoginStateHandler(loginState: LoginState, navController: NavController) {
     when (loginState) {
         is LoginState.Loading -> CircularProgressIndicator()
-        is LoginState.Success -> Text(text = "Login Successful", color = Color.White)
-        is LoginState.Error -> Text(text = (loginState as LoginState.Error).message, color = Color.Red)
+        is LoginState.Success -> {navController.navigate("home");}
+        is LoginState.Error -> Text(text = loginState.message, color = Color.Red)
         else -> {}
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    val navController = rememberNavController()
-    ComposeBottomNavigationExampleTheme {
-        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-            MainScreen(navController)
-        }
-    }
-}
-

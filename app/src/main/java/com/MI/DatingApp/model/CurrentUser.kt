@@ -2,19 +2,38 @@ package com.MI.DatingApp.model
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 object CurrentUser {
     private var user: User? = null
     private const val PREFERENCES_NAME = "MyAppPreferences"
     private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var firebaseRealTimeDB: DatabaseReference
+
+    private val _userLiveData = MutableLiveData<User?>()
+    val userLiveData: LiveData<User?> get() = _userLiveData
+
+    // ValueEventListener für Benutzeraktualisierungen
+    private var userValueEventListener: ValueEventListener? = null
+    private var isUserValueListenerActive = false
 
     fun initialize(context: Context) {
         sharedPreferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
+        firebaseRealTimeDB = FirebaseDatabase.getInstance().getReference("Users")
+
     }
 
     fun setUser(newUser: User) {
         user = newUser
         saveUserToPreferences(newUser)
+        listenToUserChanges(newUser.id) // Start the listener when the user is set
     }
     
 
@@ -29,6 +48,38 @@ object CurrentUser {
         user = null
         clearPreferences()
     }
+
+    fun listenToUserChanges(userId: String) {
+        // Überprüfe, ob der ValueEventListener bereits aktiv ist
+        if (!isUserValueListenerActive) {
+            // Füge einen ValueEventListener zur Überwachung von Benutzeränderungen hinzu
+            userValueEventListener = firebaseRealTimeDB.child(userId).addValueEventListener(
+                object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val updatedUser = snapshot.getValue(User::class.java)
+                        updatedUser?.let {
+                            if (user == null || user != updatedUser) {
+                                // Aktualisiere den LiveData des aktuellen Benutzers
+                                _userLiveData.postValue(updatedUser)
+                                user = updatedUser
+                                saveUserToPreferences(updatedUser)
+                                Log.d("CurrentUserUpdate", updatedUser.toString())
+                            }
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        // Behandlung eines Fehlers beim ValueEventListener
+                        Log.e("UserUpdateError", error.message)
+                    }
+                }
+            )
+            // Markiere den ValueEventListener als aktiv
+            isUserValueListenerActive = true
+        }
+    }
+
+
 
     private fun saveUserToPreferences(user: User) {
         val editor = sharedPreferences.edit()

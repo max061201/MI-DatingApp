@@ -39,6 +39,7 @@ fun TestView(navController: NavController) {
 
     val statusMessage by mainViewModel.statusMessage.observeAsState("")
 
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -126,6 +127,12 @@ fun TestView(navController: NavController) {
                 Text("Like")
             }
         }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text("${mainViewModel.momentanerUser2?.name}", color = Color.Black)
+        Text(" ${mainViewModel.momentanerUser2?.description}", color = Color.Black)
+        Text("  ${mainViewModel.momentanerUser2?.yearOfBirth}", color = Color.Black)
+
 //        ButtonCompose({
 //
 //

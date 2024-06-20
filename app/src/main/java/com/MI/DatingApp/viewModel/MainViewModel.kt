@@ -41,7 +41,6 @@ class MainViewModel : ViewModel() {
     val currentShownUser: LiveData<User?> get() = _currentShownUser
 
 
-
     fun incCount(){
         _number.value = _number.value?.plus(1)
     }
@@ -136,6 +135,7 @@ class MainViewModel : ViewModel() {
         }
     }
     var momentanerUser = CurrentUser.getTestUser()
+    var momentanerUser2 = CurrentUser.getUser()
     var firebaseIm = FirebaseIm()
     val changes = mutableMapOf<String, Any>()
 

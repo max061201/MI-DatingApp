@@ -10,6 +10,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -46,7 +47,7 @@ fun ProfileScreen(
     val testUser = CurrentUser.getTestUser()
 
     val userEdit by viewModel.userchanges.observeAsState()
-
+    val scrollState = rememberScrollState()
     viewModel.setUserValue(
         User(
             id = testUser.id,
@@ -90,6 +91,8 @@ fun ProfileScreen(
                         ProfileHeader(userEdit, viewModel, firebase = testUser)
                     }
                 }
+
+
             }
 
             item { Spacer(modifier = Modifier.height(16.dp)) }
@@ -97,14 +100,16 @@ fun ProfileScreen(
             item { Spacer(modifier = Modifier.height(16.dp)) }
             item { AboutMe(userEdit, viewModel) }
             item { Spacer(modifier = Modifier.height(16.dp)) }
-            item { DiscoverySettings(viewModel) }
+            item { AddImages(viewModel, userEdit!!) }
             item { Spacer(modifier = Modifier.height(16.dp)) }
             item { LogoutButton(navController, viewModel) }
             item { Spacer(modifier = Modifier.height(16.dp)) }
             item { DeleteAccountButton(navController, viewModel) }
             item { Spacer(modifier = Modifier.height(100.dp)) }
         }
+
     }
+
 }
 
 @Composable
@@ -113,9 +118,13 @@ fun ProfileHeader(userEdit: User?, viewModel: ProfileVM, firebase: User) {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth()
     ) {
-        Images(viewModel)
+        Images(viewModel, userEdit!!, 0)
         Spacer(modifier = Modifier.height(8.dp))
-        Text(firebase.name + " ," + firebase.yearOfBirth, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        Text(
+            firebase.name + " ," + firebase.yearOfBirth,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
 
@@ -176,7 +185,8 @@ fun AboutMe(userEdit: User?, viewModel: ProfileVM) {
 }
 
 @Composable
-fun DiscoverySettings(viewModel: ProfileVM) {
+fun AddImages(viewModel: ProfileVM, user: User) {
+    var j: Int = 0
     Card(
         shape = RoundedCornerShape(16.dp),
         backgroundColor = Color.White,
@@ -185,9 +195,10 @@ fun DiscoverySettings(viewModel: ProfileVM) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text("Add Images", fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Row(modifier = Modifier.padding(16.dp)) {
-                Images(viewModel)
-                Images(viewModel)
-                Images(viewModel)
+
+                Images(viewModel, user!!, 1)
+                Images(viewModel, user!!, 2)
+                Images(viewModel, user!!, 3)
             }
         }
     }
@@ -236,15 +247,20 @@ fun DeleteAccountButton(navController: NavController, viewModel: ProfileVM) {
 }
 
 @Composable
-fun Images(viewModel: ProfileVM, image: String = "") {
+fun Images(viewModel: ProfileVM, userEdit: User, index: Int = 0) {
+    val image: String = if (userEdit.imageUrls!!.size > index) {
+        userEdit.imageUrls!![index]
+    } else {
+        ""
+    }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         imageUri = uri
         uri?.let {
-            val imagePath = it.toString() // Convert Uri to String here
-            viewModel.setImage(imagePath)
+            val imagePath = it.toString()
+            viewModel.setImage(imagePath, image)
         }
     }
     Box(
@@ -259,7 +275,7 @@ fun Images(viewModel: ProfileVM, image: String = "") {
             .clip(RoundedCornerShape(50.dp))
     ) {
         AsyncImage(
-            model = if (imageUri == null) image else imageUri,
+            model = image,
             contentDescription = null,
             modifier = Modifier
                 .padding(4.dp)

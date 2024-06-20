@@ -11,8 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Card
-import androidx.compose.material.Icon
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -21,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -161,10 +161,10 @@ fun SwipeableCard(
                 modifier = Modifier
                     .align(Alignment.Center)
                     .size(100.dp)
-                   // .background(Color.Green, shape = RoundedCornerShape(50))
+                    .background(Color.White, shape = RoundedCornerShape(50))
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_heart2),
+                    painter = painterResource(id = R.drawable.ic_heart1),
                     contentDescription = null,
                     modifier = Modifier.align(Alignment.Center)
                 )
@@ -182,7 +182,8 @@ fun ControlButtons(
     modifier: Modifier = Modifier
 ) {
    Row(
-       modifier = modifier
+       horizontalArrangement = Arrangement.SpaceEvenly,
+       modifier = modifier.fillMaxWidth()
    ) {
             IconButton(onClick = onLeftSwipe) {
                Image(
@@ -242,12 +243,21 @@ fun SwipeCardDemoList(accounts: List<Item>) {
             Text("No more profiles to show", color = Color.Black , modifier = Modifier.align(Alignment.Center))
         }
 
-        Column(
+        Column (
+            modifier = Modifier
+                .background(Color.Blue)
+                .fillMaxWidth()
+        ) {
+            Text(text = "$currentIndex", color = Color.White,)
+        }
+
+
+
+       Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 64.dp)
+                .padding(bottom = 70.dp)
         ) {
-
             ControlButtons(
                 onLeftSwipe = {
                     if (currentIndex < accounts.size) {

@@ -25,7 +25,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         CurrentUser.initialize(this)
-        Log.d("CurrentUser2", CurrentUser.getUser().toString())
 
         setContent {
             val navController = rememberNavController()
@@ -33,6 +32,7 @@ class MainActivity : ComponentActivity() {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     MainScreen(navController)
                     //CurrentUser.clearUser()
+                    //Log.d("CurrentUser", CurrentUser.getUser().toString())
                    // AppContent(navController)
                 }
             }
@@ -40,11 +40,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun AppContent(navController: NavHostController) {
-    val startDestination = if (CurrentUser.getUser() != null) "home" else "login"
-    AppNavigation(navController = navController, startDestination = startDestination)
-}
+
 
 @Preview(showBackground = true)
 @Composable

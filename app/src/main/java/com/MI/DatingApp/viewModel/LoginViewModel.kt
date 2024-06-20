@@ -90,7 +90,7 @@ class LoginViewModel : ViewModel() {
             if (foundUser != null) {
                 CurrentUser.setUser(foundUser)
                 Log.d("CurrentUser", foundUser.toString())
-                Log.d("CurrentUser2", CurrentUser.getUser().toString())
+              //  Log.d("CurrentUser2", CurrentUser.getUser().toString())
 
                 _loginState.value = LoginState.Success
             } else {

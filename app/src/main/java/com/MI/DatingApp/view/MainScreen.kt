@@ -48,7 +48,7 @@ fun MainScreen(navController: NavHostController) {
         }
     ) { innerPadding ->
        // AppNavigation(navController, Modifier.padding(innerPadding), startDestination)
-        val startDestination = if (CurrentUser.getUser() != null) "home" else "login"
+        val startDestination = if (CurrentUser.getUser() != null) "test" else "login"
         AppNavigation(navController = navController, startDestination = startDestination, modifier = Modifier.padding(innerPadding) )
     }
 }

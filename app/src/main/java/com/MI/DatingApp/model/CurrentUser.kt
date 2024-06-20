@@ -16,6 +16,7 @@ object CurrentUser {
         user = newUser
         saveUserToPreferences(newUser)
     }
+    
 
     fun getUser(): User? {
         if (user == null) {
@@ -86,7 +87,11 @@ object CurrentUser {
     }
 
     fun getTestUser(): User {
-        return User(
+        // Nutzt die getUser() Funktion, um den aktuellen Benutzer zu erhalten
+        val currentUser = getUser()
+
+        // Wenn kein Benutzer gefunden wurde, wird ein Testbenutzer zurückgegeben
+        return currentUser ?: User(
             id = "-O-gTyIykyVTlqOSEkli",
             name = "Usertest",
             email = "user@gmail.com",

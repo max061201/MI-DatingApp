@@ -127,7 +127,7 @@ class ProfileVM : ViewModel() {
                 //updateUserToDatabase()
 
             } else {
-                firebaseIm.updateUserToDatabase(changes)
+                firebaseIm.updateUserToDatabase(changes, currentUser.id)
             }
         }
     }

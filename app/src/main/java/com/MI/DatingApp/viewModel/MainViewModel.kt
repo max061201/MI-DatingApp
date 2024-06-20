@@ -144,15 +144,15 @@ class MainViewModel : ViewModel() {
         Log.d("Dislike", "Dislike")
 
         // Prüfen, ob der aktuelle Benutzer angezeigt wird und wenn ja, Änderungen hinzufügen
-        _currentShownUser.value?.let { currentUser ->
-            if (!momentanerUser.likes.contains(currentUser.id) && !momentanerUser.dislikes.contains(currentUser.id)) {                momentanerUser.dislikes.add(currentUser.id)
+        _currentShownUser.value?.let { currentShownUser ->
+            if (!momentanerUser.likes.contains(currentShownUser.id) && !momentanerUser.dislikes.contains(currentShownUser.id)) {                momentanerUser.dislikes.add(currentShownUser.id)
                 changes["dislikes"] = momentanerUser.dislikes // Änderungen hinzufügen
-                firebaseIm.updateUserToDatabase(changes) // Datenbank aktualisieren
+                firebaseIm.updateUserToDatabase(changes, momentanerUser.id) // Datenbank aktualisieren
                 Log.d("changes", changes.toString())
                 Log.d("momentanerUser", momentanerUser.toString())
                // CurrentUser.setUser(momentanerUser) updated current userdata
             }else{
-                Log.d("User", "User wurde schon geliked oder gedisliked $currentUser.id")
+                Log.d("User", "User wurde schon geliked oder gedisliked $currentShownUser.id")
             }
         }
     }
@@ -160,16 +160,49 @@ class MainViewModel : ViewModel() {
 
         Log.d("Like", "Like")
         // Prüfen, ob der aktuelle Benutzer angezeigt wird und wenn ja, Änderungen hinzufügen
-        _currentShownUser.value?.let { currentUser ->
-            if (!momentanerUser.likes.contains(currentUser.id) && !momentanerUser.dislikes.contains(currentUser.id)) {
-                momentanerUser.likes.add(currentUser.id)
+        Log.d("_currentShownUser", _currentShownUser.toString())
+        Log.d("momentanerUser", momentanerUser.toString())
+
+        _currentShownUser.value?.let { currentShownUser ->
+            //hat der user den anderen schonmal geliked/ gedisliked
+            if (!momentanerUser.likes.contains(currentShownUser.id) && !momentanerUser.dislikes.contains(currentShownUser.id)   ) {
+
+                //füge den geliked user in likes von CurrentUser
+                momentanerUser.likes.add(currentShownUser.id)
                 changes["likes"] = momentanerUser.likes // Änderungen hinzufügen
-                firebaseIm.updateUserToDatabase(changes) // Datenbank aktualisieren
-                Log.d("changes", changes.toString())
-                Log.d("momentanerUser", momentanerUser.toString())
+                firebaseIm.updateUserToDatabase(changes, momentanerUser.id) // Datenbank aktualisieren
+                CurrentUser.setUser(momentanerUser) // Lokal CurrentUser aktualisieren
+                changes.clear() // Veränderungen löschen
+                Log.d("CurrentUser", CurrentUser.getUser().toString())
+
+                currentShownUser.receivedLikes.add(momentanerUser.id)
+                changes["receivedLikes"] = currentShownUser.receivedLikes // Änderungen hinzufügen
+                firebaseIm.updateUserToDatabase(changes, currentShownUser.id) // Datenbank aktualisieren
+                changes.clear()
+                Log.d("currentShownUser receivedLikes", currentShownUser.receivedLikes.toString())
+
+
                 // CurrentUser.setUser(momentanerUser) updated current userdata
-            } else{
-                Log.d("User", "User wurde schon geliked oder gedisliked $currentUser.id")
+            }
+
+            // hat einer der user denn anderen schonmal geliked?
+            //vlt irgenwie pop up mit Match gefunden oder so?
+            else if (currentShownUser.likes.contains(momentanerUser.id)){
+                Log.d("MATCH", "es gibt ein mensch zwischen ${momentanerUser.name} und ${currentShownUser.name} ")
+
+                //füge den geliked user in likes von CurrentUser
+                momentanerUser.likes.add(currentShownUser.id)
+                changes["likes"] = momentanerUser.likes // Änderungen hinzufügen
+                firebaseIm.updateUserToDatabase(changes, momentanerUser.id) // Datenbank aktualisieren
+                CurrentUser.setUser(momentanerUser) // Lokal CurrentUser aktualisieren
+                changes.clear() // Veränderungen löschen
+                Log.d("CurrentUser", CurrentUser.getUser().toString())
+
+                //erstelle ein Match
+                firebaseIm.createMatch(momentanerUser.id,currentShownUser.id)
+            }
+            else{
+                Log.d("User", "User wurde schon geliked oder gedisliked $currentShownUser.id")
             }
 
         }

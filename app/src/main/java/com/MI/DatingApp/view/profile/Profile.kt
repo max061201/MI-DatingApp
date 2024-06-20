@@ -47,20 +47,22 @@ fun ProfileScreen(
 
     val userEdit by viewModel.userchanges.observeAsState()
 
-    viewModel.setUserValue(
-        User(
-            id = testUser.id,
-            name = testUser.name,
-            email = testUser.email,
-            yearOfBirth = testUser.yearOfBirth,
-            gender = testUser.gender,
-            imageUrls = testUser.imageUrls,
-            description = testUser.description,
-            interest = testUser.interest,
-            likes = testUser.likes,
-            dislikes = testUser.dislikes
+    if (testUser != null) {
+        viewModel.setUserValue(
+            User(
+                id = testUser.id,
+                name = testUser.name,
+                email = testUser.email,
+                yearOfBirth = testUser.yearOfBirth,
+                gender = testUser.gender,
+                imageUrls = testUser.imageUrls,
+                description = testUser.description,
+                interest = testUser.interest,
+                likes = testUser.likes,
+                dislikes = testUser.dislikes
+            )
         )
-    )
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -87,7 +89,7 @@ fun ProfileScreen(
                             tint = androidx.compose.ui.graphics.Color.Black,
                             modifier = Modifier.size(24.dp)
                         )
-                        ProfileHeader(userEdit, viewModel, firebase = testUser)
+                        ProfileHeader(userEdit, viewModel, firebase = testUser!!)
                     }
                 }
             }

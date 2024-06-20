@@ -245,9 +245,7 @@ fun DiscoverySettings(viewModle: ProfileVM) {
 @Composable
 fun LogoutButton(navController: NavController, viweModle: ProfileVM) {
     Box(
-        Modifier.fillMaxWidth()
-
-
+        Modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
         Button(

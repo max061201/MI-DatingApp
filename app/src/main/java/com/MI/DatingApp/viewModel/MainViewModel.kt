@@ -5,7 +5,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.MI.DatingApp.model.Contact
+import com.MI.DatingApp.model.CurrentUser
 import com.MI.DatingApp.model.User
+import com.MI.DatingApp.model.registieren.FirebaseIm
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -35,8 +37,8 @@ class MainViewModel : ViewModel() {
     private val _currentUserIndex = MutableLiveData(0)
     val currentUserIndex: LiveData<Int> get() = _currentUserIndex
 
-    private val _currentUser = MutableLiveData<User?>()
-    val currentUser: LiveData<User?> get() = _currentUser
+    private val _currentShownUser = MutableLiveData<User?>()
+    val currentShownUser: LiveData<User?> get() = _currentShownUser
 
 
 
@@ -122,7 +124,7 @@ class MainViewModel : ViewModel() {
         val nextIndex = (_currentUserIndex.value ?: 0) + 1
         if (nextIndex < usersList.size) {
             _currentUserIndex.value = nextIndex
-            _currentUser.value = usersList[nextIndex]
+            _currentShownUser.value = usersList[nextIndex]
         }
     }
 
@@ -130,7 +132,46 @@ class MainViewModel : ViewModel() {
         val prevIndex = (_currentUserIndex.value ?: 0) - 1
         if (prevIndex >= 0) {
             _currentUserIndex.value = prevIndex
-            _currentUser.value = _users.value?.get(prevIndex)
+            _currentShownUser.value = _users.value?.get(prevIndex)
+        }
+    }
+    var momentanerUser = CurrentUser.getTestUser()
+    var firebaseIm = FirebaseIm()
+    val changes = mutableMapOf<String, Any>()
+
+    fun Dislike() {
+
+        Log.d("Dislike", "Dislike")
+
+        // Prüfen, ob der aktuelle Benutzer angezeigt wird und wenn ja, Änderungen hinzufügen
+        _currentShownUser.value?.let { currentUser ->
+            if (!momentanerUser.likes.contains(currentUser.id) && !momentanerUser.dislikes.contains(currentUser.id)) {                momentanerUser.dislikes.add(currentUser.id)
+                changes["dislikes"] = momentanerUser.dislikes // Änderungen hinzufügen
+                firebaseIm.updateUserToDatabase(changes) // Datenbank aktualisieren
+                Log.d("changes", changes.toString())
+                Log.d("momentanerUser", momentanerUser.toString())
+               // CurrentUser.setUser(momentanerUser) updated current userdata
+            }else{
+                Log.d("User", "User wurde schon geliked oder gedisliked $currentUser.id")
+            }
+        }
+    }
+    fun Like() {
+
+        Log.d("Like", "Like")
+        // Prüfen, ob der aktuelle Benutzer angezeigt wird und wenn ja, Änderungen hinzufügen
+        _currentShownUser.value?.let { currentUser ->
+            if (!momentanerUser.likes.contains(currentUser.id) && !momentanerUser.dislikes.contains(currentUser.id)) {
+                momentanerUser.likes.add(currentUser.id)
+                changes["likes"] = momentanerUser.likes // Änderungen hinzufügen
+                firebaseIm.updateUserToDatabase(changes) // Datenbank aktualisieren
+                Log.d("changes", changes.toString())
+                Log.d("momentanerUser", momentanerUser.toString())
+                // CurrentUser.setUser(momentanerUser) updated current userdata
+            } else{
+                Log.d("User", "User wurde schon geliked oder gedisliked $currentUser.id")
+            }
+
         }
     }
     fun getAllUsersData() {
@@ -141,6 +182,7 @@ class MainViewModel : ViewModel() {
                     val user = userSnapshot.getValue(User::class.java)
                     if (user != null) {
                         userList.add(user)
+
                     }
                 }
                 Log.d("Login", userList.toString())
@@ -153,4 +195,5 @@ class MainViewModel : ViewModel() {
             }
         })
     }
+
 }

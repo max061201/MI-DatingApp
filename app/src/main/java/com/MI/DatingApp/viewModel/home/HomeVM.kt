@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.MI.DatingApp.R
 import com.MI.DatingApp.model.UserFirebase
-import com.MI.DatingApp.viewModel.registering.User
 
 class HomeVM :ViewModel() {
     private val _user = MutableLiveData<MutableList<UserFirebase>>().apply { value =

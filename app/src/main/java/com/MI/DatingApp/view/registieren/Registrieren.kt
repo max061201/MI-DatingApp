@@ -32,6 +32,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.MI.DatingApp.model.User
 import com.MI.DatingApp.view.registieren.recyclable.BasicOutlineText
 import com.MI.DatingApp.view.registieren.recyclable.ButtonCompose
 import com.MI.DatingApp.view.registieren.recyclable.DatePickerTextField
@@ -48,7 +49,6 @@ import com.MI.DatingApp.view.registieren.recyclable.outletAttributeRegisPage2
 import com.MI.DatingApp.view.registieren.recyclable.outletAttributeRegisPage3
 import com.MI.DatingApp.viewModel.registering.Error
 import com.MI.DatingApp.viewModel.registering.RegisteringVM
-import com.MI.DatingApp.viewModel.registering.User
 import java.util.Date
 
 @Composable

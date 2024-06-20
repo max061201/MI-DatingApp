@@ -17,6 +17,8 @@ import com.google.firebase.storage.StorageReference
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.MI.DatingApp.model.User
+
 
 class RegisteringVM : ViewModel() {
 
@@ -34,6 +36,11 @@ class RegisteringVM : ViewModel() {
         this.context = context
     }
 
+    fun setId(id: String) {
+        val updatedUser = _user.value?.copy(id = id)
+        _user.value = updatedUser
+    }
+
     fun setName(name: String) {
         val updatedUser = _user.value?.copy(name = name)
         _user.value = updatedUser
@@ -49,18 +56,18 @@ class RegisteringVM : ViewModel() {
         _user.value = updatedUser
     }
 
-    fun setGander(gander: String) {
-        val updatedUser = _user.value?.copy(gander = gander)
+    fun setGander(gender: String) {
+        val updatedUser = _user.value?.copy(gender = gender)
         _user.value = updatedUser
     }
 
-    fun setGanderLookingFor(gander: String) {
-        val updatedUser = _user.value?.copy(ganderLookingFor = gander)
+    fun setGanderLookingFor(gender: String) {
+        val updatedUser = _user.value?.copy(genderLookingFor = gender)
         _user.value = updatedUser
     }
 
     fun describe(describe: String) {
-        val updatedUser = _user.value?.copy(describes = describe)
+        val updatedUser = _user.value?.copy(description = describe)
         _user.value = updatedUser
     }
 
@@ -71,7 +78,9 @@ class RegisteringVM : ViewModel() {
 
 
     fun setImagePath(imagePath: String) {
-        val updatedUser = _user.value?.copy(imageUrl = imagePath)
+        val updatedUser = _user.value?.apply {
+            imageUrls?.add(imagePath)
+        }
         _user.value = updatedUser
     }
 
@@ -99,7 +108,7 @@ class RegisteringVM : ViewModel() {
     }
 
     fun setDate(date: String) {
-        val updatedUser = _user.value?.copy(date = date)
+        val updatedUser = _user.value?.copy(yearOfBirth = date)
         _user.value = updatedUser
     }
 
@@ -136,7 +145,7 @@ class RegisteringVM : ViewModel() {
     }
 
     fun checkErrorForSecondPage(): Boolean {
-        val check = _user.value!!.date != "" && _user.value!!.date != ""
+        val check = _user.value!!.yearOfBirth.isNotEmpty() && _user.value!!.gender.isNotEmpty()
         if (!check) {
             setError(mutableListOf(Error(errorType = "check Date or Gander", error = true)))
             return false
@@ -155,37 +164,45 @@ class RegisteringVM : ViewModel() {
 
     fun saveUserInFirebaseAuth() {
         val user = _user.value!!
-        val imageUri = user.imageUrl
+        val imageUris = user.imageUrls?.map { Uri.parse(it) } ?: emptyList()
 
-        if (imageUri != null) {
-            // Convert the imageUrl String back to Uri
-            val uri = Uri.parse(imageUri)
+        val contactId = firebaseRef.push().key ?: ""
 
-            // Upload the image
-            val imageRef = storageRef.child("images/${user.email}.jpg")
-
-            val uploadTask = imageRef.putFile(uri)
-            uploadTask.addOnFailureListener {
-                Log.d("Firebase", "Image upload failed: ${it.message}")
-            }.addOnSuccessListener { taskSnapshot ->
-                taskSnapshot.metadata?.reference?.downloadUrl?.addOnSuccessListener { uri ->
-                    val imageUrl = uri.toString()
-                    saveUserToDatabase(user, imageUrl)
-                }
-            }
+        setId(contactId)
+        if (imageUris.isNotEmpty()) {
+            uploadImagesAndSaveUser(imageUris, contactId)
         } else {
-            // Save user without image
-            saveUserToDatabase(user, null)
+            saveUserToDatabase(null, contactId)
         }
 
         firebaseIm.saveUserAuth(user)
     }
 
+    private fun uploadImagesAndSaveUser(imageUris: List<Uri>, contactId: String) {
+        val uploadedImageUrls = mutableListOf<String>()
+        val timestamp = System.currentTimeMillis() // Zeitstempel hinzufügen
 
-    private fun saveUserToDatabase(user: User, imageUrl: String?) {
-        val userWithImage = user.copy(imageUrl = imageUrl)
-        val contactId = firebaseRef.push().key ?: ""
-        firebaseRef.child(contactId).setValue(userWithImage)
+        imageUris.forEach { uri ->
+            val imageRef = storageRef.child("images/$contactId/${timestamp}_${uri.lastPathSegment}") // Zeitstempel vor dem Dateinamen
+            val uploadTask = imageRef.putFile(uri)
+            uploadTask.addOnFailureListener {
+                Log.d("Firebase", "Image upload failed: ${it.message}")
+            }.addOnSuccessListener { taskSnapshot ->
+                taskSnapshot.metadata?.reference?.downloadUrl?.addOnSuccessListener { downloadUri ->
+                    uploadedImageUrls.add(downloadUri.toString())
+                    if (uploadedImageUrls.size == imageUris.size) {
+                        saveUserToDatabase(uploadedImageUrls, contactId)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun saveUserToDatabase(imageUrls: List<String>?, contactId: String) {
+        val user = _user.value!!
+        val userWithImages = user.copy(imageUrls = imageUrls?.toMutableList())
+
+        firebaseRef.child(contactId).setValue(userWithImages)
             .addOnCompleteListener {
                 Log.d("Firebase", "User saved successfully")
             }
@@ -193,7 +210,6 @@ class RegisteringVM : ViewModel() {
                 Log.d("Firebase", "Error saving user: ${it.message}")
             }
     }
-
 }
 
 private fun findErrorTextAndRemove(mutableList: MutableList<Error>, error: String) {
@@ -201,62 +217,6 @@ private fun findErrorTextAndRemove(mutableList: MutableList<Error>, error: Strin
 }
 
 
-
-data class User(
-    var name: String = "",
-    var email: String = "",
-    var password: String = "",
-    var confirmedPassword: String = "",
-    var date: String = "",
-    var gander: String = "",
-    var imageUrl: String? = null,  // Ändere das hier
-    var ganderLookingFor: String = "",
-    var describes: String = "",
-    var interest: MutableList<String> = mutableListOf()
-) {
-    fun emptyFields(): List<String> {
-        val emptyFields = mutableListOf<String>()
-        if (name.isEmpty()) {
-            emptyFields.add("name")
-        }
-        if (email.isEmpty()||!checkEmailPattern(email)) {
-
-                emptyFields.add("email")
-
-
-        }
-        if (password.isEmpty()) {
-            emptyFields.add("password")
-        }
-        if (confirmedPassword.isEmpty()) {
-            emptyFields.add("confirmedPassword")
-        }
-        return emptyFields
-    }
-
-    fun matchPassword(): Boolean {
-        return password == confirmedPassword && password.length >= 6
-    }
-
-    private fun checkEmailPattern(email: String): Boolean {
-        val emailPattern = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$".toRegex()
-        var s= email.matches(emailPattern)
-        return s
-    }
-}
-
-
-data class User2(
-    var name: String = "",
-    var email: String = "",
-    var password: String = "",
-    var confirmedPassword: String = "",
-    var date: String = "",
-    var gander: String = "",
-    //var image: Bitmap? = null,
-    var ganderLookingFor: String = "",
-    var describes: String = "",
-)
 
 data class Error(
     var errorType: String = "",

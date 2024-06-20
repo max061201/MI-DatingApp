@@ -182,10 +182,8 @@ fun ControlButtons(
     modifier: Modifier = Modifier
 ) {
    Row(
-       horizontalArrangement = Arrangement.SpaceAround,
-       verticalAlignment = Alignment.CenterVertically,
-       modifier = modifier.fillMaxWidth()
-        ) {
+       modifier = modifier
+   ) {
             IconButton(onClick = onLeftSwipe) {
                Image(
                     painter = painterResource(id = R.drawable.ic_cross1),
@@ -211,7 +209,6 @@ fun ControlButtons(
     }
 
 }
-
 
 
 
@@ -245,39 +242,34 @@ fun SwipeCardDemoList(accounts: List<Item>) {
             Text("No more profiles to show", color = Color.Black , modifier = Modifier.align(Alignment.Center))
         }
 
-        ControlButtons(
-            onLeftSwipe = {
-                if (currentIndex < accounts.size) {
-                    currentIndex++
-                }
-            },
-            onRightSwipe = {
-                if (currentIndex > 0) {
-                    currentIndex--
-                }
-            },
-            onUndo = {
-                if (currentIndex > 0) {
-                    currentIndex--
-                }
-            },
+        Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(16.dp)
-        )
+                .padding(bottom = 64.dp)
+        ) {
+
+            ControlButtons(
+                onLeftSwipe = {
+                    if (currentIndex < accounts.size) {
+                        currentIndex++
+                    }
+                },
+                onRightSwipe = {
+                    if (currentIndex > 0) {
+                        currentIndex--
+                    }
+                },
+                onUndo = {
+                    if (currentIndex > 0) {
+                        currentIndex--
+                    }
+                },
+                modifier = Modifier
+                    //.align(Alignment.BottomCenter)
+                    .padding(16.dp)
+            )
+        }
 
     }
 }
 
-@Preview
-@Composable
-fun PreviewSwipeCardDemo() {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
-    ) {
-        SwipeCardDemo()
-    }
-
-}

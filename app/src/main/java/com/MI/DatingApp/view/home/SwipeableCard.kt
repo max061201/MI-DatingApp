@@ -16,6 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,27 +33,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.MI.DatingApp.R
 import com.MI.DatingApp.ui.theme.ComposeBottomNavigationExampleTheme
+import com.MI.DatingApp.viewModel.user.UserViewModel
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 data class Item(
     val imageUrl: String,
-    val profession: String,
     val name: String
 )
 
 @Composable
 fun SwipeCardDemo() {
-    val accounts = mutableListOf(
-        Item("https://images.unsplash.com/photo-1668069574922-bca50880fd70?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80", "Musician", "Alice (25)"),
-        Item("https://images.unsplash.com/photo-1618641986557-1ecd230959aa?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80", "Developer", "Chris (33)"),
-        Item("https://images.unsplash.com/photo-1667935764607-73fca1a86555?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=688&q=80", "Teacher", "Roze (22)")
-    )
-    SwipeCardDemoList(accounts = accounts)
+    SwipeCardDemoList()
 }
 
 @Composable
@@ -60,14 +57,15 @@ fun CardContent(item: Item) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(15.dp)
-            .shadow(16.dp)
+            .padding(5.dp)
+            .shadow(6.dp)
 
     ) {
         Image(
             painter = rememberAsyncImagePainter(model = item.imageUrl),
             contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
+            ///modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.height(400.dp).fillMaxWidth(),
             contentScale = ContentScale.Crop
         )
         Column(
@@ -77,8 +75,7 @@ fun CardContent(item: Item) {
                 .background(Color.Black.copy(alpha = 0.5f))
                 .padding(8.dp)
         ) {
-            Text(text = item.name, color = Color.White)
-            Text(text = item.profession, color = Color.White)
+            Text(text = item.name, style = MaterialTheme.typography.labelSmall, color = Color.White)
         }
     }
 }
@@ -219,14 +216,16 @@ fun ControlButtons(
 }
 
 @Composable
-fun SwipeCardDemoList(accounts: List<Item>) {
+fun SwipeCardDemoList(userViewModel: UserViewModel = viewModel()) {
     var currentIndex by rememberSaveable { mutableIntStateOf(0) }
+    val userList by userViewModel.users.observeAsState(initial = emptyList())
 
-
-    val screenWidth = with(LocalDensity.current) {
-        LocalConfiguration.current.screenWidthDp.dp.toPx()
+    val accounts = userList.map { user ->
+        Item(
+            imageUrl = user.imageUrl ?: "",
+            name = "${user.name} (${user.date})"
+        )
     }
-
 
     Column(
         modifier = Modifier
@@ -285,8 +284,6 @@ fun SwipeCardDemoList(accounts: List<Item>) {
                 currentIndex--
             }
         }
-            Text(text = "CurrentIndex $currentIndex < ${accounts.size} AccountSize", color = Color.Black)
-        Text(text="", color = Color.Black)
 
         Column(
             modifier = Modifier

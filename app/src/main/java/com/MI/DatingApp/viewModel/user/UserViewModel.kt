@@ -1,5 +1,6 @@
 package com.MI.DatingApp.viewModel.user
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -17,7 +18,12 @@ class UserViewModel: ViewModel() {
     init {
         fetchUsers()
     }
-
+    fun like() {
+        Log.d("Righswipe", "like")
+    }
+    fun dislike() {
+        Log.d("Righswipe", "like")
+    }
     private fun fetchUsers() {
         firebaseRefUsers.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -36,4 +42,6 @@ class UserViewModel: ViewModel() {
             }
         })
     }
+
+
 }

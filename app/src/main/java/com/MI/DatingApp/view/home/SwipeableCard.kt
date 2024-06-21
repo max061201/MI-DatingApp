@@ -47,8 +47,9 @@ data class Item(
     val name: String
 )
 
+
 @Composable
-fun SwipeCardDemo() {
+fun SwipeCardDemo(viewModel: UserViewModel = viewModel()) {
     SwipeCardDemoList()
 }
 
@@ -259,9 +260,12 @@ fun SwipeCardDemoList(userViewModel: UserViewModel = viewModel()) {
                                     .zIndex(actualIndex.toFloat()),
                                 onSwipedLeft = {
                                     if (actualIndex == currentIndex) currentIndex++
+                                    userViewModel.dislike()
+
                                 },
                                 onSwipedRight = {
                                     if (actualIndex == currentIndex) currentIndex++
+                                    userViewModel.like()
                                 }
                             )
                         }
@@ -273,14 +277,14 @@ fun SwipeCardDemoList(userViewModel: UserViewModel = viewModel()) {
         }
 
         val swipeLeft: () -> Unit = {
-            if (-currentIndex < -accounts.size ) {
+            if (-currentIndex < accounts.size +1) {
                 currentIndex++
             }
             println("CurrentIndex: $currentIndex < $accounts.size" )
         }
 
         val swipeRight: () -> Unit = {
-            if (-currentIndex  < -accounts.size  ) {
+            if (-currentIndex  < accounts.size +1 ) {
                 currentIndex++
             }
         }

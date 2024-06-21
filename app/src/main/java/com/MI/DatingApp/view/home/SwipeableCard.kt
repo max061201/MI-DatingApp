@@ -260,12 +260,15 @@ fun SwipeCardDemoList(userViewModel: UserViewModel = viewModel()) {
                                     .zIndex(actualIndex.toFloat()),
                                 onSwipedLeft = {
                                     if (actualIndex == currentIndex) currentIndex++
-                                    userViewModel.dislike()
+                                    val likedUser = userList[actualIndex]
+                                    userViewModel.dislike(likedUser)
 
                                 },
                                 onSwipedRight = {
                                     if (actualIndex == currentIndex) currentIndex++
-                                    userViewModel.like()
+                                    val likedUser = userList[actualIndex] // den gelikten Benutzer bekommen
+                                    userViewModel.like(likedUser) // like Funktion mit Benutzer aufrufen
+
                                 }
                             )
                         }

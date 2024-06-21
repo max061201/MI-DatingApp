@@ -18,10 +18,10 @@ class UserViewModel: ViewModel() {
     init {
         fetchUsers()
     }
-    fun like() {
-        Log.d("Righswipe", "like")
+    fun like(user: User) {
+        Log.d("Righswipe", "like $user")
     }
-    fun dislike() {
+    fun dislike(user: User) {
         Log.d("Righswipe", "like")
     }
     private fun fetchUsers() {

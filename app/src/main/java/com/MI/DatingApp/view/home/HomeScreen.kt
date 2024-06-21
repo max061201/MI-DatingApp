@@ -10,6 +10,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -32,15 +33,25 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.MI.DatingApp.R
 import com.MI.DatingApp.view.recyclableGlobal.IconWithText
 import com.MI.DatingApp.view.recyclableGlobal.TitlePages
+import com.MI.DatingApp.viewModel.MainViewModel
 import com.MI.DatingApp.viewModel.home.FilterViewModel
+import com.MI.DatingApp.viewModel.user.UserViewModel
+
+
 
 @Composable
+
 fun HomeScreen() {
+    val mainViewModel: UserViewModel = viewModel()
+
+    val currentUserLive by mainViewModel.currentUserLiveData.observeAsState()
+
     val filterViewModel: FilterViewModel = viewModel()
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column {
             HeaderContent(onFilterClick = { filterViewModel.toggleFilterVisibility() })
+            Text("${currentUserLive?.name}  /  ${currentUserLive?.email}", color = Color.Black)
             SwipeCardDemo()
 
         }

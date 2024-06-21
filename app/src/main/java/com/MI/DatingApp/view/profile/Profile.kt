@@ -14,7 +14,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -39,6 +42,7 @@ import coil.compose.AsyncImage
 import com.MI.DatingApp.R
 import com.MI.DatingApp.model.CurrentUser
 import com.MI.DatingApp.model.User
+import com.MI.DatingApp.view.registieren.recyclable.GanderDialog
 import com.MI.DatingApp.viewModel.profile.ProfileVM
 
 @Composable
@@ -84,12 +88,13 @@ fun ProfileScreen(
 
                     Row(
                         modifier = Modifier
+                            .padding(top = 5.dp)
                             .fillMaxWidth()
                             .fillMaxHeight(),
                         horizontalArrangement = Arrangement.SpaceBetween,
 
 
-                    ) {
+                        ) {
                         Box(
                             modifier = Modifier
                                 .padding(16.dp)
@@ -104,22 +109,22 @@ fun ProfileScreen(
                                 modifier = Modifier.size(24.dp)
                             )
                         }
-                            ProfileHeader(userEdit, viewModel, firebase = testUser)
+                        ProfileHeader(userEdit, viewModel, firebase = testUser)
 
-                            Box(
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .fillMaxHeight()
-                                    .clickable(onClick = { navController.navigate("login") })
-                                    .background(Color.White),
-                                contentAlignment=Alignment.TopStart
-                            ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.logout),
-                                    contentDescription = "Back",
-                                    modifier = Modifier.size(24.dp)
-                                )
-                            }
+                        Box(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .fillMaxHeight()
+                                .clickable(onClick = { navController.navigate("login") })
+                                .background(Color.White),
+                            contentAlignment = Alignment.TopStart
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.logout),
+                                contentDescription = "Back",
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
 
                     }
                 }
@@ -149,7 +154,7 @@ fun ProfileHeader(userEdit: User?, viewModel: ProfileVM, firebase: User) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
 
-    ) {
+        ) {
         Images(viewModel, userEdit!!, 0)
         Spacer(modifier = Modifier.height(8.dp))
         Text(
@@ -207,6 +212,7 @@ fun AccountSettings(userEdit: User?, viewModel: ProfileVM) {
 
 @Composable
 fun AboutMe(userEdit: User?, viewModel: ProfileVM) {
+    var showDialog by remember { mutableStateOf(false) }
     Card(
         shape = RoundedCornerShape(16.dp),
         backgroundColor = Color.White,
@@ -228,13 +234,30 @@ fun AboutMe(userEdit: User?, viewModel: ProfileVM) {
                 )
             )
             Spacer(modifier = Modifier.height(8.dp))
-            TextField(value = userEdit.gender, onValueChange = {
-                viewModel.setGender(it)
-            }, label = { Text("Gender") },
+
+            TextField(
+                value = userEdit.gender,
+                onValueChange = { viewModel.setGender(it) },
+                label = { Text("Gender") },
                 colors = TextFieldDefaults.textFieldColors(
                     backgroundColor = Color.White
-                )
+                ),
+                trailingIcon={
+                    Icon(
+                    imageVector = Icons.Default.ArrowDropDown,
+                    contentDescription = null,
+                    modifier = Modifier.clickable { showDialog = true }
+                )},
+                keyboardActions = KeyboardActions(
+
+                ),
             )
+            if (showDialog) {
+                GanderDialog(
+                    setGander = { viewModel.setGender(it) },
+                    onDismissRequest = { showDialog = false }, mutableListOf("Women", "Man")
+                )
+            }
         }
     }
 }
@@ -316,7 +339,7 @@ fun Images(viewModel: ProfileVM, userEdit: User, index: Int = 0) {
         imageUri = uri
         uri?.let {
             val imagePath = it.toString()
-            viewModel.setImage(imagePath, image,index)
+            viewModel.setImage(imagePath, image, index)
         }
     }
     Box(
@@ -344,14 +367,17 @@ fun Images(viewModel: ProfileVM, userEdit: User, index: Int = 0) {
 }
 
 @Composable
-fun CurvedBox(content: @Composable BoxScope.() -> Unit) {
+fun CurvedBox(
+    content: @Composable BoxScope.() -> Unit
+) {
     Box(
         modifier = Modifier
+
             .fillMaxWidth()
             .background(Color.Transparent),
 
 
-    ) {
+        ) {
         Canvas(
             modifier = Modifier
                 .fillMaxWidth()

@@ -102,8 +102,7 @@ object CurrentUser {
             yearOfBirth = "02.06.2024",
             gender = "Male",
             imageUrls = mutableListOf(
-                "https://firebasestorage.googleapis.com/v0/b/datingapp-9f758.appspot.com/o/UsersImages%2Fimages%2F-O-gTyIykyVTlqOSEkli%2F1718991171568_1000044736?alt=media&token=9d692ca5-1662-422f-bfdd-6adcba72ca70",
-                "https://firebasestorage.googleapis.com/v0/b/datingapp-9f758.appspot.com/o/UsersImages%2Fimages%2F-O-gTyIykyVTlqOSEkli%2F1718991171568_1000044715?alt=media&token=3771487b-9b19-4ffa-948e-ecbcf50f6466"
+"https://firebasestorage.googleapis.com/v0/b/datingapp-9f758.appspot.com/o/UsersImages%2Fimages%2F-O-gTyIykyVTlqOSEkli%2F1718994883704_1000044619?alt=media&token=47b28508-117e-4979-b797-18c9d5500e61"
             ),
             genderLookingFor = "Women",
             description = "usertest",

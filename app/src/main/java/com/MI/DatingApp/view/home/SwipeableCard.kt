@@ -221,9 +221,15 @@ fun SwipeCardDemoList(userViewModel: UserViewModel = viewModel()) {
     val userList by userViewModel.users.observeAsState(initial = emptyList())
 
     val accounts = userList.map { user ->
+        val imageUrl = if (user.imageUrls.isNullOrEmpty()) {
+            "hi" // Fallback-Wert, wenn imageUrls null oder leer ist
+        } else {
+            user.imageUrls!![0].toString()
+        }
+
         Item(
-            imageUrl = user.imageUrl ?: "",
-            name = "${user.name} (${user.date})"
+            imageUrl = imageUrl,
+            name = "${user.name} (${user.yearOfBirth})"
         )
     }
 

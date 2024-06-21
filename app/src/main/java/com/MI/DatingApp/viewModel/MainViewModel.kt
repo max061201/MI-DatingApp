@@ -169,7 +169,8 @@ class MainViewModel : ViewModel() {
 
         _currentShownUser.value?.let { currentShownUser ->
             //hat der user den anderen schonmal geliked/ gedisliked
-            if (!momentanerUser.likes.contains(currentShownUser.id) && !momentanerUser.dislikes.contains(currentShownUser.id)   ) {
+            if (!momentanerUser.likes.contains(currentShownUser.id)
+                && !momentanerUser.dislikes.contains(currentShownUser.id) && !currentShownUser.likes.contains(momentanerUser.id) ) {
 
                 //füge den geliked user in likes von CurrentUser
                 momentanerUser.likes.add(currentShownUser.id)

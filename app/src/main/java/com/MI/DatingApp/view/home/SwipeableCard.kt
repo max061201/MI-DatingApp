@@ -7,20 +7,22 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -30,8 +32,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.zIndex
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.MI.DatingApp.R
+import com.MI.DatingApp.ui.theme.ComposeBottomNavigationExampleTheme
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -42,8 +46,8 @@ data class Item(
 )
 
 @Composable
-fun SwipeCardDemo(){
-    val accounts =  mutableListOf(
+fun SwipeCardDemo() {
+    val accounts = mutableListOf(
         Item("https://images.unsplash.com/photo-1668069574922-bca50880fd70?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80", "Musician", "Alice (25)"),
         Item("https://images.unsplash.com/photo-1618641986557-1ecd230959aa?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80", "Developer", "Chris (33)"),
         Item("https://images.unsplash.com/photo-1667935764607-73fca1a86555?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=688&q=80", "Teacher", "Roze (22)")
@@ -53,15 +57,19 @@ fun SwipeCardDemo(){
 
 @Composable
 fun CardContent(item: Item) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(15.dp)
+            .shadow(16.dp)
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    ) {
         Image(
             painter = rememberAsyncImagePainter(model = item.imageUrl),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
-
         Column(
             modifier = Modifier
                 .align(Alignment.BottomStart)
@@ -73,7 +81,6 @@ fun CardContent(item: Item) {
             Text(text = item.profession, color = Color.White)
         }
     }
-
 }
 
 @Composable
@@ -116,7 +123,6 @@ fun SwipeableCard(
         }
     }
 
-
     LaunchedEffect(offsetX) {
         animatableOffsetX.snapTo(offsetX)
         handleSwipeEnd()
@@ -148,7 +154,6 @@ fun SwipeableCard(
                 modifier = Modifier
                     .align(Alignment.Center)
                     .size(100.dp)
-                    //.background(Color.Red, shape = RoundedCornerShape(50))
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_cross1),
@@ -172,7 +177,6 @@ fun SwipeableCard(
             }
         }
     }
-
 }
 
 @Composable
@@ -182,108 +186,122 @@ fun ControlButtons(
     onUndo: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-   Row(
-       horizontalArrangement = Arrangement.SpaceEvenly,
-       modifier = modifier.fillMaxWidth()
-   ) {
-            IconButton(onClick = onLeftSwipe) {
-               Image(
-                    painter = painterResource(id = R.drawable.ic_cross1),
-                    contentDescription = null,
-                    modifier = Modifier.size(48.dp)
-                )
-            }
-            IconButton(onClick = onUndo) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_undo),
-                    contentDescription = null,
-                    modifier = Modifier.size(48.dp)
-                )
-            }
-            IconButton(onClick = onRightSwipe) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_heart2),
-                    contentDescription = null,
-                    modifier = Modifier.size(48.dp)
-                )
-            }
 
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.Bottom,
+        modifier = modifier
+            .fillMaxWidth()
+
+    ) {
+        IconButton(onClick = onLeftSwipe) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_cross1),
+                contentDescription = null,
+                modifier = Modifier.size(48.dp)
+            )
+        }
+        IconButton(onClick = onUndo) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_undo),
+                contentDescription = null,
+                modifier = Modifier.size(48.dp)
+            )
+        }
+        IconButton(onClick = onRightSwipe) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_heart2),
+                contentDescription = null,
+                modifier = Modifier.size(48.dp)
+            )
+        }
     }
-
 }
-
-
 
 @Composable
 fun SwipeCardDemoList(accounts: List<Item>) {
-    var currentIndex by rememberSaveable  { mutableIntStateOf(0) }
+    var currentIndex by rememberSaveable { mutableIntStateOf(0) }
+
+
     val screenWidth = with(LocalDensity.current) {
         LocalConfiguration.current.screenWidthDp.dp.toPx()
     }
 
-    val screenHeight = with(LocalDensity.current) {
-        LocalConfiguration.current.screenHeightDp.dp.toPx()
-    }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        if (currentIndex < accounts.size) {
-            accounts.asReversed().forEachIndexed { index, item ->
-                val actualIndex = accounts.size - 1 - index
-                if (actualIndex >= currentIndex) {
-                    SwipeableCard(
-                        item = item,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(400.dp)
-                            .padding(16.dp)
-                            .zIndex(actualIndex.toFloat()),
-                        onSwipedLeft = {
-                            if (actualIndex == currentIndex) currentIndex++
-                        },
-                        onSwipedRight = {
-                            if (actualIndex == currentIndex) currentIndex++
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+    ) {
+        Column(
+            modifier = Modifier
+                .height(500.dp)
+                .padding(top = 50.dp)
+        ){
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                if (currentIndex < accounts.size) {
+                    accounts.asReversed().forEachIndexed { index, item ->
+                        val actualIndex = accounts.size - 1 - index
+                        if (actualIndex >= currentIndex) {
+                            SwipeableCard(
+                                item = item,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(400.dp)
+                                    .padding(16.dp)
+                                    .zIndex(actualIndex.toFloat()),
+                                onSwipedLeft = {
+                                    if (actualIndex == currentIndex) currentIndex++
+                                },
+                                onSwipedRight = {
+                                    if (actualIndex == currentIndex) currentIndex++
+                                }
+                            )
                         }
-                    )
+                    }
+                } else {
+                    Text("No more profiles to show", color = Color.Black, modifier = Modifier.align(Alignment.Center))
                 }
             }
-
-        } else {
-            Text("No more profiles to show", color = Color.Black , modifier = Modifier.align(Alignment.Center))
         }
 
-        Column (
-            modifier = Modifier
-                .background(Color.Blue)
-                .fillMaxWidth()
-        ) {
-            Text(text = "$currentIndex", color = Color.White,)
+        val swipeLeft: () -> Unit = {
+            if (-currentIndex < -accounts.size ) {
+                currentIndex++
+            }
+            println("CurrentIndex: $currentIndex < $accounts.size" )
         }
 
+        val swipeRight: () -> Unit = {
+            if (-currentIndex  < -accounts.size  ) {
+                currentIndex++
+            }
+        }
 
+        val undo: () -> Unit = {
+            if (currentIndex > 0) {
+                currentIndex--
+            }
+        }
+            Text(text = "CurrentIndex $currentIndex < ${accounts.size} AccountSize", color = Color.Black)
+        Text(text="", color = Color.Black)
 
-       Column(
+        Column(
             modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(top = (screenHeight/3.9).dp)
-        ) {
+                .fillMaxSize()
+                .padding(top = 80.dp),
+            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.CenterHorizontally,
+
+        ){
             ControlButtons(
-                onLeftSwipe = {
-                    if (currentIndex < accounts.size) {
-                        currentIndex++
-                    }
-                },
-                onRightSwipe = {
-                    if (currentIndex > 0) {
-                        currentIndex--
-                    }
-                },
-                onUndo = {
-                    if (currentIndex > 0) {
-                        currentIndex--
-                    }
-                },
+                onLeftSwipe = swipeLeft,
+                onRightSwipe = swipeRight,
+                onUndo = undo,
                 modifier = Modifier
-                    //.align(Alignment.BottomCenter)
+                    .fillMaxWidth()
                     .padding(16.dp)
             )
         }
@@ -291,3 +309,13 @@ fun SwipeCardDemoList(accounts: List<Item>) {
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+    val navController = rememberNavController()
+    ComposeBottomNavigationExampleTheme {
+        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+            SwipeCardDemo()
+        }
+    }
+}

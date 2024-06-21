@@ -113,7 +113,7 @@ fun Home(navController: NavController, viewModel: LoginViewModel = viewModel()) 
             .padding(20.dp)
     ){
         Column(
-            modifier = Modifier.verticalScroll(rememberScrollState()),
+           // modifier = Modifier.verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {

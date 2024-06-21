@@ -13,6 +13,9 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ProfileVM : ViewModel() {
 
@@ -72,17 +75,19 @@ class ProfileVM : ViewModel() {
         _userchanges.value = uservalue
     }
 
-    fun setImage(imageUri: String, imageToDelete: String = "") {
+    fun setImage(imageUri: String, imageToDelete: String = "", index: Int) {
         val uservalue = _userchanges.value!!
         val newImages = uservalue.imageUrls!!.toMutableList().apply {
-             if (indexOf(imageToDelete)==-1){
-                 add(imageUri)
-             }else{
-                 add(indexOf(imageToDelete),imageUri)
-                 removeAt(indexOf(imageToDelete))
-                 deleteImages.add(imageToDelete)
+            if (indexOf(imageToDelete) == -1) {
+                add(imageUri)
+            } else {
 
-             }
+                removeAt(index)
+                add(index, imageUri)
+                deleteImages.add(imageToDelete)
+
+
+            }
 
         }
         _userchanges.value = uservalue.copy(imageUrls = newImages)
@@ -144,11 +149,19 @@ class ProfileVM : ViewModel() {
         }
     }
 
-    private fun deleteImagesFromFirebase(contactId: String, timestamp: Long) {
+    private fun deleteImagesFromFirebase() {
+        currentUser.imageUrls = currentUser.imageUrls?.apply {
+            removeAll(deleteImages)
+        }
         deleteImages.forEach {
-            Log.i("deleteImages", "deleteImagesFromFirebase: "+it)
+            Log.i("deleteImages", "deleteImagesFromFirebase: " + it)
             val imageRef =
-                storageRef.child("${Uri.parse(it).lastPathSegment!!.replace("UsersImages/","")}") // Zeitstempel vor dem Dateinamen
+                storageRef.child(
+                    Uri.parse(it).lastPathSegment!!.replace(
+                        "UsersImages/",
+                        ""
+                    )
+                ) // Zeitstempel vor dem Dateinamen
 
             imageRef.delete().addOnSuccessListener {
                 Log.d("successdelete", "Image deleted successfully")
@@ -163,27 +176,29 @@ class ProfileVM : ViewModel() {
     private fun uploadImagesAndUpdateUser(imageUris: List<Uri>) {
         val contactId = currentUser.id
         val timestamp = System.currentTimeMillis() // Zeitstempel hinzufügen
+        CoroutineScope(Dispatchers.IO).launch {
+            val uploadedImageUrls = mutableListOf<String>()
+            imageUris.forEach { uri ->
+                //   val imageRef = storageRef.child("images/$contactId/${uri.lastPathSegment}")
+                val imageRef =
+                    storageRef.child("images/$contactId/${timestamp}_${uri.lastPathSegment}") // Zeitstempel vor dem Dateinamen
 
-        val uploadedImageUrls = mutableListOf<String>()
-        imageUris.forEach { uri ->
-            //   val imageRef = storageRef.child("images/$contactId/${uri.lastPathSegment}")
-            val imageRef =
-                storageRef.child("images/$contactId/${timestamp}_${uri.lastPathSegment}") // Zeitstempel vor dem Dateinamen
+                val uploadTask = imageRef.putFile(uri)
+                uploadTask.addOnFailureListener {
+                    Log.d("Firebase", "Image upload failed: ${it.message}")
+                }.addOnSuccessListener { taskSnapshot ->
 
-            val uploadTask = imageRef.putFile(uri)
-            uploadTask.addOnFailureListener {
-                Log.d("Firebase", "Image upload failed: ${it.message}")
-            }.addOnSuccessListener { taskSnapshot ->
-
-                taskSnapshot.metadata?.reference?.downloadUrl?.addOnSuccessListener { downloadUri ->
-                    uploadedImageUrls.add(downloadUri.toString())
-                    if (uploadedImageUrls.size == imageUris.size) {
-                        updateUserImgDatabase(uploadedImageUrls, contactId)
+                    taskSnapshot.metadata?.reference?.downloadUrl?.addOnSuccessListener { downloadUri ->
+                        uploadedImageUrls.add(downloadUri.toString())
+                        if (uploadedImageUrls.size == imageUris.size) {
+                            updateUserImgDatabase(uploadedImageUrls, contactId)
+                        }
                     }
+                    deleteImagesFromFirebase()
                 }
-                 deleteImagesFromFirebase(contactId,timestamp)
             }
         }
+
     }
 
     private fun updateUserImgDatabase(imageUrls: List<String>, contactId: String) {

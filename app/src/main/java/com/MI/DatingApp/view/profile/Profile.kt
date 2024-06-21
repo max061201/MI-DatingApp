@@ -5,6 +5,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -28,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -73,22 +75,52 @@ fun ProfileScreen(
                     brush = Brush.verticalGradient(
                         colors = listOf(Color(0xFFFCF7F7), Color(0xFFAA3FEC))
                     )
-                )
+                ),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             item {
+
                 CurvedBox {
-                    Box(
+
+                    Row(
                         modifier = Modifier
-                            .clickable(onClick = { navController.navigate("home") })
-                            .background(Color.White)
+                            .fillMaxWidth()
+                            .fillMaxHeight(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+
+
                     ) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.baseline_arrow_back_24),
-                            contentDescription = "Back",
-                            tint = androidx.compose.ui.graphics.Color.Black,
-                            modifier = Modifier.size(24.dp)
-                        )
-                        ProfileHeader(userEdit, viewModel, firebase = testUser)
+                        Box(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .fillMaxHeight()
+                                .clickable(onClick = { navController.navigate("home") })
+                                .background(Color.White)
+                        ) {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(id = R.drawable.baseline_arrow_back_24),
+                                contentDescription = "Back",
+                                tint = androidx.compose.ui.graphics.Color.Black,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                            ProfileHeader(userEdit, viewModel, firebase = testUser)
+
+                            Box(
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .fillMaxHeight()
+                                    .clickable(onClick = { navController.navigate("login") })
+                                    .background(Color.White),
+                                contentAlignment=Alignment.TopStart
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.logout),
+                                    contentDescription = "Back",
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
+
                     }
                 }
 
@@ -116,7 +148,7 @@ fun ProfileScreen(
 fun ProfileHeader(userEdit: User?, viewModel: ProfileVM, firebase: User) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxWidth()
+
     ) {
         Images(viewModel, userEdit!!, 0)
         Spacer(modifier = Modifier.height(8.dp))
@@ -145,15 +177,30 @@ fun AccountSettings(userEdit: User?, viewModel: ProfileVM) {
             Spacer(modifier = Modifier.height(8.dp))
             TextField(value = userEdit!!.name, onValueChange = {
                 viewModel.setName(it)
-            }, label = { Text("Name") })
+            }, label = { Text("Name") },
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = Color.White
+                )
+            )
             Spacer(modifier = Modifier.height(8.dp))
             TextField(value = userEdit.yearOfBirth, onValueChange = {
                 viewModel.setDate(it)
-            }, label = { Text("Date of Birth") })
+            }, label = { Text("Date of Birth") },
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = Color.White
+                )
+            )
             Spacer(modifier = Modifier.height(8.dp))
-            TextField(value = userEdit.email, onValueChange = {
-                viewModel.setEmail(it)
-            }, label = { Text("Email") })
+            TextField(
+                value = userEdit.email, onValueChange = {
+                    viewModel.setEmail(it)
+                },
+                label = { Text("Email") },
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = Color.White
+                )
+            )
+
         }
     }
 }
@@ -175,30 +222,39 @@ fun AboutMe(userEdit: User?, viewModel: ProfileVM) {
             Spacer(modifier = Modifier.height(8.dp))
             TextField(value = userEdit!!.description, onValueChange = {
                 viewModel.setDesc(it)
-            }, label = { Text("Description") })
+            }, label = { Text("Description") },
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = Color.White
+                )
+            )
             Spacer(modifier = Modifier.height(8.dp))
             TextField(value = userEdit.gender, onValueChange = {
                 viewModel.setGender(it)
-            }, label = { Text("Gender") })
+            }, label = { Text("Gender") },
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = Color.White
+                )
+            )
         }
     }
 }
 
 @Composable
 fun AddImages(viewModel: ProfileVM, user: User) {
-    var j: Int = 0
+
     Card(
         shape = RoundedCornerShape(16.dp),
         backgroundColor = Color.White,
-        elevation = 4.dp
-    ) {
+        elevation = 4.dp,
+
+        ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text("Add Images", fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Row(modifier = Modifier.padding(16.dp)) {
 
-                Images(viewModel, user!!, 1)
-                Images(viewModel, user!!, 2)
-                Images(viewModel, user!!, 3)
+                Images(viewModel, user, 1)
+                Images(viewModel, user, 2)
+                Images(viewModel, user, 3)
             }
         }
     }
@@ -260,7 +316,7 @@ fun Images(viewModel: ProfileVM, userEdit: User, index: Int = 0) {
         imageUri = uri
         uri?.let {
             val imagePath = it.toString()
-            viewModel.setImage(imagePath, image)
+            viewModel.setImage(imagePath, image,index)
         }
     }
     Box(
@@ -292,7 +348,9 @@ fun CurvedBox(content: @Composable BoxScope.() -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.Transparent)
+            .background(Color.Transparent),
+
+
     ) {
         Canvas(
             modifier = Modifier

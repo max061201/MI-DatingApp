@@ -61,12 +61,19 @@ object CurrentUser {
         val userConfirmedPassword = sharedPreferences.getString("userConfirmedPassword", "") ?: ""
         val userYearOfBirth = sharedPreferences.getString("userYearOfBirth", "") ?: ""
         val userGender = sharedPreferences.getString("userGender", "") ?: ""
-        val userImageUrls = sharedPreferences.getStringSet("userImageUrls", emptySet())?.toMutableList() ?: mutableListOf()
+        val userImageUrls =
+            sharedPreferences.getStringSet("userImageUrls", emptySet())?.toMutableList()
+                ?: mutableListOf()
         val userGenderLookingFor = sharedPreferences.getString("userGenderLookingFor", "") ?: ""
         val userDescription = sharedPreferences.getString("userDescription", "") ?: ""
-        val userInterests = sharedPreferences.getStringSet("userInterests", emptySet())?.toMutableList() ?: mutableListOf()
-        val userLikes = sharedPreferences.getStringSet("userLikes", emptySet())?.toMutableList() ?: mutableListOf()
-        val userDislikes = sharedPreferences.getStringSet("userDislikes", emptySet())?.toMutableList() ?: mutableListOf()
+        val userInterests =
+            sharedPreferences.getStringSet("userInterests", emptySet())?.toMutableList()
+                ?: mutableListOf()
+        val userLikes = sharedPreferences.getStringSet("userLikes", emptySet())?.toMutableList()
+            ?: mutableListOf()
+        val userDislikes =
+            sharedPreferences.getStringSet("userDislikes", emptySet())?.toMutableList()
+                ?: mutableListOf()
 
         return User(
             id = userId,
@@ -95,10 +102,9 @@ object CurrentUser {
             yearOfBirth = "02.06.2024",
             gender = "Male",
             imageUrls = mutableListOf(
-                "https://firebasestorage.googleapis.com/v0/b/datingapp-9f758.appspot.com/o/UsersImages%2Fimages%2F-O-gTyIykyVTlqOSEkli%2F1718800867782_msf%3A65?alt=media&token=07b9b71f-0779-4557-8084-f15dd7270efe",
-
-
-                ),
+                "https://firebasestorage.googleapis.com/v0/b/datingapp-9f758.appspot.com/o/UsersImages%2Fimages%2F-O-gTyIykyVTlqOSEkli%2F1718991171568_1000044736?alt=media&token=9d692ca5-1662-422f-bfdd-6adcba72ca70",
+                "https://firebasestorage.googleapis.com/v0/b/datingapp-9f758.appspot.com/o/UsersImages%2Fimages%2F-O-gTyIykyVTlqOSEkli%2F1718991171568_1000044715?alt=media&token=3771487b-9b19-4ffa-948e-ecbcf50f6466"
+            ),
             genderLookingFor = "Women",
             description = "usertest",
             interest = mutableListOf("Travel"),

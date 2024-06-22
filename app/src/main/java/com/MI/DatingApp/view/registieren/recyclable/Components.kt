@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextButton
+import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CalendarToday
@@ -57,12 +58,10 @@ import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -70,7 +69,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import com.MI.DatingApp.R
-import com.MI.DatingApp.model.User
 import com.MI.DatingApp.viewModel.registering.Error
 import com.MI.DatingApp.viewModel.registering.RegisteringVM
 import com.MI.DatingApp.viewModel.registering.formatAndToString
@@ -100,10 +98,7 @@ fun Registering(stepByStep: Int) {
         Circle(thirdCycle)
     }
 
-    if (stepByStep == 2) {
 
-        //  ImageSelect()
-    }
 }
 
 @Composable
@@ -230,22 +225,36 @@ fun ButtonCompose(onClick: () -> Unit, text: String = "Next") {
 
 @Composable
 fun DatePickerTextField(
-    outletAttribute: OutletAttribute,
     value: String,
-    setDate: (date: String) -> Unit
-) {
+    reg: Boolean = true,
+    setDate: (date: String) -> Unit,
+
+    ) {
     var showDialog by remember { mutableStateOf(false) }
 
+    val colorText: Color
+    val backgroundColor: Color
+    val lineColor: Color
+    if (reg) {
+        colorText = Color.White
+        backgroundColor = Color.Transparent
+        lineColor = Color.White
+    } else {
+        colorText = Color.Black
+        backgroundColor = Color.White
+        lineColor = Color.Black
+    }
 
-    OutlinedTextField(
-        modifier = Modifier.fillMaxWidth(),
+    TextField(
+
         value = value,
         onValueChange = { /* Ignoring manual input for now */ },
-        label = { Text("Date", color = Color.White) },
+        label = { Text("Date", color = colorText) },
         readOnly = true, // Prevents manual input
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Number
         ),
+
         keyboardActions = KeyboardActions(
             onDone = {
                 showDialog = true
@@ -258,30 +267,32 @@ fun DatePickerTextField(
                 modifier = Modifier.clickable { showDialog = true }
             )
         },
-        colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = outletAttribute.textFieldColors.focusedBorderColor, // Change border color when focused
-            cursorColor = outletAttribute.textFieldColors.cursorColor, // Change cursor color
-            textColor = outletAttribute.textFieldColors.textColor, // Change text color
-            unfocusedBorderColor = Color.White,
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = backgroundColor,
+            focusedIndicatorColor = lineColor,
+            unfocusedIndicatorColor = lineColor,
 
             )
     )
+    Spacer(modifier = Modifier.height(8.dp))
     if (showDialog) {
-        DatePickerDialogCo {
+
+        DatePickerDialogCo(showDialog = showDialog) {
             setDate(it)
         }
+
     }
 
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DatePickerDialogCo(setDate: (date: String) -> Unit) {
+fun DatePickerDialogCo(showDialog: Boolean,setDate: (date: String) -> Unit) {
     val datePickerState = rememberDatePickerState(
         initialDisplayedMonthMillis = System.currentTimeMillis(),
         yearRange = 1900..2024
     )
-    val showDatePicker = remember { mutableStateOf(true) }
+    val showDatePicker = remember { mutableStateOf(showDialog) }
 
     if (showDatePicker.value) {
         DatePickerDialog(
@@ -312,7 +323,7 @@ fun DatePickerDialogCo(setDate: (date: String) -> Unit) {
                 todayContentColor = Color.Green,
 
 
-            )
+                )
 
 
         ) {
@@ -377,13 +388,15 @@ fun Gander(
 
 @Composable
 fun LookingForSection(
-    registeringViewModel: RegisteringVM,
-    outletAttribute: OutletAttribute
+    value: String,
+    outletAttribute: OutletAttribute,
+    setGeander: (data: String) -> Unit
+
 ) {
     var showDialog by remember { mutableStateOf(false) }
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
-        value = registeringViewModel.user.value!!.genderLookingFor,
+        value = value,
         onValueChange = { /* Ignoring manual input for now */ },
         label = { Text("Your are looking for", color = Color.White) },
         readOnly = true, // Prevents manual input
@@ -412,7 +425,7 @@ fun LookingForSection(
     )
     if (showDialog) {
         GanderDialog(
-            setGander = { registeringViewModel.setGanderLookingFor(it) },
+            setGander = { setGeander(it) },
             onDismissRequest = { showDialog = false }, mutableListOf("Women", "Man")
         )
     }
@@ -532,26 +545,47 @@ fun AppIcon() {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun Interests(interestsMap: Map<String, Int> = userInterests, registeringViewModel: RegisteringVM) {
-    var interests: String =
-        registeringViewModel.user.value!!.interest.joinToString(separator = "  ")
+fun Interests(
+    interestsMap: Map<String, Int> = userInterests,
+    setInterestes: (data: String) -> Unit,
+    interest: MutableList<String>,
+    reg: Boolean = true
+) {
+    val interests: String =
+        interest.joinToString(separator = "  ")
+    val colorText: Color
+    val backgroundColor: Color
+    val lineColor: Color
+    if (reg) {
+        colorText = Color.White
+        backgroundColor = Color.Transparent
+        lineColor = Color.White
+    } else {
+        colorText = Color.Black
+        backgroundColor = Color.White
+        lineColor = Color.Black
+    }
 
 
     Column(
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Text(text = "your interests")
-        BasicTextField(
+        Text(text = "your interests", color = colorText)
+        TextField(
             value = interests,
-            onValueChange = { registeringViewModel.setInterestes(it) },
+            onValueChange = { setInterestes(it) },
             readOnly = true,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
-                .background(Color.Transparent)
-                .border(1.dp, Color.White, RoundedCornerShape(8.dp))
+
                 .padding(16.dp),
-            textStyle = TextStyle(color = Color.White),
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = backgroundColor,
+                focusedIndicatorColor = lineColor,
+                unfocusedIndicatorColor = lineColor,
+            ),
+            textStyle = TextStyle(colorText),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Next
@@ -563,7 +597,7 @@ fun Interests(interestsMap: Map<String, Int> = userInterests, registeringViewMod
             interestsMap.forEach { (key, value) ->
                 Spacer(modifier = Modifier.width(8.dp))
                 Button(onClick = {
-                    registeringViewModel.setInterestes(key)
+                    setInterestes(key)
 
                 }) {
                     Row {

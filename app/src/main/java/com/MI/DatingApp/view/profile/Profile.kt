@@ -44,6 +44,7 @@ import com.MI.DatingApp.model.CurrentUser
 import com.MI.DatingApp.model.User
 import com.MI.DatingApp.view.registieren.recyclable.DatePickerTextField
 import com.MI.DatingApp.view.registieren.recyclable.GanderDialog
+import com.MI.DatingApp.view.registieren.recyclable.Interests
 import com.MI.DatingApp.view.registieren.recyclable.OutletAttribute
 import com.MI.DatingApp.view.registieren.recyclable.outletAttributeRegisPage2
 import com.MI.DatingApp.viewModel.profile.ProfileVM
@@ -146,6 +147,7 @@ fun ProfileScreen(
             item { Spacer(modifier = Modifier.height(16.dp)) }
             item { DeleteAccountButton(navController, viewModel) }
             item { Spacer(modifier = Modifier.height(100.dp)) }
+            item { Spacer(modifier = Modifier.height(100.dp)) }
         }
 
     }
@@ -187,14 +189,16 @@ fun AccountSettings(userEdit: User?, viewModel: ProfileVM) {
                 viewModel.setName(it)
             }, label = { Text("Name") },
                 colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.White
+                    backgroundColor = Color.White,
+                    focusedIndicatorColor = Color.Black,
+                    unfocusedIndicatorColor = Color.Black,
                 )
             )
             Spacer(modifier = Modifier.height(8.dp))
             DatePickerTextField(
-                mutableListOf<OutletAttribute>(outletAttributeRegisPage2[0])[0],
-                value = userEdit.yearOfBirth
-            ){
+                value = userEdit.yearOfBirth,
+                reg = false
+            ) {
                 viewModel.setDate(it)
             }
             Spacer(modifier = Modifier.height(8.dp))
@@ -204,8 +208,12 @@ fun AccountSettings(userEdit: User?, viewModel: ProfileVM) {
                 },
                 label = { Text("Email") },
                 colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.White
-                )
+                    backgroundColor = Color.White ,
+                    focusedIndicatorColor = Color.Black,
+                    unfocusedIndicatorColor = Color.Black,
+
+                    )
+
             )
 
         }
@@ -232,24 +240,30 @@ fun AboutMe(userEdit: User?, viewModel: ProfileVM) {
                 viewModel.setDesc(it)
             }, label = { Text("Description") },
                 colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.White
+                    backgroundColor = Color.White,
+                    focusedIndicatorColor = Color.Black,
+                    unfocusedIndicatorColor = Color.Black,
                 )
             )
             Spacer(modifier = Modifier.height(8.dp))
 
             TextField(
                 value = userEdit.gender,
+                readOnly = true,
                 onValueChange = { viewModel.setGender(it) },
                 label = { Text("Gender") },
                 colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.White
+                    backgroundColor = Color.White,
+                    focusedIndicatorColor = Color.Black,
+                    unfocusedIndicatorColor = Color.Black,
                 ),
-                trailingIcon={
+                trailingIcon = {
                     Icon(
-                    imageVector = Icons.Default.ArrowDropDown,
-                    contentDescription = null,
-                    modifier = Modifier.clickable { showDialog = true }
-                )},
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = null,
+                        modifier = Modifier.clickable { showDialog = true }
+                    )
+                },
                 keyboardActions = KeyboardActions(
 
                 ),
@@ -257,9 +271,18 @@ fun AboutMe(userEdit: User?, viewModel: ProfileVM) {
             if (showDialog) {
                 GanderDialog(
                     setGander = { viewModel.setGender(it) },
-                    onDismissRequest = { showDialog = false }, mutableListOf("Women", "Man")
-                )
+                    onDismissRequest = { showDialog = false })
+
             }
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            Interests(
+                interest = userEdit.interest,
+                setInterestes = { viewModel.setInteressent(it)
+                },
+                reg = false
+            )
         }
     }
 }

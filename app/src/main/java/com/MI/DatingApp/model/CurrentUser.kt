@@ -106,7 +106,7 @@ object CurrentUser {
             ),
             genderLookingFor = "Women",
             description = "usertest",
-            interest = mutableListOf("Travel"),
+            interest = mutableListOf("Travel","Sport","Film"),
             likes = mutableListOf("-O-gTyIykyVTlqOSEkli"),
             dislikes = mutableListOf()
         )

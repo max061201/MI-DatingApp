@@ -129,7 +129,7 @@ var outletAttributeRegisPage3 = mutableListOf(
 
 var userInterests:Map<String,Int> = mapOf(
     "Travel" to R.drawable.baseline_airplanemode_active_24,
-    "Sprot" to R.drawable.baseline_sports_handball_24,
+    "Sport" to R.drawable.baseline_sports_handball_24,
     "Cinma" to R.drawable.baseline_local_movies_24,
     "Shoping" to R.drawable.baseline_shopping_cart_24,
 

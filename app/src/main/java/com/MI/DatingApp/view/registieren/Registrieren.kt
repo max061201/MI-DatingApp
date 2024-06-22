@@ -71,12 +71,12 @@ fun Registrieren(navController: NavHostController, viewModel: RegisteringVM = vi
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            NavHost(navController = registerNavController, startDestination = "firstPage") {
+            NavHost(navController = registerNavController, startDestination = "secondRPage") {
                 composable("firstPage") {
                     FirstPage(
                         navController = registerNavController,
                         uservalue,
-                        viewModel ,
+                        viewModel,
                         errorfield1
                     )
 
@@ -86,7 +86,11 @@ fun Registrieren(navController: NavHostController, viewModel: RegisteringVM = vi
                 }
 
                 composable("third") {
-                    ThirdPage(navController = navController, uservalue = uservalue, registeringViewModel =viewModel )
+                    ThirdPage(
+                        navController = navController,
+                        uservalue = uservalue,
+                        registeringViewModel = viewModel
+                    )
                 }
 
 
@@ -96,11 +100,12 @@ fun Registrieren(navController: NavHostController, viewModel: RegisteringVM = vi
             ClickableText(
                 text = buildAnnotatedString {
                     append("Existing account ")
-                    withStyle(style = SpanStyle(
-                        textDecoration = TextDecoration.Underline,
-                        color = Color.White,
-                        fontWeight = FontWeight.SemiBold
-                    )
+                    withStyle(
+                        style = SpanStyle(
+                            textDecoration = TextDecoration.Underline,
+                            color = Color.White,
+                            fontWeight = FontWeight.SemiBold
+                        )
                     ) {
                         append("Log In")
                     }
@@ -178,9 +183,8 @@ fun secondRPage(
 
         UserImage(registeringViewModel)
         DatePickerTextField(
-            mutableListOf<OutletAttribute>(outletAttributeRegisPage2[0])[0],
             value = uservalue!!.yearOfBirth
-        ){
+        ) {
             registeringViewModel.setDate(it)
         }
         Gander(
@@ -208,13 +212,22 @@ fun ThirdPage(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         RegistFirstItems(3)
-        LookingForSection(registeringViewModel, outletAttributeRegisPage3[0])
-        DescribesYouSection( registeringViewModel,outletAttributeRegisPage3[1])
-        Interests(registeringViewModel =  registeringViewModel)
+        LookingForSection(
+            registeringViewModel.user.value!!.genderLookingFor,
+            outletAttributeRegisPage3[0],
+
+            ) {
+            registeringViewModel.setGanderLookingFor(it)
+        }
+        DescribesYouSection(registeringViewModel, outletAttributeRegisPage3[1])
+        Interests(
+            interest = registeringViewModel.user.value!!.interest,
+            setInterestes = { registeringViewModel.setInterestes(it) }
+            )
         ButtonCompose({
 
 
-                registeringViewModel.saveUserInFirebaseAuth()
+            registeringViewModel.saveUserInFirebaseAuth()
             navController.navigate("login")
         }, text = "Create Account")
     }

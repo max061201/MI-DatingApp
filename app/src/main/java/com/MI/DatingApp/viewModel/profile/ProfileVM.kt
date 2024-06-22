@@ -47,6 +47,16 @@ class ProfileVM : ViewModel() {
         _userchanges.value = uservalue
     }
 
+    fun setInteressent(interessent: String) {
+        val userInterest = _userchanges.value!!.interest.toMutableList().apply {
+            if(contains(interessent)){
+                remove(interessent)
+            }else
+                add(interessent)
+        }
+        _userchanges.value = _userchanges.value!!.copy(interest = userInterest)
+    }
+
     fun setGender(gender: String) {
         val uservalue = _userchanges.value!!.copy(
             gender = gender

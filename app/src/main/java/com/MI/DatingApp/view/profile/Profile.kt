@@ -42,7 +42,10 @@ import coil.compose.AsyncImage
 import com.MI.DatingApp.R
 import com.MI.DatingApp.model.CurrentUser
 import com.MI.DatingApp.model.User
+import com.MI.DatingApp.view.registieren.recyclable.DatePickerTextField
 import com.MI.DatingApp.view.registieren.recyclable.GanderDialog
+import com.MI.DatingApp.view.registieren.recyclable.OutletAttribute
+import com.MI.DatingApp.view.registieren.recyclable.outletAttributeRegisPage2
 import com.MI.DatingApp.viewModel.profile.ProfileVM
 
 @Composable
@@ -188,13 +191,12 @@ fun AccountSettings(userEdit: User?, viewModel: ProfileVM) {
                 )
             )
             Spacer(modifier = Modifier.height(8.dp))
-            TextField(value = userEdit.yearOfBirth, onValueChange = {
+            DatePickerTextField(
+                mutableListOf<OutletAttribute>(outletAttributeRegisPage2[0])[0],
+                value = userEdit.yearOfBirth
+            ){
                 viewModel.setDate(it)
-            }, label = { Text("Date of Birth") },
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.White
-                )
-            )
+            }
             Spacer(modifier = Modifier.height(8.dp))
             TextField(
                 value = userEdit.email, onValueChange = {

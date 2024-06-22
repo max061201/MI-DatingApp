@@ -53,6 +53,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -229,17 +230,16 @@ fun ButtonCompose(onClick: () -> Unit, text: String = "Next") {
 
 @Composable
 fun DatePickerTextField(
-    selectedDate: Date?,
     outletAttribute: OutletAttribute,
-    value: User,
-    registeringViewModel: RegisteringVM
+    value: String,
+    setDate: (date: String) -> Unit
 ) {
     var showDialog by remember { mutableStateOf(false) }
-    val context = LocalContext.current
+
 
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
-        value = value.yearOfBirth,
+        value = value,
         onValueChange = { /* Ignoring manual input for now */ },
         label = { Text("Date", color = Color.White) },
         readOnly = true, // Prevents manual input
@@ -267,14 +267,16 @@ fun DatePickerTextField(
             )
     )
     if (showDialog) {
-        DatePickerDialogCo(value, registeringViewModel)
+        DatePickerDialogCo {
+            setDate(it)
+        }
     }
 
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DatePickerDialogCo(value: User, registeringViewModel: RegisteringVM) {
+fun DatePickerDialogCo(setDate: (date: String) -> Unit) {
     val datePickerState = rememberDatePickerState(
         initialDisplayedMonthMillis = System.currentTimeMillis(),
         yearRange = 1900..2024
@@ -296,13 +298,30 @@ fun DatePickerDialogCo(value: User, registeringViewModel: RegisteringVM) {
                 TextButton(onClick = { showDatePicker.value = false }) {
                     Text(text = "Dismiss")
                 }
-            }) {
+            },
+            colors = DatePickerDefaults.colors(
+                containerColor = Color.Black,
+                yearContentColor = Color.White,
+                currentYearContentColor = Color.Blue,
+                titleContentColor = Color.White,
+                headlineContentColor = Color.White,
+                weekdayContentColor = Color.Gray,
+                subheadContentColor = Color.LightGray,
+                dayContentColor = Color.White,
+                selectedDayContentColor = Color.Blue,
+                todayContentColor = Color.Green,
+
+
+            )
+
+
+        ) {
 
             DatePicker(
                 state = datePickerState
             )
             if (datePickerState.selectedDateMillis != null) {
-                registeringViewModel.setDate(Date(datePickerState.selectedDateMillis!!).formatAndToString())
+                setDate(Date(datePickerState.selectedDateMillis!!).formatAndToString())
             }
 
         }
@@ -433,7 +452,7 @@ fun GanderDialog(
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
                 containerColor = Color.White,
-                contentColor =Color.Black
+                contentColor = Color.Black
             )
         ) {
             Column(
@@ -524,7 +543,7 @@ fun Interests(interestsMap: Map<String, Int> = userInterests, registeringViewMod
         Text(text = "your interests")
         BasicTextField(
             value = interests,
-            onValueChange = { registeringViewModel.setInterestes(it )},
+            onValueChange = { registeringViewModel.setInterestes(it) },
             readOnly = true,
             modifier = Modifier
                 .fillMaxWidth()
@@ -538,12 +557,12 @@ fun Interests(interestsMap: Map<String, Int> = userInterests, registeringViewMod
                 imeAction = ImeAction.Next
             ),
         )
-        FlowRow (
+        FlowRow(
             modifier = Modifier.fillMaxWidth(),
-        ){
+        ) {
             interestsMap.forEach { (key, value) ->
                 Spacer(modifier = Modifier.width(8.dp))
-                Button(  onClick = {
+                Button(onClick = {
                     registeringViewModel.setInterestes(key)
 
                 }) {

@@ -54,7 +54,10 @@ fun Login(navController: NavController, viewModel: LoginViewModel = viewModel())
 
     LaunchedEffect(loginState) {
         if (loginState is LoginState.Success) {
-            navController.navigate("home")
+            navController.navigate("test") {
+                popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                launchSingleTop = true
+            }
         }
     }
 
@@ -251,7 +254,7 @@ fun LoginButtonAndSignUpText(onClick: () -> Unit, navController: NavController) 
 fun LoginStateHandler(loginState: LoginState, navController: NavController) {
     when (loginState) {
         is LoginState.Loading -> CircularProgressIndicator()
-        is LoginState.Success -> {navController.navigate("home");}
+        is LoginState.Success -> {navController.navigate("test");}
         is LoginState.Error -> Text(text = loginState.message, color = Color.Red)
         else -> {}
     }

@@ -9,17 +9,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.MI.DatingApp.AppNavigation
 import com.MI.DatingApp.bottomBarRoutes
 import com.MI.DatingApp.bottomNavigationItems
 import com.MI.DatingApp.model.CurrentUser
-import com.MI.DatingApp.viewModel.LoginViewModel
 
 
 @Composable
@@ -60,7 +57,7 @@ fun MainScreen(navController: NavHostController) {
         }
     ) { innerPadding ->
        // AppNavigation(navController, Modifier.padding(innerPadding), startDestination)
-        val startDestination = if (CurrentUser.getUser() != null) "home" else "login"
+        val startDestination = if (CurrentUser.getUser() != null) "test" else "login"
         AppNavigation(navController = navController, startDestination = startDestination, modifier = Modifier.padding(innerPadding) )
     }
 }

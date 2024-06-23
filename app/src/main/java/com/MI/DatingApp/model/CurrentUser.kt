@@ -27,6 +27,17 @@ object CurrentUser {
     fun initialize(context: Context) {
         sharedPreferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
         firebaseRealTimeDB = FirebaseDatabase.getInstance().getReference("Users")
+        // Lade den Benutzer aus den SharedPreferences, falls vorhanden
+        user = loadUserFromPreferences()
+
+        // Wenn ein Benutzer geladen wurde (d.h. user ist nicht null), dann:
+        user?.let {
+            // Aktualisiere den LiveData-Wert, damit die UI-Komponenten darüber informiert werden
+            _userLiveData.postValue(it)
+
+            // Starte den ValueEventListener, um Änderungen am Benutzer in der Datenbank zu überwachen
+            listenToUserChanges(it.id)
+        }
 
     }
 
@@ -51,33 +62,36 @@ object CurrentUser {
     }
 
     fun listenToUserChanges(userId: String) {
-        // Überprüfe, ob der ValueEventListener bereits aktiv ist
-        if (!isUserValueListenerActive) {
-            // Füge einen ValueEventListener zur Überwachung von Benutzeränderungen hinzu
-            userValueEventListener = firebaseRealTimeDB.child(userId).addValueEventListener(
-                object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        val updatedUser = snapshot.getValue(User::class.java)
-                        updatedUser?.let {
-                            if (user == null || user != updatedUser) {
-                                // Aktualisiere den LiveData des aktuellen Benutzers
-                                _userLiveData.postValue(updatedUser)
-                                setUser(updatedUser)
+        // Entferne den alten Listener, falls vorhanden
+        userValueEventListener?.let {
+            firebaseRealTimeDB.child(userId).removeEventListener(it)
+        }
 
-                                Log.d("CurrentUserUpdate", updatedUser.toString())
-                            }
+        // Füge einen neuen ValueEventListener zur Überwachung von Benutzeränderungen hinzu
+        userValueEventListener = firebaseRealTimeDB.child(userId).addValueEventListener(
+            object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val updatedUser = snapshot.getValue(User::class.java)
+                    updatedUser?.let {
+                        if (user == null || user != updatedUser) {
+                            // Aktualisiere den LiveData des aktuellen Benutzers
+                            _userLiveData.postValue(updatedUser)
+                            setUser(updatedUser)
+
+                            Log.d("CurrentUserUpdate", updatedUser.toString())
                         }
                     }
-
-                    override fun onCancelled(error: DatabaseError) {
-                        // Behandlung eines Fehlers beim ValueEventListener
-                        Log.e("UserUpdateError", error.message)
-                    }
                 }
-            )
-            // Markiere den ValueEventListener als aktiv
-            isUserValueListenerActive = true
-        }
+
+                override fun onCancelled(error: DatabaseError) {
+                    // Behandlung eines Fehlers beim ValueEventListener
+                    Log.e("UserUpdateError", error.message)
+                }
+            }
+        )
+
+        // Markiere den ValueEventListener als aktiv
+        isUserValueListenerActive = true
     }
 
 

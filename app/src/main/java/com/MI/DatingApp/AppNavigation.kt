@@ -16,12 +16,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.MI.DatingApp.view.Chat
 import com.MI.DatingApp.view.Home
-import com.MI.DatingApp.view.Likes
+
 import com.MI.DatingApp.view.NavigationItem
 import com.MI.DatingApp.view.Screen3
 import com.MI.DatingApp.view.Screen4
 import com.MI.DatingApp.view.Login
 import com.MI.DatingApp.view.TestView
+import com.MI.DatingApp.view.likes.Likes
 import com.MI.DatingApp.view.profile.ProfileScreen
 import com.MI.DatingApp.view.registieren.Registrieren
 
@@ -29,12 +30,12 @@ import com.MI.DatingApp.view.registieren.Registrieren
 @Composable
 
 fun AppNavigation(navController: NavHostController, startDestination: String, modifier: Modifier = Modifier) {
-    NavHost(navController = navController, startDestination = "registrieren") {
+    NavHost(navController = navController, startDestination = "likes") {
         composable("login") { Login(navController) }
         composable("registrieren") { Registrieren(navController = navController) }
         composable("test") { TestView(navController) }
         composable("home") { Home(navController) }
-        composable("likes") { Likes(navController) }
+        composable("likes") { Likes() }
         composable("chat") { Chat(navController) }
 
         composable("profile") { ProfileScreen(navController) }

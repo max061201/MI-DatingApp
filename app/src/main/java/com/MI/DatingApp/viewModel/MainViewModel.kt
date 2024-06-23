@@ -67,6 +67,9 @@ class MainViewModel : ViewModel() {
     private val _usersListLiveData = MutableLiveData<List<User>>()
     val usersListLiveData: LiveData<List<User>> get() = _usersListLiveData
 
+    init {
+        CurrentUser.initialize2()
+    }
     fun setCurrentUser(user: User?) {
         _currentShownUser.postValue(user)
     }

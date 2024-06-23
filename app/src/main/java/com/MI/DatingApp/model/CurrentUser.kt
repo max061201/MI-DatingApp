@@ -30,6 +30,12 @@ object CurrentUser {
         // Lade den Benutzer aus den SharedPreferences, falls vorhanden
         user = loadUserFromPreferences()
 
+
+    }
+
+    fun initialize2() {
+        user = loadUserFromPreferences()
+
         // Wenn ein Benutzer geladen wurde (d.h. user ist nicht null), dann:
         user?.let {
             // Aktualisiere den LiveData-Wert, damit die UI-Komponenten darüber informiert werden

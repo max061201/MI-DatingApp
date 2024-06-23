@@ -20,6 +20,7 @@ class UserViewModel: ViewModel() {
 
     init {
         fetchUsers()
+        CurrentUser.initialize2()
     }
     fun like(user: User) {
         Log.d("Righswipe", "like")

@@ -71,7 +71,7 @@ fun Registrieren(navController: NavHostController, viewModel: RegisteringVM = vi
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            NavHost(navController = registerNavController, startDestination = "secondRPage") {
+            NavHost(navController = registerNavController, startDestination = "firstPage") {
                 composable("firstPage") {
                     FirstPage(
                         navController = registerNavController,

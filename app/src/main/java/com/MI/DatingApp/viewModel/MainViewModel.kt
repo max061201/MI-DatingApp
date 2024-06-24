@@ -1,8 +1,6 @@
 package com.MI.DatingApp.viewModel
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -176,7 +174,7 @@ class MainViewModel : ViewModel() {
                 momentanerUser.likes.add(currentShownUser.id)
                 changes["likes"] = momentanerUser.likes // Änderungen hinzufügen
                 firebaseIm.updateUserToDatabase(changes, momentanerUser.id) // Datenbank aktualisieren
-                CurrentUser.setUser(momentanerUser) // Lokal CurrentUser aktualisieren
+                CurrentUser.setUserLocalStorage(momentanerUser) // Lokal CurrentUser aktualisieren
                 changes.clear() // Veränderungen löschen
                 Log.d("CurrentUser", CurrentUser.getUser().toString())
 
@@ -199,7 +197,7 @@ class MainViewModel : ViewModel() {
                 momentanerUser.likes.add(currentShownUser.id)
                 changes["likes"] = momentanerUser.likes // Änderungen hinzufügen
                 firebaseIm.updateUserToDatabase(changes, momentanerUser.id) // Datenbank aktualisieren
-                CurrentUser.setUser(momentanerUser) // Lokal CurrentUser aktualisieren
+                CurrentUser.setUserLocalStorage(momentanerUser) // Lokal CurrentUser aktualisieren
                 changes.clear() // Veränderungen löschen
                 Log.d("CurrentUser", CurrentUser.getUser().toString())
 

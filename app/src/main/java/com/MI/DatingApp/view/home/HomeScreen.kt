@@ -44,9 +44,16 @@ import com.MI.DatingApp.viewModel.user.UserViewModel
 fun HomeScreen() {
     val mainViewModel: UserViewModel = viewModel()
 
+
     val currentUserLive by mainViewModel.currentUserLiveData.observeAsState()
 
     val filterViewModel: FilterViewModel = viewModel()
+    val users by mainViewModel.users.observeAsState()
+
+    // Lade Benutzer beim Starten der Ansicht
+    LaunchedEffect(Unit) {
+        mainViewModel.fetchUsers()
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column {

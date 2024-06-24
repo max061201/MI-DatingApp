@@ -20,6 +20,9 @@ object CurrentUser {
     private val _userLiveData = MutableLiveData<User?>()
     val userLiveData: LiveData<User?> get() = _userLiveData
 
+   // private val _initialUserLiveData = MutableLiveData<User?>()
+   // val userLiveData2: LiveData<User?> get() = _initialUserLiveData
+
     // ValueEventListener für Benutzeraktualisierungen
     private var userValueEventListener: ValueEventListener? = null
     private var isUserValueListenerActive = false
@@ -27,16 +30,35 @@ object CurrentUser {
     fun initialize(context: Context) {
         sharedPreferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
         firebaseRealTimeDB = FirebaseDatabase.getInstance().getReference("Users")
+       // _initialUserLiveData.postValue(getUser())
+        user = loadUserFromPreferences()
 
+        // Wenn ein Benutzer geladen wurde (d.h. user ist nicht null), dann:
+        user?.let {
+            // Aktualisiere den LiveData-Wert, damit die UI-Komponenten darüber informiert werden
+            _userLiveData.postValue(it)
+
+            // Starte den ValueEventListener, um Änderungen am Benutzer in der Datenbank zu überwachen
+            listenToUserChanges(it.id)
+        }
     }
 
-    fun setUser(newUser: User) {
+    fun setUserLocalStorage(newUser: User) {
         user = newUser
         saveUserToPreferences(newUser)
         _userLiveData.postValue(newUser)
       //  listenToUserChanges(newUser.id) // Start the listener when the user is set
     }
-    
+
+    fun setUserDBandLocalStorage(newUser: User) {
+        user = newUser
+        saveUserToPreferences(newUser)
+        _userLiveData.postValue(newUser)
+        firebaseRealTimeDB.child(newUser.id).setValue(newUser)
+        Log.d("setUserDBandLocalStorage", newUser.toString())
+
+        //  listenToUserChanges(newUser.id) // Start the listener when the user is set
+    }
 
     fun getUser(): User? {
         if (user == null) {
@@ -48,6 +70,8 @@ object CurrentUser {
     fun clearUser() {
         user = null
         clearPreferences()
+        _userLiveData.postValue(null)
+
     }
 
     fun listenToUserChanges(userId: String) {
@@ -62,7 +86,7 @@ object CurrentUser {
                             if (user == null || user != updatedUser) {
                                 // Aktualisiere den LiveData des aktuellen Benutzers
                                 _userLiveData.postValue(updatedUser)
-                                setUser(updatedUser)
+                                setUserLocalStorage(updatedUser)
 
                                 Log.d("CurrentUserUpdate", updatedUser.toString())
                             }

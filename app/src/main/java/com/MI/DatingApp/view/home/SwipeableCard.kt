@@ -1,5 +1,6 @@
 package com.MI.DatingApp.view.home
 
+import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.tween
@@ -8,7 +9,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.IconButton
@@ -20,7 +20,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -50,7 +49,7 @@ data class Item(
 
 @Composable
 fun SwipeCardDemo(viewModel: UserViewModel = viewModel()) {
-    SwipeCardDemoList()
+    SwipeCardDemoList(viewModel)
 }
 
 @Composable
@@ -217,9 +216,14 @@ fun ControlButtons(
 }
 
 @Composable
-fun SwipeCardDemoList(userViewModel: UserViewModel = viewModel()) {
-    var currentIndex by rememberSaveable { mutableIntStateOf(0) }
+fun SwipeCardDemoList(viewModel: UserViewModel) {
+    val userViewModel: UserViewModel = viewModel()
+
+    var currentIndex by rememberSaveable { mutableStateOf(0) }
     val userList by userViewModel.users.observeAsState(initial = emptyList())
+    Log.d("SwipeCardDemoList", "UserList size: ${userList.size}, Users: $userList")
+
+   // Text(text = userList.toString(), style = MaterialTheme.typography.labelSmall, color = Color.Black)
 
     val accounts = userList.map { user ->
         val imageUrl = if (!user.imageUrls.isNullOrEmpty()) {

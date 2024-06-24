@@ -88,7 +88,7 @@ class LoginViewModel : ViewModel() {
                 }
             }
             if (foundUser != null) {
-                CurrentUser.setUser(foundUser)
+                CurrentUser.setUserLocalStorage(foundUser)
                 Log.d("CurrentUser", foundUser.toString())
               //  Log.d("CurrentUser2", CurrentUser.getUser().toString())
 

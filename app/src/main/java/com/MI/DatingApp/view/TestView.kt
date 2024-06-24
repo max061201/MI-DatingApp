@@ -1,5 +1,6 @@
 package com.MI.DatingApp.view
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -41,7 +42,7 @@ fun TestView(navController: NavController) {
     val currentUser by mainViewModel.currentShownUser.observeAsState()
 
     val currentUserLive by mainViewModel.currentUserLiveData.observeAsState()
-
+    Log.d("currentUserLive", currentUserLive.toString())
     Column(
         modifier = Modifier
             .fillMaxSize()

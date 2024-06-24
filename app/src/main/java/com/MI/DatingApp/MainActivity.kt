@@ -34,6 +34,7 @@ class MainActivity : ComponentActivity() {
             ComposeBottomNavigationExampleTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     MainScreen(navController)
+
                     //CurrentUser.clearUser()
                     Log.d("CurrentUser", CurrentUser.getUser().toString())
                    // AppContent(navController)

@@ -7,11 +7,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,17 +25,19 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-
+import com.MI.DatingApp.R
 
 
 @Composable
-fun Likes(){
-    var likes= mutableListOf("1","2","1","2","1","2","7")
+fun Likes() {
+    var likes = mutableListOf("1", "2", "1", "2", "1", "2", "7")
     Text(text = "Text", color = Color.Black)
 
     Column(
@@ -45,16 +51,56 @@ fun Likes(){
                         colors = listOf(Color(0xFFFCF7F7), Color(0xFFAA3FEC))
                     )
                 )
-        ){
+        ) {
             Column(
                 modifier = Modifier.fillMaxSize()
-            ){
+            ) {
                 CurvedBox {
-                    UnderlinedText(text = "Likes",
+                    UnderlinedText(
+                        text = "Likes",
                         color = Color.Black,
-                        underlineColor= Color(0xFF58C3B6)
+                        underlineColor = Color(0xFF58C3B6)
 
                     )
+
+                }
+
+                Text(
+                    text = "${likes.size} Likes",
+                    color = Color.Black,
+                    modifier = Modifier.padding(16.dp),
+                    fontWeight = FontWeight.Bold,
+                )
+
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier.padding(8.dp)
+                ) {
+                    items(likes.size) { like ->
+
+                        Box(
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .aspectRatio(1f)
+                                .background(Color.White, RoundedCornerShape(8.dp))
+                        ) {
+
+                            Image(
+                                painter = painterResource(id = R.drawable.logo),
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize()
+                            )
+
+                            Text(
+                                text = "test",
+                                color = Color.Black,
+                                modifier = Modifier.padding(top=150.dp, start = 40.dp)
+
+                                )
+
+                        }
+                    }
 
                 }
 
@@ -63,11 +109,6 @@ fun Likes(){
 
     }
 }
-
-
-
-
-
 
 
 @Composable
@@ -85,7 +126,7 @@ fun CurvedBox(
                 .fillMaxWidth()
                 .height(100.dp),
 
-        ) {
+            ) {
             val width = size.width
             val height = size.height
 
@@ -93,9 +134,9 @@ fun CurvedBox(
                 moveTo(0f, 0f)
                 lineTo(0f, height - 50)
                 cubicTo(
-                    width / 2, height ,
-                    width / 2, height ,
-                    width, height-50
+                    width / 2, height,
+                    width / 2, height,
+                    width, height - 50
                 )
                 lineTo(width, 0f)
                 close()
@@ -127,10 +168,11 @@ fun UnderlinedText(text: String, color: Color, underlineColor: Color) {
             fontWeight = FontWeight.Bold,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
-        Canvas(modifier = Modifier
+        Canvas(
+            modifier = Modifier
 
-            .height(2.dp)
-            ) {
+                .height(2.dp)
+        ) {
             drawLine(
                 color = underlineColor,
                 start = Offset(0f, 0f),
@@ -143,6 +185,6 @@ fun UnderlinedText(text: String, color: Color, underlineColor: Color) {
 
 @Preview
 @Composable
-fun prview(){
+fun prview() {
     Likes()
 }

@@ -253,6 +253,37 @@ class ProfileVM : ViewModel() {
     }
 
     fun deleteAccount() {
-        // TODO: Implement delete account functionality
+        val userId = currentUser.id
+
+        // Lösche Benutzer aus der Realtime Database
+        firebaseRefRealTime.child(userId).removeValue()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("Firebase", "User removed from Realtime Database successfully")
+                } else {
+                    Log.e("Firebase", "Error removing user from Realtime Database: ${task.exception?.message}")
+                }
+            }
+
+        // Lösche Benutzerbilder aus Firebase Storage
+        currentUser.imageUrls?.forEach { imageUrl ->
+            val imageRef = FirebaseStorage.getInstance().getReferenceFromUrl(imageUrl)
+            imageRef.delete().addOnSuccessListener {
+                Log.d("Firebase", "Image deleted successfully")
+            }.addOnFailureListener {
+                Log.e("Firebase", "Error deleting image: ${it.message}")
+            }
+        }
+        CurrentUser.clearUser()
+
+//        // Lösche Benutzer aus Firebase Authentication
+//        val firebaseUser = FirebaseAuth.getInstance().currentUser
+//        firebaseUser?.delete()?.addOnCompleteListener { task ->
+//            if (task.isSuccessful) {
+//                Log.d("Firebase", "User account deleted successfully")
+//            } else {
+//                Log.e("Firebase", "Error deleting user account: ${task.exception?.message}")
+//            }
+//        }
     }
 }

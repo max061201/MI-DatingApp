@@ -254,7 +254,7 @@ fun LoginButtonAndSignUpText(onClick: () -> Unit, navController: NavController) 
 fun LoginStateHandler(loginState: LoginState, navController: NavController) {
     when (loginState) {
         is LoginState.Loading -> CircularProgressIndicator()
-        is LoginState.Success -> {navController.navigate("test");}
+        is LoginState.Success -> {navController.navigate("home");}
         is LoginState.Error -> Text(text = loginState.message, color = Color.Red)
         else -> {}
     }

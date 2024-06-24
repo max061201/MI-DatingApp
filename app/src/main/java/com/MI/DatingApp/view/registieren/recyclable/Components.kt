@@ -426,7 +426,7 @@ fun LookingForSection(
     if (showDialog) {
         GanderDialog(
             setGander = { setGeander(it) },
-            onDismissRequest = { showDialog = false }, mutableListOf("Women", "Man")
+            onDismissRequest = { showDialog = false }, mutableListOf("Women", "Male")
         )
     }
 }

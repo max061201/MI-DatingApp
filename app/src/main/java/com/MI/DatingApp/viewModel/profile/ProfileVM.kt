@@ -2,6 +2,7 @@ package com.MI.DatingApp.viewModel.profile
 
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,6 +13,9 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ProfileVM : ViewModel() {
 
@@ -19,7 +23,7 @@ class ProfileVM : ViewModel() {
     val userchanges: LiveData<User> = _userchanges
 
     val currentUser = CurrentUser.getTestUser()
-
+    var deleteImages: MutableList<String> = mutableListOf()
     fun setUserValue(user: User) {
         val uservalue = _userchanges.value!!.copy(
             id = user.id,
@@ -41,6 +45,16 @@ class ProfileVM : ViewModel() {
             name = name
         )
         _userchanges.value = uservalue
+    }
+
+    fun setInteressent(interessent: String) {
+        val userInterest = _userchanges.value!!.interest.toMutableList().apply {
+            if(contains(interessent)){
+                remove(interessent)
+            }else
+                add(interessent)
+        }
+        _userchanges.value = _userchanges.value!!.copy(interest = userInterest)
     }
 
     fun setGender(gender: String) {
@@ -71,27 +85,39 @@ class ProfileVM : ViewModel() {
         _userchanges.value = uservalue
     }
 
-    fun setImage(imageUri: String) {
-        val uservalue = _userchanges.value
-        if (uservalue != null) {
-            val updatedImageUrls = uservalue.imageUrls?.toMutableList()
-            updatedImageUrls?.add(imageUri)
-            _userchanges.value = uservalue.copy(imageUrls = updatedImageUrls)
+    fun setImage(imageUri: String, imageToDelete: String = "", index: Int) {
+        val uservalue = _userchanges.value!!
+        val newImages = uservalue.imageUrls!!.toMutableList().apply {
+            if (indexOf(imageToDelete) == -1) {
+                add(imageUri)
+            } else {
+
+                removeAt(index)
+                add(index, imageUri)
+                deleteImages.add(imageToDelete)
+
+
+            }
+
         }
-        Log.d("setImage", _userchanges.value.toString())
+        _userchanges.value = uservalue.copy(imageUrls = newImages)
+
 
     }
 
     //Set für welches images würde bearbeitet
 
-    private var firebaseRefRealTime: DatabaseReference = FirebaseDatabase.getInstance().getReference("Users")
-   // private var auth: FirebaseAuth = FirebaseAuth.getInstance()
-    private var storageRef: StorageReference = FirebaseStorage.getInstance().getReference("UsersImages")
+    private var firebaseRefRealTime: DatabaseReference =
+        FirebaseDatabase.getInstance().getReference("Users")
+
+    // private var auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private var storageRef: StorageReference =
+        FirebaseStorage.getInstance().getReference("UsersImages")
     val changes = mutableMapOf<String, Any>()
     var firebaseIm = FirebaseIm()
 
 
-   // UpdateUSer in DB
+    // UpdateUSer in DB
     fun updateDataFirebase() {
 
         _userchanges.value?.let { userChanges ->
@@ -123,6 +149,7 @@ class ProfileVM : ViewModel() {
                 deleteSameImages()
                 val user = _userchanges.value!!
                 val imageUris = user.imageUrls?.map { Uri.parse(it) } ?: emptyList()
+
                 uploadImagesAndUpdateUser(imageUris)
                 //updateUserToDatabase()
 
@@ -132,27 +159,56 @@ class ProfileVM : ViewModel() {
         }
     }
 
+    private fun deleteImagesFromFirebase() {
+        currentUser.imageUrls = currentUser.imageUrls?.apply {
+            removeAll(deleteImages)
+        }
+        deleteImages.forEach {
+            Log.i("deleteImages", "deleteImagesFromFirebase: " + it)
+            val imageRef =
+                storageRef.child(
+                    Uri.parse(it).lastPathSegment!!.replace(
+                        "UsersImages/",
+                        ""
+                    )
+                ) // Zeitstempel vor dem Dateinamen
+
+            imageRef.delete().addOnSuccessListener {
+                Log.d("successdelete", "Image deleted successfully")
+
+            }.addOnFailureListener {
+                Log.d("failddelete", "Image deleted successfully+$it")
+            }
+        }
+
+    }
+
     private fun uploadImagesAndUpdateUser(imageUris: List<Uri>) {
         val contactId = currentUser.id
         val timestamp = System.currentTimeMillis() // Zeitstempel hinzufügen
+        CoroutineScope(Dispatchers.IO).launch {
+            val uploadedImageUrls = mutableListOf<String>()
+            imageUris.forEach { uri ->
+                //   val imageRef = storageRef.child("images/$contactId/${uri.lastPathSegment}")
+                val imageRef =
+                    storageRef.child("images/$contactId/${timestamp}_${uri.lastPathSegment}") // Zeitstempel vor dem Dateinamen
 
-        val uploadedImageUrls = mutableListOf<String>()
-        imageUris.forEach { uri ->
-         //   val imageRef = storageRef.child("images/$contactId/${uri.lastPathSegment}")
-            val imageRef = storageRef.child("images/$contactId/${timestamp}_${uri.lastPathSegment}") // Zeitstempel vor dem Dateinamen
+                val uploadTask = imageRef.putFile(uri)
+                uploadTask.addOnFailureListener {
+                    Log.d("Firebase", "Image upload failed: ${it.message}")
+                }.addOnSuccessListener { taskSnapshot ->
 
-            val uploadTask = imageRef.putFile(uri)
-            uploadTask.addOnFailureListener {
-                Log.d("Firebase", "Image upload failed: ${it.message}")
-            }.addOnSuccessListener { taskSnapshot ->
-                taskSnapshot.metadata?.reference?.downloadUrl?.addOnSuccessListener { downloadUri ->
-                    uploadedImageUrls.add(downloadUri.toString())
-                    if (uploadedImageUrls.size == imageUris.size) {
-                        updateUserImgDatabase(uploadedImageUrls, contactId)
+                    taskSnapshot.metadata?.reference?.downloadUrl?.addOnSuccessListener { downloadUri ->
+                        uploadedImageUrls.add(downloadUri.toString())
+                        if (uploadedImageUrls.size == imageUris.size) {
+                            updateUserImgDatabase(uploadedImageUrls, contactId)
+                        }
                     }
+                    deleteImagesFromFirebase()
                 }
             }
         }
+
     }
 
     private fun updateUserImgDatabase(imageUrls: List<String>, contactId: String) {
@@ -172,7 +228,7 @@ class ProfileVM : ViewModel() {
     }
 
 
-//    private fun updateUserToDatabase() {
+    //    private fun updateUserToDatabase() {
 //        val userId = currentUser.id
 //        firebaseRefRealTime.child(userId).updateChildren(changes)
 //            .addOnCompleteListener {
@@ -195,6 +251,7 @@ class ProfileVM : ViewModel() {
             _userchanges.value = _userchanges.value?.copy(imageUrls = newImageUrls)
         }
     }
+
     fun deleteAccount() {
         // TODO: Implement delete account functionality
     }

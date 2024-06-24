@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.MI.DatingApp.model.Contact
 import com.MI.DatingApp.model.CurrentUser
 import com.MI.DatingApp.model.User
 import com.MI.DatingApp.model.registieren.FirebaseIm
@@ -68,7 +67,7 @@ class MainViewModel : ViewModel() {
     val usersListLiveData: LiveData<List<User>> get() = _usersListLiveData
 
     init {
-        CurrentUser.initialize2()
+        CurrentUser.initializeUser()
     }
     fun setCurrentUser(user: User?) {
         _currentShownUser.postValue(user)
@@ -90,7 +89,6 @@ class MainViewModel : ViewModel() {
                     val user = userSnapshot.getValue(User::class.java)
                     if (user != null && shouldShowUser(currentUserLiveData.value!!, user)) {
                         userList.add(user)
-
                     }
                 }
                 Log.d("Login", userList.toString())

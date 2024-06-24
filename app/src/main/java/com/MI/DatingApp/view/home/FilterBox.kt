@@ -28,8 +28,13 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun FilterBox(onDismiss: () -> Unit, filterViewModel: FilterViewModel = viewModel()) {
-    var selectedGender by remember { mutableStateOf("Male") }
     // var ageRange by remember { mutableStateOf(21f..37f) }
+    val currentUser = filterViewModel.currentUserLiveData.value
+
+    // MutableState für den ausgewählten Gender
+    var selectedGender by remember {
+        mutableStateOf(currentUser?.genderLookingFor ?: "Male") // Standardmäßig "Male", falls currentUser null ist
+    }
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -54,7 +59,10 @@ fun FilterBox(onDismiss: () -> Unit, filterViewModel: FilterViewModel = viewMode
 
                 TitlePages("Filter", Modifier.padding(start = 16.dp, end = 16.dp))
 
-                IconButton(onClick = onDismiss,  modifier = Modifier.padding(top = 30.dp)) {
+                IconButton(onClick = {
+                    filterViewModel.updateFilterData()
+                    onDismiss()
+                },  modifier = Modifier.padding(top = 30.dp)) {
                     Icon(imageVector = Icons.Default.Check, contentDescription = "Apply", tint = Color(0xFFAA3FEC))
                 }
             }
@@ -79,8 +87,14 @@ fun FilterBox(onDismiss: () -> Unit, filterViewModel: FilterViewModel = viewMode
                         .padding(bottom = 16.dp),
                     horizontalArrangement = Arrangement.Start
                 ) {
-                    GenderButton("Male", selectedGender == "Male") { selectedGender = "Male" }
-                    GenderButton("Female", selectedGender == "Female") { selectedGender = "Female" }
+                    GenderButton("Male", selectedGender == "Male") {
+                        selectedGender = "Male"
+                        filterViewModel.setGender(selectedGender) // Update filter data with the selected gender
+                    }
+                    GenderButton("Female", selectedGender == "Female") {
+                        selectedGender = "Female"
+                        filterViewModel.setGender(selectedGender) // Update filter data with the selected gender
+                    }
                 }
                 // Add your gender selection UI here
                 Spacer(modifier = Modifier.height(8.dp))

@@ -37,11 +37,14 @@ object CurrentUser {
         user = loadUserFromPreferences()
         // Wenn ein Benutzer geladen wurde (d.h. user ist nicht null), dann:
         user?.let {
+            // Starte den ValueEventListener, um Änderungen am Benutzer in der Datenbank zu überwachen
+            listenToUserChanges(it.id)
+
             // Aktualisiere den LiveData-Wert, damit die UI-Komponenten darüber informiert werden
             _userLiveData.postValue(it)
 
-            // Starte den ValueEventListener, um Änderungen am Benutzer in der Datenbank zu überwachen
-            listenToUserChanges(it.id)
+            //saveUserToPreferences(_userLiveData.value!!)
+
         }
 
     }

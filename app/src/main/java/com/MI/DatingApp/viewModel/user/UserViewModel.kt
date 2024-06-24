@@ -51,7 +51,7 @@ class UserViewModel: ViewModel() {
         user.let { currentShownUser ->
             //hat der user den anderen schonmal geliked/ gedisliked
             if (!momentanerUser.likes.contains(currentShownUser.id)
-                && !momentanerUser.dislikes.contains(currentShownUser.id) && !currentShownUser.likes.contains(momentanerUser.id) ) {
+                && !momentanerUser.dislikes.contains(currentShownUser.id) && !momentanerUser.receivedLikes.contains(currentShownUser.id) ) {
 
                 //füge den geliked user in likes von CurrentUser
                 momentanerUser.likes.add(currentShownUser.id)
@@ -59,13 +59,13 @@ class UserViewModel: ViewModel() {
                 firebaseIm.updateUserToDatabase(changes, momentanerUser.id) // Datenbank aktualisieren
                 CurrentUser.setUser(momentanerUser) // Lokal CurrentUser aktualisieren
                 changes.clear() // Veränderungen löschen
-                Log.d("CurrentUser", CurrentUser.getUser().toString())
+                Log.d("Righswipe CurrentUser", CurrentUser.getUser().toString())
 
                 currentShownUser.receivedLikes.add(momentanerUser.id)
                 changes["receivedLikes"] = currentShownUser.receivedLikes // Änderungen hinzufügen
                 firebaseIm.updateUserToDatabase(changes, currentShownUser.id) // Datenbank aktualisieren
                 changes.clear()
-                Log.d("currentShownUser receivedLikes", currentShownUser.receivedLikes.toString())
+                Log.d("Righswipe currentShownUser receivedLikes", currentShownUser.receivedLikes.toString())
 
 
                 // CurrentUser.setUser(momentanerUser) updated current userdata
@@ -74,7 +74,7 @@ class UserViewModel: ViewModel() {
             // hat einer der user denn anderen schonmal geliked?
             //vlt irgenwie pop up mit Match gefunden oder so?
             else if (currentShownUser.likes.contains(momentanerUser.id)){
-                Log.d("MATCH", "es gibt ein mensch zwischen ${momentanerUser.name} und ${currentShownUser.name} ")
+                Log.d("Righswipe MATCH", "es gibt ein mensch zwischen ${momentanerUser.name} und ${currentShownUser.name} ")
 
                 //füge den geliked user in likes von CurrentUser
                 momentanerUser.likes.add(currentShownUser.id)
@@ -82,13 +82,13 @@ class UserViewModel: ViewModel() {
                 firebaseIm.updateUserToDatabase(changes, momentanerUser.id) // Datenbank aktualisieren
                 CurrentUser.setUser(momentanerUser) // Lokal CurrentUser aktualisieren
                 changes.clear() // Veränderungen löschen
-                Log.d("CurrentUser", CurrentUser.getUser().toString())
+                Log.d("Righswipe CurrentUser", CurrentUser.getUser().toString())
 
                 //erstelle ein Match
                 firebaseIm.createMatch(momentanerUser.id,currentShownUser.id)
             }
             else{
-                Log.d("User", "User wurde schon geliked oder gedisliked $currentShownUser.id")
+                Log.d("Righswipe User", "User wurde schon geliked oder gedisliked $currentShownUser.id")
             }
         }
 
@@ -111,24 +111,46 @@ class UserViewModel: ViewModel() {
     }
 
     fun getAllUsersData() {
-        //schaut ob in der FirebasDB sich was ändert wenn ja aktualisiert er _usersListLiveData
-        firebaseRefUsers.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val userList = mutableListOf<User>()
-                for (userSnapshot in dataSnapshot.children) {
-                    val user = userSnapshot.getValue(User::class.java)
-                    if (user != null && shouldShowUser(currentUserLiveData.value!!, user)) {
-                        userList.add(user)
+        lateinit var gender1: String
+        var count = 0
+        currentUserLiveData.observeForever { currentUser ->
+            if (currentUser != null) {
+                //val query = firebaseRefUsers.orderByChild("id").startAt(currentUser.id) // das ist für wenn mann nur bestimmte anzahl bzw gholt hat das man bei einer bestimmten id weiter machen kann
+                firebaseRefUsers.addListenerForSingleValueEvent(object : ValueEventListener {
+
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val userList = mutableListOf<User>()
+                        for (userSnapshot in snapshot.children) {
+                            val user = userSnapshot.getValue(User::class.java)
+                            // Füge Benutzer zur Liste hinzu, wenn sie den Kriterien entsprechen
+                            if (user != null && shouldShowUser(currentUser, user)) {
+                                userList.add(user)
+                                Log.d("userList", userList.toString())
+                            }
+                        }
+                        _usersListLiveData.value = userList
+
+                        if (count <= 0){
+                            // Aktualisiere die LiveData mit der gefilterten Benutzerliste
+                            _usersListLiveData.value = userList
+                            count++
+                            gender1 = currentUser.gender
+                            Log.d("userList count 1", userList.toString() + gender1 )
+
+                        }
+                        if (gender1.isNotEmpty() && gender1 != currentUser.gender){
+                            // Aktualisiere die LiveData mit der gefilterten Benutzerliste
+                            _usersListLiveData.value = userList
+                            gender1 = currentUser.gender
+                        }
 
                     }
-                }
-                Log.d("Login", userList.toString())
-                _usersListLiveData.postValue(userList)
-            }
 
-            override fun onCancelled(databaseError: DatabaseError) {
+                    override fun onCancelled(error: DatabaseError) {
+                    }
+                })
             }
-        })
+        }
     }
     // Funktion, um zu überprüfen, ob ein Benutzer angezeigt werden soll
     private fun shouldShowUser(currentUser: User, user: User): Boolean {

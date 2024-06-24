@@ -47,6 +47,8 @@ import com.MI.DatingApp.view.registieren.recyclable.GanderDialog
 import com.MI.DatingApp.view.registieren.recyclable.Interests
 import com.MI.DatingApp.view.registieren.recyclable.OutletAttribute
 import com.MI.DatingApp.view.registieren.recyclable.outletAttributeRegisPage2
+import com.MI.DatingApp.viewModel.home.FilterViewModel
+import com.MI.DatingApp.viewModel.home.HomeVM
 import com.MI.DatingApp.viewModel.profile.ProfileVM
 
 @Composable
@@ -54,7 +56,14 @@ fun ProfileScreen(
     navController: NavController,
     viewModel: ProfileVM = viewModel()
 ) {
-    val testUser = CurrentUser.getUser()!!
+    val testUser = CurrentUser.getUser()
+    val homeViewModel: HomeVM = viewModel()
+
+    if (testUser == null) {
+        // Falls der testUser null ist, navigiere zur Login-Seite
+        navController.navigate("login")
+        return
+    }
 
     val userEdit by viewModel.userchanges.observeAsState()
     val scrollState = rememberScrollState()
@@ -119,7 +128,7 @@ fun ProfileScreen(
                             modifier = Modifier
                                 .padding(16.dp)
                                 .fillMaxHeight()
-                                .clickable(onClick = {navController.navigate("login") })
+                                .clickable(onClick = {homeViewModel.handleLogout(navController)})
                                 .background(Color.White),
                             contentAlignment = Alignment.TopStart
                         ) {

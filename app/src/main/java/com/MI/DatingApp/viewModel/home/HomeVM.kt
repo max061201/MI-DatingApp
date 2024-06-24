@@ -3,7 +3,9 @@ package com.MI.DatingApp.viewModel.home
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NavController
 import com.MI.DatingApp.R
+import com.MI.DatingApp.model.CurrentUser
 import com.MI.DatingApp.model.UserFirebase
 
 class HomeVM :ViewModel() {
@@ -20,6 +22,11 @@ class HomeVM :ViewModel() {
         photos = mutableListOf(R.drawable.heart,R.drawable.delete)
     ) )}
     val user: LiveData<MutableList<UserFirebase>> = _user
+
+    fun handleLogout(navController: NavController) {
+        navController.navigate("login")
+        CurrentUser.clearUser()
+    }
 
     //TODO get infor from fire base
     fun getUsers(){

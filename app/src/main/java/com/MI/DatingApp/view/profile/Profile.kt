@@ -54,7 +54,7 @@ fun ProfileScreen(
     navController: NavController,
     viewModel: ProfileVM = viewModel()
 ) {
-    val testUser = CurrentUser.getTestUser()
+    val testUser = CurrentUser.getUser()!!
 
     val userEdit by viewModel.userchanges.observeAsState()
     val scrollState = rememberScrollState()
@@ -367,16 +367,15 @@ fun Images(viewModel: ProfileVM, userEdit: User, index: Int = 0) {
             viewModel.setImage(imagePath, image, index)
         }
     }
+
     Box(
         modifier = Modifier
-            .clickable(onClick = {
-                launcher.launch("image/*")
-            })
             .padding(4.dp)
             .width(100.dp)
             .height(100.dp)
-            .border(BorderStroke(2.dp, Color.Gray), shape = RoundedCornerShape(50.dp))
-            .clip(RoundedCornerShape(50.dp))
+            .clickable(onClick = {
+                launcher.launch("image/*")
+            })
     ) {
         AsyncImage(
             model = image,
@@ -385,11 +384,31 @@ fun Images(viewModel: ProfileVM, userEdit: User, index: Int = 0) {
                 .padding(4.dp)
                 .width(100.dp)
                 .height(100.dp)
-                .clip(RoundedCornerShape(50.dp)),
+                .clip(RoundedCornerShape(50.dp))
+                .border(BorderStroke(2.dp, Color.Gray), shape = RoundedCornerShape(50.dp)),
             contentScale = ContentScale.Crop,
         )
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .offset(x = 4.dp, y = -4.dp) // Positioniert den Button außerhalb des Kreises
+                .size(30.dp)
+                .clickable(onClick = {
+                    viewModel.removeImage(index)
+                })
+                .background(Color.LightGray, shape = RoundedCornerShape(50.dp)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.delete),
+                contentDescription = "Back",
+                modifier = Modifier.size(20.dp)
+            )
+        }
     }
 }
+
 
 @Composable
 fun CurvedBox(

@@ -22,10 +22,12 @@ class ProfileVM : ViewModel() {
     private val _userchanges = MutableLiveData<User>().apply { value = User() }
     val userchanges: LiveData<User> = _userchanges
 
+    val currentUserLiveData: LiveData<User?> = CurrentUser.userLiveData
+
     val currentUser = CurrentUser.getTestUser()
     var deleteImages: MutableList<String> = mutableListOf()
     fun setUserValue(user: User) {
-        val uservalue = _userchanges.value!!.copy(
+        val uservalue = currentUserLiveData.value!!.copy(
             id = user.id,
             name = user.name,
             email = user.email,
@@ -84,7 +86,7 @@ class ProfileVM : ViewModel() {
         )
         _userchanges.value = uservalue
     }
-
+    var setOneImage: Boolean = false
     fun setImage(imageUri: String, imageToDelete: String = "", index: Int) {
         val uservalue = _userchanges.value!!
         val newImages = uservalue.imageUrls!!.toMutableList().apply {
@@ -96,13 +98,26 @@ class ProfileVM : ViewModel() {
                 add(index, imageUri)
                 deleteImages.add(imageToDelete)
 
-
             }
-
         }
         _userchanges.value = uservalue.copy(imageUrls = newImages)
+        setOneImage = true
+    }
+    var removedOneImage: Boolean = false
+    fun removeImage(index: Int) {
+
+        Log.d("removeImage", "removeImage $index")
 
 
+        val uservalue = _userchanges.value!!
+        val newImages = uservalue.imageUrls!!.toMutableList().apply {
+            if (index in indices) {
+                val imageToRemove = removeAt(index)
+                deleteImages.add(imageToRemove)
+            }
+        }
+        _userchanges.value = uservalue.copy(imageUrls = newImages)
+        removedOneImage = true
     }
 
     //Set für welches images würde bearbeitet
@@ -146,12 +161,21 @@ class ProfileVM : ViewModel() {
         } else {
             Log.d("UpdateDataFirebase", "Changes detected: $changes")
             if (changes.containsKey("imageUrls")) {
-                deleteSameImages()
-                val user = _userchanges.value!!
-                val imageUris = user.imageUrls?.map { Uri.parse(it) } ?: emptyList()
+                //Falls der user ein image entfernen will
+                if (removedOneImage){
 
-                uploadImagesAndUpdateUser(imageUris)
-                //updateUserToDatabase()
+                    deleteImagesFromFirebase()
+                    firebaseIm.updateUserToDatabase(changes, currentUser.id)
+                }
+                if (setOneImage){
+                    //Falls der user ein Bild Updaten/neu hinzufügen will
+                    deleteSameImages()
+                    val user = _userchanges.value!!
+                    val imageUris = user.imageUrls?.map { Uri.parse(it) } ?: emptyList()
+
+                    uploadImagesAndUpdateUser(imageUris)
+                    //updateUserToDatabase()
+                }
 
             } else {
                 firebaseIm.updateUserToDatabase(changes, currentUser.id)

@@ -119,7 +119,7 @@ fun ProfileScreen(
                             modifier = Modifier
                                 .padding(16.dp)
                                 .fillMaxHeight()
-                                .clickable(onClick = { navController.navigate("login") })
+                                .clickable(onClick = {CurrentUser.clearUser(); navController.navigate("login") })
                                 .background(Color.White),
                             contentAlignment = Alignment.TopStart
                         ) {

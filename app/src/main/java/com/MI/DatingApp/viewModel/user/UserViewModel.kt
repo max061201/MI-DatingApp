@@ -1,5 +1,7 @@
 package com.MI.DatingApp.viewModel.user
 
+import android.icu.text.SimpleDateFormat
+import android.icu.util.Calendar
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -7,23 +9,36 @@ import androidx.lifecycle.ViewModel
 import com.MI.DatingApp.model.CurrentUser
 import com.MI.DatingApp.model.User
 import com.MI.DatingApp.model.registieren.FirebaseIm
+import com.MI.DatingApp.viewModel.home.FilterViewModel
 import com.google.firebase.database.*
+import java.time.LocalDate
+import java.time.Period
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 class UserViewModel: ViewModel() {
 
     private val _usersListLiveData = MutableLiveData<List<User>>()
     val usersListLiveData: LiveData<List<User>> get() = _usersListLiveData
 
-
     val currentUserLiveData: LiveData<User?> = CurrentUser.userLiveData
 
-
     private var firebaseRefUsers: DatabaseReference = FirebaseDatabase.getInstance().getReference("Users")
+
+    private val filterViewModel = FilterViewModel()
 
     init {
         CurrentUser.initializeUser()
         getAllUsersData()
     }
+    fun setAgeRange() {
+
+    }
+    // Beispiel für den Zugriff auf die ageRange
+    fun getAgeRange(): Pair<Int, Int> {
+        return filterViewModel.filterData.value.ageRange
+    }
+
     private var momentanerUser = CurrentUser.getUser()!!
     private val changes = mutableMapOf<String, Any>()
     private var firebaseIm = FirebaseIm()
@@ -117,11 +132,33 @@ class UserViewModel: ViewModel() {
     }
     // Funktion, um zu überprüfen, ob ein Benutzer angezeigt werden soll
     private fun shouldShowUser(currentUser: User, user: User): Boolean {
+        //val ageRange = filterViewModel.getAgeRange()
+        //Log.d("ageRange", ageRange.toString())
+
+       // val userAge = calculateAge(user.yearOfBirth)
+
         return user.id != currentUser.id &&
                 !currentUser.likes.contains(user.id) &&
                 !currentUser.dislikes.contains(user.id)
                 && currentUser.genderLookingFor == user.gender
+               // && userAge in ageRange.first..ageRange.second
     }
 
+    // Funktion zur Berechnung des Alters aus dem Geburtsdatum
+    private fun calculateAge(yearOfBirth: String): Int {
+        val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+        val dob = sdf.parse(yearOfBirth) ?: return 0 // Falls das Parsing fehlschlägt, 0 zurückgeben
 
+        val today = Calendar.getInstance()
+
+        val dobCalendar = Calendar.getInstance()
+        dobCalendar.time = dob
+
+        var age = today.get(Calendar.YEAR) - dobCalendar.get(Calendar.YEAR)
+        if (today.get(Calendar.DAY_OF_YEAR) < dobCalendar.get(Calendar.DAY_OF_YEAR)) {
+            age--
+        }
+
+        return age
+    }
 }

@@ -24,16 +24,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.MI.DatingApp.model.CurrentUser
 
 
 @Composable
 fun FilterBox(onDismiss: () -> Unit, filterViewModel: FilterViewModel = viewModel()) {
     // var ageRange by remember { mutableStateOf(21f..37f) }
-    val currentUser = filterViewModel.currentUserLiveData.value
+    val currentUser = CurrentUser.getUser()
 
     // MutableState für den ausgewählten Gender
     var selectedGender by remember {
-        mutableStateOf(currentUser?.genderLookingFor ?: "Male") // Standardmäßig "Male", falls currentUser null ist
+        mutableStateOf(currentUser?.genderLookingFor ?: "") // Standardmäßig "Male", falls currentUser null ist
     }
     Box(
         modifier = Modifier

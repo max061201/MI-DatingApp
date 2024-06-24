@@ -29,7 +29,6 @@ class FilterViewModel : ViewModel() {
 
     fun setGender(gender: String) {
         _filterData.value = _filterData.value.copy(gender = gender)
-
     }
 
     private val _ageRangeLiveData = MutableLiveData<Pair<Int, Int>>()
@@ -48,6 +47,7 @@ class FilterViewModel : ViewModel() {
     fun toggleFilterVisibility() {
         _isFilterVisible.value = !_isFilterVisible.value
     }
+    var firebaseRealTimeDB = FirebaseDatabase.getInstance().getReference("Users")
 
     fun updateFilterData() {
         val currentFilterData = _filterData.value
@@ -59,6 +59,8 @@ class FilterViewModel : ViewModel() {
             val updatedUser = currentUser.value?.copy(genderLookingFor = currentFilterData.gender)
             if (updatedUser != null) {
                 CurrentUser.setUser(updatedUser)
+                 firebaseRealTimeDB.child(updatedUser.id).setValue(updatedUser)
+
             }
         }
 

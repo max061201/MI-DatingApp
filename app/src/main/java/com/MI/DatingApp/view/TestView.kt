@@ -54,7 +54,7 @@ fun TestView(navController: NavController, viewModel: MainViewModel = viewModel(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.getAllUsersData()
+        //viewModel.getAllUsersData()
     }
 
     LaunchedEffect(users) {

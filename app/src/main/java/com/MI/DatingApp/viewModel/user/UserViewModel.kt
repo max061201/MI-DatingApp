@@ -39,7 +39,6 @@ class UserViewModel: ViewModel() {
         return filterViewModel.filterData.value.ageRange
     }
 
-    private var momentanerUser = CurrentUser.getUser()!!
     private val changes = mutableMapOf<String, Any>()
     private var firebaseIm = FirebaseIm()
 
@@ -49,15 +48,19 @@ class UserViewModel: ViewModel() {
        // Log.d("momentanerUser", currentUserLiveData.value.toString())
 
         user.let { currentShownUser ->
+            var momentanerUser = currentUserLiveData.value!!
+
             //hat der user den anderen schonmal geliked/ gedisliked
             if (!momentanerUser.likes.contains(currentShownUser.id)
                 && !momentanerUser.dislikes.contains(currentShownUser.id) && !momentanerUser.receivedLikes.contains(currentShownUser.id) ) {
 
                 //füge den geliked user in likes von CurrentUser
                 momentanerUser.likes.add(currentShownUser.id)
+
                 changes["likes"] = momentanerUser.likes // Änderungen hinzufügen
                 firebaseIm.updateUserToDatabase(changes, momentanerUser.id) // Datenbank aktualisieren
                 CurrentUser.setUser(momentanerUser) // Lokal CurrentUser aktualisieren
+
                 changes.clear() // Veränderungen löschen
                 Log.d("Righswipe CurrentUser", CurrentUser.getUser().toString())
 
@@ -98,6 +101,8 @@ class UserViewModel: ViewModel() {
         Log.d("leftswipe", "dislike")
         // Prüfen, ob der aktuelle Benutzer angezeigt wird und wenn ja, Änderungen hinzufügen
         user.let { currentShownUser ->
+             var momentanerUser = CurrentUser.getUser()!!
+
             if (!momentanerUser.likes.contains(currentShownUser.id) && !momentanerUser.dislikes.contains(currentShownUser.id)) {                momentanerUser.dislikes.add(currentShownUser.id)
                 changes["dislikes"] = momentanerUser.dislikes // Änderungen hinzufügen
                 firebaseIm.updateUserToDatabase(changes, momentanerUser.id) // Datenbank aktualisieren
@@ -128,20 +133,22 @@ class UserViewModel: ViewModel() {
                                 Log.d("userList", userList.toString())
                             }
                         }
-                        _usersListLiveData.value = userList
+                        //_usersListLiveData.value = userList
 
                         if (count <= 0){
                             // Aktualisiere die LiveData mit der gefilterten Benutzerliste
                             _usersListLiveData.value = userList
                             count++
-                            gender1 = currentUser.gender
+                            //MALE
+                            gender1 = currentUser.genderLookingFor
                             Log.d("userList count 1", userList.toString() + gender1 )
 
-                        }
-                        if (gender1.isNotEmpty() && gender1 != currentUser.gender){
+                        }                           //Female      //Female
+                        if (gender1.isNotEmpty() && gender1 != currentUser.genderLookingFor){
                             // Aktualisiere die LiveData mit der gefilterten Benutzerliste
+                            Log.d("userList count 1", "ISTDRINE")
                             _usersListLiveData.value = userList
-                            gender1 = currentUser.gender
+                            gender1 = currentUser.genderLookingFor
                         }
 
                     }
@@ -159,10 +166,10 @@ class UserViewModel: ViewModel() {
 
        // val userAge = calculateAge(user.yearOfBirth)
 
-        return user.id != currentUser.id &&
-                !currentUser.likes.contains(user.id) &&
-                !currentUser.dislikes.contains(user.id)
-                && currentUser.genderLookingFor == user.gender
+        return user.id != currentUser.id //&&
+              //  !currentUser.likes.contains(user.id) &&
+              //  !currentUser.dislikes.contains(user.id)
+               // && currentUser.genderLookingFor == user.gender
                // && userAge in ageRange.first..ageRange.second
     }
 

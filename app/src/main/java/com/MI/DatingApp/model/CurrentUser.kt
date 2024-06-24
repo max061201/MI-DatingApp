@@ -53,7 +53,7 @@ object CurrentUser {
         saveUserToPreferences(newUser)
         _userLiveData.postValue(newUser)
         // save new user to FireDB
-        if (newUser != user){firebaseRealTimeDB.child(newUser.id).setValue(newUser)}
+        // if (newUser != user){firebaseRealTimeDB.child(newUser.id).setValue(newUser)}
         user = newUser
 
         //  listenToUserChanges(newUser.id) // Start the listener when the user is set

@@ -21,12 +21,17 @@ class LikesVM  : ViewModel() {
     private val firebaseRefUsers = FirebaseDatabase.getInstance().getReference("users")
     private val _receivedLikesUsersLiveData = MutableLiveData<List<User>>()
     val receivedLikesUsersLiveData: LiveData<List<User>> = _receivedLikesUsersLiveData
+    init {
+        getReceivedLikes()
+    }
 
     fun getReceivedLikes() {
         val receivedLikesIds = currentUserLiveData.value?.receivedLikes ?: return
 
         val userList = mutableListOf<User>()
         var remainingQueries = receivedLikesIds.size
+
+
 
         receivedLikesIds.forEach { userId ->
             firebaseRefUsers.child(userId).addListenerForSingleValueEvent(object :

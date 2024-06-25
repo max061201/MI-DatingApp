@@ -11,7 +11,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -45,9 +44,6 @@ import com.MI.DatingApp.model.User
 import com.MI.DatingApp.view.registieren.recyclable.DatePickerTextField
 import com.MI.DatingApp.view.registieren.recyclable.GanderDialog
 import com.MI.DatingApp.view.registieren.recyclable.Interests
-import com.MI.DatingApp.view.registieren.recyclable.OutletAttribute
-import com.MI.DatingApp.view.registieren.recyclable.outletAttributeRegisPage2
-import com.MI.DatingApp.viewModel.home.FilterViewModel
 import com.MI.DatingApp.viewModel.home.HomeVM
 import com.MI.DatingApp.viewModel.profile.ProfileVM
 
@@ -66,7 +62,6 @@ fun ProfileScreen(
     }
 
     val userEdit by viewModel.userchanges.observeAsState()
-    val scrollState = rememberScrollState()
     viewModel.setUserValue(
         User(
             id = testUser.id,
@@ -204,12 +199,13 @@ fun AccountSettings(userEdit: User?, viewModel: ProfileVM) {
                 )
             )
             Spacer(modifier = Modifier.height(8.dp))
+            /*
             DatePickerTextField(
                 value = userEdit.yearOfBirth,
                 reg = false
             ) {
                 viewModel.setDate(it)
-            }
+            }*/
             Spacer(modifier = Modifier.height(8.dp))
             TextField(
                 value = userEdit.email, onValueChange = {
@@ -285,13 +281,13 @@ fun AboutMe(userEdit: User?, viewModel: ProfileVM) {
             }
 
             Spacer(modifier = Modifier.height(15.dp))
-
+            /*
             Interests(
                 interest = userEdit.interest,
                 setInterestes = { viewModel.setInteressent(it)
                 },
                 reg = false
-            )
+            )*/
         }
     }
 }

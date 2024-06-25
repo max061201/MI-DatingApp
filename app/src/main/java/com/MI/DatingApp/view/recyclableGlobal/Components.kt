@@ -72,10 +72,10 @@ fun TextGlobal(isStandard: Boolean = true, idText : Int = 0, text: String = "", 
 fun LoginRegisterHeader(idTitle: Int, idSubtitle: Int){
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top,
+        verticalArrangement = Arrangement.SpaceEvenly,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 100.dp)
+            .padding(top = 100.dp).background(Color.Red)
     ) {
         AppIcon( modifierIcon =  Modifier
             .size(100.dp)

@@ -91,7 +91,6 @@ class LoginViewModel : ViewModel() {
                 CurrentUser.setUser(foundUser)
                 Log.d("CurrentUser", foundUser.toString())
               //  Log.d("CurrentUser2", CurrentUser.getUser().toString())
-
                 _loginState.value = LoginState.Success
             } else {
                 _loginState.value = LoginState.Error("User data not found")

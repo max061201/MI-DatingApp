@@ -22,12 +22,11 @@ import com.MI.DatingApp.view.Screen3
 import com.MI.DatingApp.view.Screen4
 import com.MI.DatingApp.view.Login
 import com.MI.DatingApp.view.RegisterUser.RegisterUser
-
 import com.MI.DatingApp.view.TestView
 import com.MI.DatingApp.view.profile.ProfileScreen
-import com.MI.DatingApp.view.register.Register
 
-import com.MI.DatingApp.view.registieren.Registrieren
+
+
 
 
 @Composable
@@ -51,7 +50,7 @@ fun AppNavigation(navController: NavHostController, startDestination: String, mo
 }
 
 val bottomNavigationItems = listOf(
-    NavigationItem("home", "Screen 1", Icons.Filled.Home),
+    NavigationItem("home", "Home", Icons.Filled.Home),
     NavigationItem("likes", "Screen 2", Icons.Filled.Favorite),
     NavigationItem("chat", "Screen 3", Icons.Filled.MailOutline),
     NavigationItem("profile", "Screen 4", Icons.Filled.AccountCircle)

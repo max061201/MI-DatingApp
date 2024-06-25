@@ -55,7 +55,6 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
@@ -231,7 +230,7 @@ fun DatePickerTextField(
     selectedDate: Date?,
     outletAttribute: OutletAttribute,
     value: User,
-    registeringViewModel: RegisteringVM
+    registeringViewModel: () -> Unit
 ) {
     var showDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -266,7 +265,7 @@ fun DatePickerTextField(
             )
     )
     if (showDialog) {
-        DatePickerDialogCo(value, registeringViewModel)
+       // DatePickerDialogCo(value, registeringViewModel)
     }
 
 }

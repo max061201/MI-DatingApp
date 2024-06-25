@@ -29,8 +29,6 @@ object CurrentUser {
         firebaseRealTimeDB = FirebaseDatabase.getInstance().getReference("Users")
         // Lade den Benutzer aus den SharedPreferences, falls vorhanden
         user = loadUserFromPreferences()
-
-
     }
 
     fun initializeUser() {
@@ -39,14 +37,10 @@ object CurrentUser {
         user?.let {
             // Starte den ValueEventListener, um Änderungen am Benutzer in der Datenbank zu überwachen
             listenToUserChanges(it.id)
-
             // Aktualisiere den LiveData-Wert, damit die UI-Komponenten darüber informiert werden
             _userLiveData.postValue(it)
-
             //saveUserToPreferences(_userLiveData.value!!)
-
         }
-
     }
 
     fun setUser(newUser: User) {
@@ -55,7 +49,6 @@ object CurrentUser {
         // save new user to FireDB
         // if (newUser != user){firebaseRealTimeDB.child(newUser.id).setValue(newUser)}
         user = newUser
-
         //  listenToUserChanges(newUser.id) // Start the listener when the user is set
     }
     

@@ -47,9 +47,6 @@ class MainViewModel : ViewModel() {
         _password.value = newPassword
     }
 
-
-
-
 //    private val _users = MutableLiveData<List<User>>()
 //    val users: LiveData<List<User>> get() = _users
 

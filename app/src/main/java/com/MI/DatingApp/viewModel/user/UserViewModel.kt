@@ -11,9 +11,6 @@ import com.MI.DatingApp.model.User
 import com.MI.DatingApp.model.registieren.FirebaseIm
 import com.MI.DatingApp.viewModel.home.FilterViewModel
 import com.google.firebase.database.*
-import java.time.LocalDate
-import java.time.Period
-import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 class UserViewModel: ViewModel() {

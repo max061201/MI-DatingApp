@@ -24,7 +24,6 @@ fun HomeScreen() {
         Column {
             HeaderContent(onFilterClick = { filterViewModel.toggleFilterVisibility() })
             SwipeCardDemo()
-
         }
         AnimatedVisibility(
             visible = filterViewModel.isFilterVisible.collectAsState().value,

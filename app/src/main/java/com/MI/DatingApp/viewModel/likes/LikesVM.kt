@@ -9,6 +9,7 @@ import com.MI.DatingApp.model.CurrentUser
 import com.MI.DatingApp.model.User
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.CoroutineScope
@@ -18,44 +19,52 @@ import kotlinx.coroutines.launch
 class LikesVM  : ViewModel() {
 
     val currentUserLiveData: LiveData<User?> = CurrentUser.userLiveData
-    private val firebaseRefUsers = FirebaseDatabase.getInstance().getReference("users")
+    private var firebaseRefUsers: DatabaseReference = FirebaseDatabase.getInstance().getReference("Users")
+
     private val _receivedLikesUsersLiveData = MutableLiveData<List<User>>()
     val receivedLikesUsersLiveData: LiveData<List<User>> = _receivedLikesUsersLiveData
     init {
         getReceivedLikes()
     }
-
-    fun getReceivedLikes() {
-        val receivedLikesIds = currentUserLiveData.value?.receivedLikes ?: return
-
-        val userList = mutableListOf<User>()
-        var remainingQueries = receivedLikesIds.size
+    val userList = mutableListOf<User>()
 
 
+        fun getReceivedLikes() {
+            val receivedLikesIds = currentUserLiveData.value?.receivedLikes ?: return
 
-        receivedLikesIds.forEach { userId ->
-            firebaseRefUsers.child(userId).addListenerForSingleValueEvent(object :
-                ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val user = snapshot.getValue(User::class.java)
-                    if (user != null) {
-                        userList.add(user)
+            // Entferne null-Werte aus der Liste
+            val nonNullReceivedLikesIds = receivedLikesIds.filterNotNull()
+
+            val userList = mutableListOf<User>()
+            var remainingQueries = nonNullReceivedLikesIds.size
+
+            nonNullReceivedLikesIds.forEach { userId ->
+                firebaseRefUsers.child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val user = snapshot.getValue(User::class.java)
+                        Log.d("userListuserList1", userList.toString())
+
+                        if (user != null) {
+                            userList.add(user)
+                            Log.d("userListuserList2", userList.toString())
+
+                        }
+                        remainingQueries--
+                        if (remainingQueries == 0) {
+                            _receivedLikesUsersLiveData.value = userList
+                            Log.d("ReceivedLikesUsers", userList.joinToString(", ") { it.name })
+                        }
                     }
-                    remainingQueries--
-                    if (remainingQueries == 0) {
-                        _receivedLikesUsersLiveData.value = userList
-                        Log.d("ReceivedLikesUsers", userList.joinToString(", ") { it.name })
-                    }
-                }
 
-                override fun onCancelled(error: DatabaseError) {
-                    remainingQueries--
-                    if (remainingQueries == 0) {
-                        _receivedLikesUsersLiveData.value = userList
+                    override fun onCancelled(error: DatabaseError) {
+                        remainingQueries--
+                        if (remainingQueries == 0) {
+                            _receivedLikesUsersLiveData.value = userList
+                        }
+                        Log.e("ReceivedLikesUsers", "Failed to load user with ID $userId", error.toException())
                     }
-                    Log.e("ReceivedLikesUsers", "Failed to load user with ID $userId", error.toException())
-                }
-            })
+                })
+            }
         }
-    }
+
 }

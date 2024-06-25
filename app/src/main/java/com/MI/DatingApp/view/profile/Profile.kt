@@ -279,8 +279,7 @@ fun AboutMe(userEdit: User?, viewModel: ProfileVM) {
 
             Interests(
                 interest = userEdit.interest,
-                setInterestes = { viewModel.setInteressent(it)
-                },
+                setInterestes = { viewModel.setInteressent(it)},
                 reg = false
             )
         }

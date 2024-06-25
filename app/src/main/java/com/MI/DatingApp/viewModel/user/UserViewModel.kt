@@ -127,12 +127,18 @@ class UserViewModel: ViewModel() {
                         val userList = mutableListOf<User>()
                         for (userSnapshot in snapshot.children) {
                             val user = userSnapshot.getValue(User::class.java)
+                            val userFemale = userSnapshot.getValue(User::class.java)
+
                             // Füge Benutzer zur Liste hinzu, wenn sie den Kriterien entsprechen
                             if (user != null && shouldShowUser(currentUser, user)) {
                                 userList.add(user)
-                                Log.d("userList", userList.toString())
                             }
+
+
                         }
+                        // Logge die Liste der Benutzernamen
+                        val userNames = userList.map { it.name }
+                        Log.d("userList", userNames.joinToString(", "))
                         //_usersListLiveData.value = userList
 
                         if (count <= 0){
@@ -146,8 +152,20 @@ class UserViewModel: ViewModel() {
                         }                           //Female      //Female
                         if (gender1.isNotEmpty() && gender1 != currentUser.genderLookingFor){
                             // Aktualisiere die LiveData mit der gefilterten Benutzerliste
-                            Log.d("userList count 1", "ISTDRINE")
+                            //Log.d("userList gender", "gender1: $_usersListLiveData.value ")
                             _usersListLiveData.value = userList
+                            // Hole die aktuelle Benutzerliste aus LiveData
+                            val currentUserList = _usersListLiveData.value ?: emptyList()
+
+                            // Extrahiere die Namen der Benutzer
+                            val userNames = currentUserList.map { it.name }
+
+                            // Logge die Namen der Benutzer
+                            Log.d("userList gender", "UserList: ${userNames.joinToString(", ")} + Gender: $gender1")
+
+
+                            //Log.d("userList gender", "_usersListLiveData: ${_usersListLiveData.value} + $gender1")
+
                             gender1 = currentUser.genderLookingFor
                         }
 
@@ -166,10 +184,10 @@ class UserViewModel: ViewModel() {
 
        // val userAge = calculateAge(user.yearOfBirth)
 
-        return user.id != currentUser.id //&&
-              //  !currentUser.likes.contains(user.id) &&
-              //  !currentUser.dislikes.contains(user.id)
-               // && currentUser.genderLookingFor == user.gender
+        return user.id != currentUser.id &&
+                !currentUser.likes.contains(user.id) &&
+                !currentUser.dislikes.contains(user.id)
+                && currentUser.genderLookingFor == user.gender
                // && userAge in ageRange.first..ageRange.second
     }
 

@@ -1,5 +1,6 @@
 package com.MI.DatingApp.view.home
 
+import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.tween
@@ -219,6 +220,14 @@ fun SwipeCardDemoList(userViewModel: UserViewModel = viewModel()) {
     var currentIndex by rememberSaveable { mutableIntStateOf(0) }
     val userList by userViewModel.usersListLiveData.observeAsState(initial = emptyList())
 
+    // Reset currentIndex when the userList changes
+    LaunchedEffect(userList) {
+       // currentIndex = 0
+        val userNames = userList.map { it.name }
+        Log.d("userList SwipeCardDemoList", userNames.joinToString(", "))
+
+    }
+
     val accounts = userList.map { user ->
         val imageUrl = if (!user.imageUrls.isNullOrEmpty()) {
             user.imageUrls!![0].toString()
@@ -267,7 +276,13 @@ fun SwipeCardDemoList(userViewModel: UserViewModel = viewModel()) {
 
                                 }
                             )
+                            Log.d("userList currentIndex", currentIndex.toString())
+                            Log.d("userList actualIndex", actualIndex.toString())
+                            Log.d("userList userList actualIndex", "${userList[actualIndex]}")
+                            Log.d("userList userList currentIndex", "${userList[currentIndex]}")
+
                         }
+
                     }
                 } else {
                     Text("No more profiles to show", color = Color.Black, modifier = Modifier.align(Alignment.Center))

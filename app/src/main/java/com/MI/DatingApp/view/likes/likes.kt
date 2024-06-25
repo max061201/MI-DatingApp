@@ -35,6 +35,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import com.MI.DatingApp.R
 import com.MI.DatingApp.viewModel.likes.LikesVM
 
@@ -82,8 +84,9 @@ fun Likes(likesVM: LikesVM = viewModel()) {
                     columns = GridCells.Fixed(2),
                     modifier = Modifier.padding(8.dp)
                 ) {
-                    items(likes.size) { like ->
-
+                    items(likes.size) { index  ->
+                        val user = likes[index]
+                        val imageUrl = user.imageUrls?.firstOrNull()
                         Box(
                             modifier = Modifier
                                 .padding(8.dp)
@@ -92,14 +95,14 @@ fun Likes(likesVM: LikesVM = viewModel()) {
                         ) {
 
                             Image(
-                                painter = painterResource(id = R.drawable.logo),
+                                painter = rememberAsyncImagePainter(model = imageUrl),
                                 contentDescription = null,
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier.fillMaxSize()
                             )
 
                             Text(
-                                text = "test",
+                                text = user.name,
                                 color = Color.Black,
                                 modifier = Modifier.padding(top=150.dp, start = 40.dp)
 

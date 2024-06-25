@@ -1,6 +1,22 @@
 package com.MI.DatingApp.view.registieren.recyclable
 
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import com.MI.DatingApp.R
 
 data class TextRegistering(val title: String = "", val subTitle: String)
@@ -28,6 +44,8 @@ data class OutLineTextColor(
     val errorBorderColor: Color,
     val textStyle: Color
 )
+
+
 
 var outletAttributeRegisPage1 = mutableListOf(
     OutletAttribute(

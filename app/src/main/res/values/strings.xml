@@ -6,4 +6,7 @@
     <string name="app_login_title">Login to Chat&amp;Meet</string>
     <string name="app_login_subtitle">Welcome back! Sign in using your social account or email to continue us</string>
 
+    <string name="app_register_title">SignUp to Chat&amp;Meet</string>
+    <string name="app_register_subtitle"> Start chatting with people near you by signing up in our Chat&amp;Meet</string>
+
 </resources>

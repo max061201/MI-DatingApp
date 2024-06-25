@@ -1,18 +1,9 @@
 package com.MI.DatingApp.view.registieren
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -23,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -32,7 +24,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.MI.DatingApp.R
 import com.MI.DatingApp.model.User
+import com.MI.DatingApp.view.recyclableGlobal.LoginRegisterHeader
+import com.MI.DatingApp.view.recyclableGlobal.OutlinedTextFieldGlobal
 import com.MI.DatingApp.view.registieren.recyclable.BasicOutlineText
 import com.MI.DatingApp.view.registieren.recyclable.ButtonCompose
 import com.MI.DatingApp.view.registieren.recyclable.DatePickerTextField
@@ -64,15 +59,15 @@ fun Registrieren(navController: NavHostController, viewModel: RegisteringVM = vi
                     colors = listOf(Color(0xFF1C1B1B), Color(0xFFAA3FEC))
                 )
             ),
-        contentAlignment = Alignment.Center
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxSize()
         ) {
+            RegisterHeader()
+            Spacer(modifier = Modifier.height(25.dp))
+
             NavHost(navController = registerNavController, startDestination = "firstPage") {
                 composable("firstPage") {
                     FirstPage(
@@ -116,6 +111,14 @@ fun Registrieren(navController: NavHostController, viewModel: RegisteringVM = vi
 
     }
 }
+
+@Composable
+fun RegisterHeader(){
+    LoginRegisterHeader(R.string.app_register_title, R.string.app_register_subtitle)
+}
+
+
+
 
 @Composable
 fun FirstPage(
@@ -176,6 +179,7 @@ fun secondRPage(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
         RegistFirstItems(2)
 
         UserImage(registeringViewModel)

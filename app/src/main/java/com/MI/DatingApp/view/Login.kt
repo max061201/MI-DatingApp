@@ -1,47 +1,32 @@
 package com.MI.DatingApp.view
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.MI.DatingApp.R
-import com.MI.DatingApp.ui.theme.ComposeBottomNavigationExampleTheme
+import com.MI.DatingApp.view.recyclableGlobal.LoginRegisterHeader
+import com.MI.DatingApp.view.recyclableGlobal.OutlinedTextFieldGlobal
 import com.MI.DatingApp.viewModel.LoginViewModel
 import com.MI.DatingApp.viewModel.LoginState
 
@@ -86,38 +71,7 @@ fun Login(navController: NavController, viewModel: LoginViewModel = viewModel())
 
 @Composable
 fun LoginHeader() {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 100.dp)
-    ) {
-
-        Icon(
-            painter = painterResource(id = R.drawable.logo),
-            contentDescription = null,
-            tint = Color.Red,
-            modifier = Modifier
-                .size(100.dp)
-                .clip(MaterialTheme.shapes.large)
-        )
-
-        Text(
-            text = stringResource(R.string.app_login_title),
-            style = MaterialTheme.typography.titleLarge,
-            color = Color.White,
-            modifier = Modifier.padding(top = 16.dp)
-        )
-        Text(
-            text = stringResource(R.string.app_login_subtitle),
-            style = MaterialTheme.typography.labelSmall,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .padding(top = 8.dp)
-                .width(250.dp)
-        )
-    }
+    LoginRegisterHeader(R.string.app_login_title, R.string.app_login_subtitle)
 }
 
 @Composable
@@ -126,79 +80,46 @@ fun TextFieldInput(email: String,
                    onEmailChange: (String) -> Unit,
                    onPasswordChange: (String) -> Unit
 ) {
+
+    val modifier: Modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 20.dp)
+        .background(Color.Transparent)
+        .padding(10.dp)
+
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = Alignment.Start,
         modifier = Modifier.fillMaxWidth()
             .padding(top = 50.dp)
     ) {
-        BasicTextField(
-            value = email,
-            onValueChange = onEmailChange,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .background(Color.Transparent)
-                .border(1.dp, Color.White, RoundedCornerShape(8.dp))
-                .padding(16.dp),
-            textStyle = TextStyle(color = Color.White),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Next
-            ),
-            decorationBox = { innerTextField ->
-                if (email.isEmpty()) {
-                    Text(
-                        text = "Your email",
-                        style = MaterialTheme.typography.labelSmall,
-                        modifier = Modifier.padding(start = 4.dp)
-                    )
-                }
-                innerTextField()
-            }
+        OutlinedTextFieldGlobal(
+            textValue = email,
+            onValueChanged= onEmailChange,
+            label= "email",
+            isPassword = false,
+            imeAction= ImeAction.Next,
+            modifier = modifier
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
 
-        BasicTextField(
-            value = password,
-            onValueChange = onPasswordChange,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .background(Color.Transparent)
-                .border(1.dp, Color.White, RoundedCornerShape(8.dp))
-                .padding(16.dp),
-            textStyle = TextStyle(color = Color.White),
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Done
-            ),
-            decorationBox = { innerTextField ->
-                if (password.isEmpty()) {
-                    Text(
-                        text = "Password",
-                        style = MaterialTheme.typography.labelSmall,
-                        modifier = Modifier.padding(start = 4.dp)
-                    )
-                }
-                innerTextField()
-            }
+        OutlinedTextFieldGlobal(
+            textValue = password,
+            onValueChanged= onPasswordChange,
+            label= "password",
+            isPassword =true,
+            imeAction= ImeAction.Done,
+            modifier = modifier
         )
 
-        Row(
-            modifier = Modifier.fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            Text(
+
+        Text(
                 text = "Forgot password?",
                 style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier
-                    .padding(top = 16.dp)
-                    .clickable { /* Handle click */ }
-            )
-        }
+                    .padding( horizontal = 30.dp)
+                    .clickable { /* TO DO */ }
+        )
+
     }
 }
 
@@ -207,16 +128,17 @@ fun TextFieldInput(email: String,
 fun LoginButtonAndSignUpText(onClick: () -> Unit, navController: NavController) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Bottom,
+        verticalArrangement = Arrangement.SpaceEvenly,
         modifier = Modifier.fillMaxHeight()
-            .padding( top= 60.dp)
+            .padding( top= 20.dp)
+
     ) {
         Button(
             onClick = onClick,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp)
-                .padding(horizontal = 16.dp),
+                .height(50.dp)
+                .padding(horizontal = 20.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color.White)
         ) {
             Text(
@@ -227,7 +149,7 @@ fun LoginButtonAndSignUpText(onClick: () -> Unit, navController: NavController) 
                 fontWeight = FontWeight.Medium
             )
         }
-        Spacer(modifier = Modifier.height(16.dp))
+
         ClickableText(
             text = buildAnnotatedString {
                 append("Don’t have account? ")
@@ -256,3 +178,5 @@ fun LoginStateHandler(loginState: LoginState, navController: NavController) {
         else -> {}
     }
 }
+
+

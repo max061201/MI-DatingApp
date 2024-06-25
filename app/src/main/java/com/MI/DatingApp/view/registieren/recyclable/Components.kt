@@ -23,9 +23,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material3.IconButton
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,23 +38,22 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.material.Icon
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.TextButton
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
+//noinspection UsingMaterialAndMaterial3Libraries
+import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Card
+import androidx.compose.material.Icon
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -116,9 +113,6 @@ fun Text(textUnit: TextUnit, text: String, color: Color) {
 
 @Composable
 fun RegistFirstItems(fullCycle: Int = 1) {
-    AppIcon()
-    Text(textUnit = 20.sp, text = RegisteringTexts.title, color = Color.White)
-    Text(textUnit = 16.sp, text = RegisteringTexts.subTitle, color = Color.White)
     Circles(fullCycle)
 
 }
@@ -148,7 +142,7 @@ fun BasicOutlineText(
     OutlinedTextField(
         value = textValue,
         onValueChange = onValueChange,
-        label = { Text(outletAttribute.text, color = Color.White) },
+        label = { Text(text = outletAttribute.text, color = Color.White) },
         trailingIcon = {
             if (isPassword) {
                 val image =
@@ -218,7 +212,7 @@ fun ButtonCompose(onClick: () -> Unit, text: String = "Next") {
             .padding(vertical = 50.dp)
             .width(300.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.White,
+           // containerColor = Color.White,
             contentColor = Color.Black
         )
     ) {
@@ -271,7 +265,7 @@ fun DatePickerTextField(
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerDialogCo(value: User, registeringViewModel: RegisteringVM) {
     val datePickerState = rememberDatePickerState(
@@ -301,7 +295,7 @@ fun DatePickerDialogCo(value: User, registeringViewModel: RegisteringVM) {
                 state = datePickerState
             )
             if (datePickerState.selectedDateMillis != null) {
-                registeringViewModel.setDate(Date(datePickerState.selectedDateMillis!!).formatAndToString())
+                registeringViewModel.setDate(java.sql.Date(datePickerState.selectedDateMillis!!).formatAndToString())
             }
 
         }
@@ -493,17 +487,6 @@ fun UserImage(registeringViewModel: RegisteringVM) {
 }
 
 
-@Composable
-fun AppIcon() {
-    Icon(
-        painter = painterResource(id = R.drawable.logo),
-        contentDescription = null,
-        tint = Color.Red,
-        modifier = Modifier
-            .size(100.dp)
-            .clip(MaterialTheme.shapes.large)
-    )
-}
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

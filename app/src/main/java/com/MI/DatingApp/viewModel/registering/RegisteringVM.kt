@@ -3,9 +3,7 @@ package com.MI.DatingApp.viewModel.registering
 
 import android.content.Context
 import android.net.Uri
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -153,11 +151,7 @@ class RegisteringVM : ViewModel() {
         return true
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun checkDate(date: String) {
-        // TODO check if date in future
-        //  return (Date.from(Instant.now()) > DateTimeFormatter.ofPattern())
-    }
+
 
     private var firebaseRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("Users")
     private var storageRef: StorageReference = FirebaseStorage.getInstance().getReference("UsersImages")

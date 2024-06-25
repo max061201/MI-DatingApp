@@ -18,7 +18,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.MI.DatingApp.R
-import com.MI.DatingApp.view.recyclableGlobal.TitlePages
+import com.MI.DatingApp.view.recyclableGlobal.TitleGlobal
 import com.MI.DatingApp.viewModel.home.FilterViewModel
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -52,7 +52,7 @@ fun FilterBox(onDismiss: () -> Unit, filterViewModel: FilterViewModel = viewMode
                     Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                 }
 
-                TitlePages("Filter", Modifier.padding(start = 16.dp, end = 16.dp))
+                TitleGlobal("Filter", Modifier.padding(start = 16.dp, end = 16.dp))
 
                 IconButton(onClick = onDismiss,  modifier = Modifier.padding(top = 30.dp)) {
                     Icon(imageVector = Icons.Default.Check, contentDescription = "Apply", tint = Color(0xFFAA3FEC))

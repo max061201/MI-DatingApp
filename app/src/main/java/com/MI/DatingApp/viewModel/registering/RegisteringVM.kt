@@ -28,11 +28,9 @@ class RegisteringVM : ViewModel() {
 
     var firebaseIm = FirebaseIm()
 
-    private var context: Context? = null
 
-    fun setContext(context: Context) {
-        this.context = context
-    }
+
+
 
     fun setId(id: String) {
         val updatedUser = _user.value?.copy(id = id)
@@ -148,6 +146,10 @@ class RegisteringVM : ViewModel() {
             setError(mutableListOf(Error(errorType = "check Date or Gander", error = true)))
             return false
         }
+        if(_user.value!!.imageUrls!!.isEmpty()){
+            setError(mutableListOf(Error(errorType = " profile picture", error = true)))
+            return false
+        }
         return true
     }
 
@@ -204,6 +206,7 @@ class RegisteringVM : ViewModel() {
                 Log.d("Firebase", "Error saving user: ${it.message}")
             }
     }
+
 }
 
 private fun findErrorTextAndRemove(mutableList: MutableList<Error>, error: String) {

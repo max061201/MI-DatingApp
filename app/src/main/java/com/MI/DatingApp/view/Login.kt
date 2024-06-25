@@ -39,7 +39,10 @@ fun Login(navController: NavController, viewModel: LoginViewModel = viewModel())
 
     LaunchedEffect(loginState) {
         if (loginState is LoginState.Success) {
-            navController.navigate("home")
+            navController.navigate("test") {
+                popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                launchSingleTop = true
+            }
         }
     }
 

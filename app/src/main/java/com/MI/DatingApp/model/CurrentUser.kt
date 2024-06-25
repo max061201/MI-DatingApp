@@ -27,14 +27,36 @@ object CurrentUser {
     fun initialize(context: Context) {
         sharedPreferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
         firebaseRealTimeDB = FirebaseDatabase.getInstance().getReference("Users")
+        // Lade den Benutzer aus den SharedPreferences, falls vorhanden
+        user = loadUserFromPreferences()
+
+
+    }
+
+    fun initializeUser() {
+        user = loadUserFromPreferences()
+        // Wenn ein Benutzer geladen wurde (d.h. user ist nicht null), dann:
+        user?.let {
+            // Starte den ValueEventListener, um Änderungen am Benutzer in der Datenbank zu überwachen
+            listenToUserChanges(it.id)
+
+            // Aktualisiere den LiveData-Wert, damit die UI-Komponenten darüber informiert werden
+            _userLiveData.postValue(it)
+
+            //saveUserToPreferences(_userLiveData.value!!)
+
+        }
 
     }
 
     fun setUser(newUser: User) {
-        user = newUser
         saveUserToPreferences(newUser)
         _userLiveData.postValue(newUser)
-      //  listenToUserChanges(newUser.id) // Start the listener when the user is set
+        // save new user to FireDB
+        // if (newUser != user){firebaseRealTimeDB.child(newUser.id).setValue(newUser)}
+        user = newUser
+
+        //  listenToUserChanges(newUser.id) // Start the listener when the user is set
     }
     
 
@@ -51,33 +73,36 @@ object CurrentUser {
     }
 
     fun listenToUserChanges(userId: String) {
-        // Überprüfe, ob der ValueEventListener bereits aktiv ist
-        if (!isUserValueListenerActive) {
-            // Füge einen ValueEventListener zur Überwachung von Benutzeränderungen hinzu
-            userValueEventListener = firebaseRealTimeDB.child(userId).addValueEventListener(
-                object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        val updatedUser = snapshot.getValue(User::class.java)
-                        updatedUser?.let {
-                            if (user == null || user != updatedUser) {
-                                // Aktualisiere den LiveData des aktuellen Benutzers
-                                _userLiveData.postValue(updatedUser)
-                                setUser(updatedUser)
+        // Entferne den alten Listener, falls vorhanden
+        userValueEventListener?.let {
+            firebaseRealTimeDB.child(userId).removeEventListener(it)
+        }
 
-                                Log.d("CurrentUserUpdate", updatedUser.toString())
-                            }
+        // Füge einen neuen ValueEventListener zur Überwachung von Benutzeränderungen hinzu
+        userValueEventListener = firebaseRealTimeDB.child(userId).addValueEventListener(
+            object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val updatedUser = snapshot.getValue(User::class.java)
+                    updatedUser?.let {
+                        if (user == null || user != updatedUser) {
+                            // Aktualisiere den LiveData des aktuellen Benutzers
+                            _userLiveData.postValue(updatedUser)
+                            setUser(updatedUser)
+
+                            Log.d("CurrentUserUpdate", updatedUser.toString())
                         }
                     }
-
-                    override fun onCancelled(error: DatabaseError) {
-                        // Behandlung eines Fehlers beim ValueEventListener
-                        Log.e("UserUpdateError", error.message)
-                    }
                 }
-            )
-            // Markiere den ValueEventListener als aktiv
-            isUserValueListenerActive = true
-        }
+
+                override fun onCancelled(error: DatabaseError) {
+                    // Behandlung eines Fehlers beim ValueEventListener
+                    Log.e("UserUpdateError", error.message)
+                }
+            }
+        )
+
+        // Markiere den ValueEventListener als aktiv
+        isUserValueListenerActive = true
     }
 
 
@@ -114,12 +139,19 @@ object CurrentUser {
         val userConfirmedPassword = sharedPreferences.getString("userConfirmedPassword", "") ?: ""
         val userYearOfBirth = sharedPreferences.getString("userYearOfBirth", "") ?: ""
         val userGender = sharedPreferences.getString("userGender", "") ?: ""
-        val userImageUrls = sharedPreferences.getStringSet("userImageUrls", emptySet())?.toMutableList() ?: mutableListOf()
+        val userImageUrls =
+            sharedPreferences.getStringSet("userImageUrls", emptySet())?.toMutableList()
+                ?: mutableListOf()
         val userGenderLookingFor = sharedPreferences.getString("userGenderLookingFor", "") ?: ""
         val userDescription = sharedPreferences.getString("userDescription", "") ?: ""
-        val userInterests = sharedPreferences.getStringSet("userInterests", emptySet())?.toMutableList() ?: mutableListOf()
-        val userLikes = sharedPreferences.getStringSet("userLikes", emptySet())?.toMutableList() ?: mutableListOf()
-        val userDislikes = sharedPreferences.getStringSet("userDislikes", emptySet())?.toMutableList() ?: mutableListOf()
+        val userInterests =
+            sharedPreferences.getStringSet("userInterests", emptySet())?.toMutableList()
+                ?: mutableListOf()
+        val userLikes = sharedPreferences.getStringSet("userLikes", emptySet())?.toMutableList()
+            ?: mutableListOf()
+        val userDislikes =
+            sharedPreferences.getStringSet("userDislikes", emptySet())?.toMutableList()
+                ?: mutableListOf()
 
         return User(
             id = userId,
@@ -152,12 +184,11 @@ object CurrentUser {
             yearOfBirth = "02.06.2024",
             gender = "Male",
             imageUrls = mutableListOf(
-                "https://firebasestorage.googleapis.com/v0/b/datingapp-9f758.appspot.com/o/UsersImages%2Fimages%2F-O-gTyIykyVTlqOSEkli%2F1718800867782_msf%3A65?alt=media&token=07b9b71f-0779-4557-8084-f15dd7270efe",
-                "https://firebasestorage.googleapis.com/v0/b/datingapp-9f758.appspot.com/o/UsersImages%2Fimages%2F-O-gTyIykyVTlqOSEkli%2Fmsf%3A62?alt=media&token=b171b59b-62f8-496b-94c4-810b7aad7f69"
+"https://firebasestorage.googleapis.com/v0/b/datingapp-9f758.appspot.com/o/UsersImages%2Fimages%2F-O-gTyIykyVTlqOSEkli%2F1718994883704_1000044619?alt=media&token=47b28508-117e-4979-b797-18c9d5500e61"
             ),
             genderLookingFor = "Women",
             description = "usertest",
-            interest = mutableListOf("Travel"),
+            interest = mutableListOf("Travel","Sport","Film"),
             likes = mutableListOf("-O-gTyIykyVTlqOSEkli"),
             dislikes = mutableListOf()
         )

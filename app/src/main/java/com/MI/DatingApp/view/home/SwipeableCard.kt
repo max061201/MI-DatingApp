@@ -1,5 +1,6 @@
 package com.MI.DatingApp.view.home
 
+import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.tween
@@ -19,6 +20,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -37,19 +39,16 @@ import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 data class Item(
-    var id: String = "",
-    var name: String = "",
-    var email: String = "",
-    var yearOfBirth: String = "",
-    var gender: String = "",
-    var genderLookingFor: String = "",
+    var name: String,
+    var yearOfBirth: String,
+    var profilsImage: String,
+    var gender: String ,
+    var genderLookingFor: String ,
     var imageUrls: MutableList<String>? = mutableListOf(),
-    var description: String = "",
+    var description: String,
     var interest: MutableList<String> = mutableListOf(),
-    var likes: MutableList<String> = mutableListOf(),      // IDs der Nutzer, die geliked wurden
-    var dislikes: MutableList<String> = mutableListOf(),    // IDs der Nutzer, die disliked wurden
-    val receivedLikes: MutableList<String> = mutableListOf()
 )
+
 
 @Composable
 fun SwipeCardDemo(viewModel: UserViewModel = viewModel()) {
@@ -73,7 +72,7 @@ fun CardContent(item: Item) {
                 .background(Color.Black.copy(alpha = 0.5f))
                 .padding(8.dp)
         ) {
-            Text(text = item.name, style = MaterialTheme.typography.titleLarge, color = Color.White)
+            Text(text =" ${item.name}, ${item.yearOfBirth}", style = MaterialTheme.typography.titleLarge, color = Color.White)
         }
     }
 }
@@ -215,27 +214,33 @@ fun ControlButtons(
 
 @Composable
 fun SwipeCardDemoList(userViewModel: UserViewModel = viewModel()) {
-    var currentIndex by rememberSaveable { mutableStateOf(0) }
-    val userList by userViewModel.users.observeAsState(initial = emptyList())
-
+    var currentIndex by rememberSaveable { mutableIntStateOf(0) }
+    val userList by userViewModel.usersListLiveData.observeAsState(initial = emptyList())
     var showUserDetail by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf<Item?>(null) }
 
-    val accounts = userList.map { user ->
-        Item(
-            id = user.id,
-            name = user.name,
-            email = user.email,
-            yearOfBirth = user.yearOfBirth,
-            gender = user.gender,
-            genderLookingFor = user.genderLookingFor,
-            imageUrls = user.imageUrls,
-            description = user.description,
-            interest = user.interest,
-            likes = user.likes,
-            dislikes = user.dislikes,
-            receivedLikes = user.receivedLikes,
+    // Reset currentIndex when the userList changes
+    LaunchedEffect(userList) {
+       // currentIndex = 0
+        val userNames = userList.map { it.name }
+        Log.d("userList SwipeCardDemoList", userNames.joinToString(", "))
 
+    }
+
+    val accounts = userList.map { user ->
+        val imageUrl = if (!user.imageUrls.isNullOrEmpty()) {
+            user.imageUrls!![0].toString()
+        } else {""}
+
+        Item(
+            name = user.name,
+       yearOfBirth = user.yearOfBirth,
+        profilsImage = imageUrl,
+        gender = user.gender,
+        genderLookingFor = user.genderLookingFor,
+        imageUrls =  user.imageUrls,
+        description = user.description,
+        interest = user.interest,
         )
     }
 

@@ -15,6 +15,19 @@ import com.MI.DatingApp.model.CurrentUser
 import com.MI.DatingApp.view.MainScreen
 import com.MI.DatingApp.ui.theme.ComposeBottomNavigationExampleTheme
 
+//Must haves:
+//- Login/ Registrieren, Profil erstellen / Bilder Hochladen (Seiten im PDF 2-6)
+//- Homescreen, Liken/ Disliken/ Return (Seiten im PDF 7)
+//- Profilansicht der zu liken/dislikenden Person (Seite im PDF 8)
+//- Filter Einstellungen (Seite im PDF 9)
+//- Profil Bearbeiten, Profil Löschen, Ausloggen (Seite im PDF 14)
+//- Anzeige der erhaltenen Likes (Seite im PDF 18)
+//Und natürlich die untere Navigation bar
+
+//Nice to Have:
+//- Chat (Seite im PDF 15-17)
+//- Swipe(Animation) zum Liken/ Disliken (Seite im PDF 10-11)
+//- Animation bei Starten der App. (Seite im PDF 1)
 
 class MainActivity : ComponentActivity() {
 

@@ -14,33 +14,54 @@ import androidx.navigation.NavController
 import androidx.compose.runtime.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Divider
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.MI.DatingApp.viewModel.MainViewModel
-import com.MI.DatingApp.viewModel.registering.RegisteringVM
 
 
 import coil.compose.rememberImagePainter
-import com.MI.DatingApp.model.CurrentUser
 import com.MI.DatingApp.model.User
 
 @Composable
-fun TestView(navController: NavController) {
-    val mainViewModel: MainViewModel = viewModel()
-    val registeringVM: RegisteringVM = viewModel()
+fun TestView(navController: NavController, viewModel: MainViewModel = viewModel()) {
+   // val mainViewModel: MainViewModel = viewModel()
+    //val registeringVM: RegisteringVM = viewModel()
 
-    val count by mainViewModel.number.observeAsState(0)
-    val text by mainViewModel.text.observeAsState("")
-    val name by mainViewModel.name.observeAsState("")
-    val password by mainViewModel.password.observeAsState("")
-    val users by mainViewModel.users.observeAsState(emptyList())
+    val count by viewModel.number.observeAsState(0)
+    val text by viewModel.text.observeAsState("")
+    val name by viewModel.name.observeAsState("")
+    val password by viewModel.password.observeAsState("")
+    //val users by mainViewModel.users.observeAsState(emptyList())
     // Beobachte die LiveData des aktuellen Benutzers
-    val statusMessage by mainViewModel.statusMessage.observeAsState("")
-    val currentUser by mainViewModel.currentShownUser.observeAsState()
+    val statusMessage by viewModel.statusMessage.observeAsState("")
+    val currentUser by viewModel.currentShownUser.observeAsState()
 
-    val currentUserLive by mainViewModel.currentUserLiveData.observeAsState()
+
+    val currentUserLive by viewModel.currentUserLiveData.observeAsState()
+
+    val users by viewModel.usersListLiveData.observeAsState(emptyList())
+
+    // Wenn die Liste nicht leer ist und currentUser null ist, setzen Sie currentUser auf den ersten Benutzer
+    if (users.isNotEmpty() && currentUser == null) {
+        viewModel.setCurrentUser(users[0])
+    }
+    if (users.isEmpty()) {
+        viewModel.setCurrentUser(null)
+    }
+
+    LaunchedEffect(Unit) {
+        //viewModel.getAllUsersData()
+    }
+
+    LaunchedEffect(users) {
+        if (users.isNotEmpty() && currentUser == null) {
+            viewModel.showNextUser() // Zeigt den ersten Benutzer an
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -50,7 +71,7 @@ fun TestView(navController: NavController) {
         verticalArrangement = Arrangement.Center
     ) {
         Text("This is registrieren", color = Color.Black)
-
+        UsersTable(users = users)
 //        // Eingabefeld für Name
 //        OutlinedTextField(
 //            value = name,
@@ -72,18 +93,18 @@ fun TestView(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Button zum Senden der Daten
-        Button(onClick = {
-            //mainViewModel.saveRegData()
-            mainViewModel.getAllUsersData()
-        }) {
-            Text("get all user")
-        }
-        Button(onClick = {
-            //mainViewModel.saveRegData()
-        }) {
-            Text("next")
-        }
+//        // Button zum Senden der Daten
+//        Button(onClick = {
+//            //mainViewModel.saveRegData()
+//            viewModel.getAllUsersData()
+//        }) {
+//            Text("get all user")
+//        }
+//        Button(onClick = {
+//            //mainViewModel.saveRegData()
+//        }) {
+//            Text("next")
+//        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -91,16 +112,20 @@ fun TestView(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text("Eingegebener Text: $text", color = Color.Black)
+        Text("Swipe example: $text", color = Color.Black)
 
         // Statusnachricht anzeigen
         if (statusMessage.isNotEmpty()) {
             Text(statusMessage, color = Color.Red)
         }
         // Aktuellen Benutzer anzeigen
-        currentUser?.let {
-            UserRow(user = it)
+
+        if (currentUser != null) {
+            UserRow(user = currentUser!!)
+        } else {
+            Text("No Users found", color = Color.Black)
         }
+
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -109,10 +134,10 @@ fun TestView(navController: NavController) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Button(onClick = { mainViewModel.showPreviousUser() }) {
+            Button(onClick = { viewModel.showPreviousUser() }) {
                 Text("Previous")
             }
-            Button(onClick = { mainViewModel.showNextUser() }) {
+            Button(onClick = { viewModel.showNextUser() }) {
                 Text("Next")
             }
         }
@@ -122,18 +147,23 @@ fun TestView(navController: NavController) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Button(onClick = { mainViewModel.Dislike() }) {
+            Button(onClick = { viewModel.Dislike() }) {
                 Text("Dislike")
             }
-            Button(onClick = { mainViewModel.Like() }) {
+            Button(onClick = { viewModel.Like() }) {
                 Text("Like")
             }
+        }
+        Button(onClick = { viewModel.ChangelookingForGender() }) {
+            Text("ChangelookingForGender")
         }
         Spacer(modifier = Modifier.height(16.dp))
 
         Text("${currentUserLive?.name}", color = Color.Black)
         Text("${currentUserLive?.description}", color = Color.Black)
         Text("${currentUserLive?.yearOfBirth}", color = Color.Black)
+        Text("${currentUserLive?.likes}", color = Color.Black)
+
 
 //        ButtonCompose({
 //
@@ -146,7 +176,61 @@ fun TestView(navController: NavController) {
     }
 }
 @Composable
+fun UsersTable(users: List<User>) {
+    LazyColumn {
+        items(users.size) { index ->
+            UserRow(user = users[index])
+        }
+    }
+}
+
+@Composable
 fun UserRow(user: User) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Spalte für Name und Email
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(text = user.name, color = Color.Black)
+                Text(text = user.email, color = Color.Black)
+            }
+
+            // Spalte für Gender und GenderLookingFor
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(text = "Gender: ${user.gender}", color = Color.Black)
+                Text(text = "Looking for: ${user.genderLookingFor}", color = Color.Black)
+            }
+
+            // Bilder anzeigen, falls vorhanden
+            user.imageUrls?.let { imageUrls ->
+                Row {
+                    imageUrls.forEach { imageUrl ->
+                        Image(
+                            painter = rememberImagePainter(data = imageUrl),
+                            contentDescription = null,
+                            modifier = Modifier.size(48.dp) // Größe des Bildes anpassen
+                        )
+                    }
+                }
+            }
+        }
+            Divider(modifier = Modifier.padding(vertical = 8.dp))
+    }
+}
+
+
+
+@Composable
+fun UserRow2(user: User) {
     Row(
         modifier = Modifier
             .fillMaxWidth()

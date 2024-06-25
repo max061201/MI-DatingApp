@@ -212,6 +212,7 @@ class RegisteringVM : ViewModel() {
                 Log.d("Firebase", "Error saving user: ${it.message}")
             }
     }
+
 }
 
 private fun findErrorTextAndRemove(mutableList: MutableList<Error>, error: String) {

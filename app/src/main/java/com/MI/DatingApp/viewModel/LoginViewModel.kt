@@ -43,8 +43,8 @@ class LoginViewModel : ViewModel() {
     }
 
     fun login() {
-        val emailValue = email.value
-        val passwordValue = password.value
+        val emailValue = email.value.trim()
+        val passwordValue = password.value.trim()
 
         _loginState.value = LoginState.Loading
 
@@ -90,7 +90,7 @@ class LoginViewModel : ViewModel() {
             if (foundUser != null) {
                 CurrentUser.setUser(foundUser)
                 Log.d("CurrentUser", foundUser.toString())
-                Log.d("CurrentUser2", CurrentUser.getUser().toString())
+              //  Log.d("CurrentUser2", CurrentUser.getUser().toString())
 
                 _loginState.value = LoginState.Success
             } else {

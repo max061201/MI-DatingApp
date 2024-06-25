@@ -13,7 +13,8 @@ data class User(
     var description: String = "",
     var interest: MutableList<String> = mutableListOf(),
     var likes: MutableList<String> = mutableListOf(),      // IDs der Nutzer, die geliked wurden
-    var dislikes: MutableList<String> = mutableListOf()    // IDs der Nutzer, die disliked wurden
+    var dislikes: MutableList<String> = mutableListOf(),    // IDs der Nutzer, die disliked wurden
+    val receivedLikes: MutableList<String> = mutableListOf() // eingehende Likes
 
 ){
     fun emptyFields(): List<String> {

@@ -2,20 +2,63 @@ package com.MI.DatingApp.model
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 object CurrentUser {
     private var user: User? = null
     private const val PREFERENCES_NAME = "MyAppPreferences"
     private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var firebaseRealTimeDB: DatabaseReference
+
+    private val _userLiveData = MutableLiveData<User?>()
+    val userLiveData: LiveData<User?> get() = _userLiveData
+
+    // ValueEventListener für Benutzeraktualisierungen
+    private var userValueEventListener: ValueEventListener? = null
+    private var isUserValueListenerActive = false
 
     fun initialize(context: Context) {
         sharedPreferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
+        firebaseRealTimeDB = FirebaseDatabase.getInstance().getReference("Users")
+        // Lade den Benutzer aus den SharedPreferences, falls vorhanden
+        user = loadUserFromPreferences()
+
+
+    }
+
+    fun initializeUser() {
+        user = loadUserFromPreferences()
+        // Wenn ein Benutzer geladen wurde (d.h. user ist nicht null), dann:
+        user?.let {
+            // Starte den ValueEventListener, um Änderungen am Benutzer in der Datenbank zu überwachen
+            listenToUserChanges(it.id)
+
+            // Aktualisiere den LiveData-Wert, damit die UI-Komponenten darüber informiert werden
+            _userLiveData.postValue(it)
+
+            //saveUserToPreferences(_userLiveData.value!!)
+
+        }
+
     }
 
     fun setUser(newUser: User) {
-        user = newUser
         saveUserToPreferences(newUser)
+        _userLiveData.postValue(newUser)
+        // save new user to FireDB
+        // if (newUser != user){firebaseRealTimeDB.child(newUser.id).setValue(newUser)}
+        user = newUser
+
+        //  listenToUserChanges(newUser.id) // Start the listener when the user is set
     }
+    
 
     fun getUser(): User? {
         if (user == null) {
@@ -28,6 +71,41 @@ object CurrentUser {
         user = null
         clearPreferences()
     }
+
+    fun listenToUserChanges(userId: String) {
+        // Entferne den alten Listener, falls vorhanden
+        userValueEventListener?.let {
+            firebaseRealTimeDB.child(userId).removeEventListener(it)
+        }
+
+        // Füge einen neuen ValueEventListener zur Überwachung von Benutzeränderungen hinzu
+        userValueEventListener = firebaseRealTimeDB.child(userId).addValueEventListener(
+            object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val updatedUser = snapshot.getValue(User::class.java)
+                    updatedUser?.let {
+                        if (user == null || user != updatedUser) {
+                            // Aktualisiere den LiveData des aktuellen Benutzers
+                            _userLiveData.postValue(updatedUser)
+                            setUser(updatedUser)
+
+                            Log.d("CurrentUserUpdate", updatedUser.toString())
+                        }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    // Behandlung eines Fehlers beim ValueEventListener
+                    Log.e("UserUpdateError", error.message)
+                }
+            }
+        )
+
+        // Markiere den ValueEventListener als aktiv
+        isUserValueListenerActive = true
+    }
+
+
 
     private fun saveUserToPreferences(user: User) {
         val editor = sharedPreferences.edit()
@@ -93,7 +171,11 @@ object CurrentUser {
     }
 
     fun getTestUser(): User {
-        return User(
+        // Nutzt die getUser() Funktion, um den aktuellen Benutzer zu erhalten
+        val currentUser = getUser()
+
+        // Wenn kein Benutzer gefunden wurde, wird ein Testbenutzer zurückgegeben
+        return currentUser ?: User(
             id = "-O-gTyIykyVTlqOSEkli",
             name = "Usertest",
             email = "user@gmail.com",

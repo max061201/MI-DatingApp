@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.MI.DatingApp.model.Contact
 import com.MI.DatingApp.model.CurrentUser
 import com.MI.DatingApp.model.User
 import com.MI.DatingApp.model.registieren.FirebaseIm
@@ -31,16 +30,6 @@ class MainViewModel : ViewModel() {
     private val _statusMessage = MutableLiveData<String>()
     val statusMessage: LiveData<String> get() = _statusMessage
 
-    private val _users = MutableLiveData<List<User>>()
-    val users: LiveData<List<User>> get() = _users
-
-    private val _currentUserIndex = MutableLiveData(0)
-    val currentUserIndex: LiveData<Int> get() = _currentUserIndex
-
-    private val _currentShownUser = MutableLiveData<User?>()
-    val currentShownUser: LiveData<User?> get() = _currentShownUser
-
-
 
     fun incCount(){
         _number.value = _number.value?.plus(1)
@@ -58,69 +47,69 @@ class MainViewModel : ViewModel() {
         _password.value = newPassword
     }
 
-     private var firebaseRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("contacts")
 
 
-    // Funktion zum Speichern der Daten in Firebase
-    fun saveData() {
-        val nameValue = _name.value ?: ""
-        val passwordValue = _password.value ?: ""
 
-        if (nameValue.isEmpty()) {
-            // Handle empty name
-            return
-        }
-        if (passwordValue.isEmpty()) {
-            // Handle empty password
-            return
-        }
+//    private val _users = MutableLiveData<List<User>>()
+//    val users: LiveData<List<User>> get() = _users
 
-        // Erstellen eines Kontaktobjekts
-        val contactId = firebaseRef.push().key ?: ""
-        val contact = Contact(contactId, nameValue, passwordValue)
+    private val _currentUserIndex = MutableLiveData(0)
+    val currentUserIndex: LiveData<Int> get() = _currentUserIndex
 
-        // Daten in Firebase speichern
-        firebaseRef.child(contactId).setValue(contact)
-            .addOnCompleteListener {
-                _statusMessage.value = "Daten erfolgreich gespeichert."
-            }
-            .addOnFailureListener {
-                _statusMessage.value = "Fehler beim Speichern der Daten: ${it.message}"
-            }
-    }
-    data class User2(
-        var name: String = "",
-        var email: String = "",
-        var password: String = "",
-        var confirmedPassword: String = "",
-        var date: String = "",
-        var gander: String = "",
-        //var image: Bitmap? = null,
-        var ganderLookingFor: String = "",
-        var describes: String = "",
-        // var interest: MutableSet<String> = mutableSetOf(),
-    )
     private var firebaseRefUsers: DatabaseReference = FirebaseDatabase.getInstance().getReference("Users")
-
-    fun saveRegData() {
-        var user = User2("max","max@gmail.com","123456","123456","01.06.2021","Male","Woman","Der King")
+    val currentUserLiveData: LiveData<User?> = CurrentUser.userLiveData
 
 
-        // Erstellen eines Kontaktobjekts
-        val contactId = firebaseRefUsers.push().key ?: ""
-        //val contact = Contact(contactId, nameValue, passwordValue)
+    private val _currentShownUser = MutableLiveData<User?>()
+    val currentShownUser: LiveData<User?> get() = _currentShownUser
 
-        // Daten in Firebase speichern
-        firebaseRefUsers.child(contactId).setValue(user)
-            .addOnCompleteListener {
-                _statusMessage.value = "Daten erfolgreich gespeichert."
+    private val _usersListLiveData = MutableLiveData<List<User>>()
+    val usersListLiveData: LiveData<List<User>> get() = _usersListLiveData
+
+    init {
+        CurrentUser.initializeUser()
+    }
+    fun setCurrentUser(user: User?) {
+        _currentShownUser.postValue(user)
+    }
+    var lookingForGender = "Male"
+    fun ChangelookingForGender() {
+        lookingForGender = if (lookingForGender == "Male") "Women" else "Male"
+
+        Log.d("lookingForGender", lookingForGender.toString())
+        getAllUsersData()
+
+    }
+
+    fun getAllUsersData() {
+        firebaseRefUsers.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val userList = mutableListOf<User>()
+                for (userSnapshot in dataSnapshot.children) {
+                    val user = userSnapshot.getValue(User::class.java)
+                    if (user != null && shouldShowUser(currentUserLiveData.value!!, user)) {
+                        userList.add(user)
+                    }
+                }
+                Log.d("Login", userList.toString())
+                _usersListLiveData.postValue(userList)
+                //_users.value = userList
             }
-            .addOnFailureListener {
-                _statusMessage.value = "Fehler beim Speichern der Daten: ${it.message}"
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                _statusMessage.value = "Fehler beim Abrufen der Daten: ${databaseError.message}"
             }
+        })
+    }
+    // Funktion, um zu überprüfen, ob ein Benutzer angezeigt werden soll
+    private fun shouldShowUser(currentUser: User, user: User): Boolean {
+        return user.id != currentUser.id &&
+                !currentUser.likes.contains(user.id) &&
+                !currentUser.dislikes.contains(user.id) &&
+                lookingForGender == user.gender
     }
     fun showNextUser() {
-        val usersList = _users.value ?: return
+        val usersList = _usersListLiveData.value ?: return
         val nextIndex = (_currentUserIndex.value ?: 0) + 1
         if (nextIndex < usersList.size) {
             _currentUserIndex.value = nextIndex
@@ -132,10 +121,11 @@ class MainViewModel : ViewModel() {
         val prevIndex = (_currentUserIndex.value ?: 0) - 1
         if (prevIndex >= 0) {
             _currentUserIndex.value = prevIndex
-            _currentShownUser.value = _users.value?.get(prevIndex)
+            _currentShownUser.value = _usersListLiveData.value?.get(prevIndex)
         }
     }
-    var momentanerUser = CurrentUser.getTestUser()
+    var momentanerUser = CurrentUser.getUser()!!
+    var momentanerUser2 = CurrentUser.getUser()
     var firebaseIm = FirebaseIm()
     val changes = mutableMapOf<String, Any>()
 
@@ -144,56 +134,129 @@ class MainViewModel : ViewModel() {
         Log.d("Dislike", "Dislike")
 
         // Prüfen, ob der aktuelle Benutzer angezeigt wird und wenn ja, Änderungen hinzufügen
-        _currentShownUser.value?.let { currentUser ->
-            if (!momentanerUser.likes.contains(currentUser.id) && !momentanerUser.dislikes.contains(currentUser.id)) {                momentanerUser.dislikes.add(currentUser.id)
+        _currentShownUser.value?.let { currentShownUser ->
+            if (!momentanerUser.likes.contains(currentShownUser.id) && !momentanerUser.dislikes.contains(currentShownUser.id)) {                momentanerUser.dislikes.add(currentShownUser.id)
                 changes["dislikes"] = momentanerUser.dislikes // Änderungen hinzufügen
-                firebaseIm.updateUserToDatabase(changes) // Datenbank aktualisieren
+                firebaseIm.updateUserToDatabase(changes, momentanerUser.id) // Datenbank aktualisieren
                 Log.d("changes", changes.toString())
                 Log.d("momentanerUser", momentanerUser.toString())
                // CurrentUser.setUser(momentanerUser) updated current userdata
             }else{
-                Log.d("User", "User wurde schon geliked oder gedisliked $currentUser.id")
+                Log.d("User", "User wurde schon geliked oder gedisliked $currentShownUser.id")
             }
+            showNextUser()
         }
     }
     fun Like() {
 
         Log.d("Like", "Like")
         // Prüfen, ob der aktuelle Benutzer angezeigt wird und wenn ja, Änderungen hinzufügen
-        _currentShownUser.value?.let { currentUser ->
-            if (!momentanerUser.likes.contains(currentUser.id) && !momentanerUser.dislikes.contains(currentUser.id)) {
-                momentanerUser.likes.add(currentUser.id)
+        Log.d("Like _currentShownUser", _currentShownUser.value.toString())
+        Log.d("Like momentanerUser", momentanerUser.toString())
+
+        _currentShownUser.value?.let { currentShownUser ->
+            //hat der user den anderen schonmal geliked/ gedisliked
+            if (!momentanerUser.likes.contains(currentShownUser.id)
+                && !momentanerUser.dislikes.contains(currentShownUser.id) && !currentShownUser.likes.contains(momentanerUser.id) ) {
+
+                //füge den geliked user in likes von CurrentUser
+                momentanerUser.likes.add(currentShownUser.id)
                 changes["likes"] = momentanerUser.likes // Änderungen hinzufügen
-                firebaseIm.updateUserToDatabase(changes) // Datenbank aktualisieren
-                Log.d("changes", changes.toString())
-                Log.d("momentanerUser", momentanerUser.toString())
+                firebaseIm.updateUserToDatabase(changes, momentanerUser.id) // Datenbank aktualisieren
+                CurrentUser.setUser(momentanerUser) // Lokal CurrentUser aktualisieren
+                changes.clear() // Veränderungen löschen
+                Log.d("CurrentUser", CurrentUser.getUser().toString())
+
+                currentShownUser.receivedLikes.add(momentanerUser.id)
+                changes["receivedLikes"] = currentShownUser.receivedLikes // Änderungen hinzufügen
+                firebaseIm.updateUserToDatabase(changes, currentShownUser.id) // Datenbank aktualisieren
+                changes.clear()
+                Log.d("currentShownUser receivedLikes", currentShownUser.receivedLikes.toString())
+
+
                 // CurrentUser.setUser(momentanerUser) updated current userdata
-            } else{
-                Log.d("User", "User wurde schon geliked oder gedisliked $currentUser.id")
             }
 
+            // hat einer der user denn anderen schonmal geliked?
+            //vlt irgenwie pop up mit Match gefunden oder so?
+            else if (currentShownUser.likes.contains(momentanerUser.id)){
+                Log.d("MATCH", "es gibt ein mensch zwischen ${momentanerUser.name} und ${currentShownUser.name} ")
+
+                //füge den geliked user in likes von CurrentUser
+                momentanerUser.likes.add(currentShownUser.id)
+                changes["likes"] = momentanerUser.likes // Änderungen hinzufügen
+                firebaseIm.updateUserToDatabase(changes, momentanerUser.id) // Datenbank aktualisieren
+                CurrentUser.setUser(momentanerUser) // Lokal CurrentUser aktualisieren
+                changes.clear() // Veränderungen löschen
+                Log.d("CurrentUser", CurrentUser.getUser().toString())
+
+                //erstelle ein Match
+                firebaseIm.createMatch(momentanerUser.id,currentShownUser.id)
+            }
+            else{
+                Log.d("User", "User wurde schon geliked oder gedisliked $currentShownUser.id")
+            }
+            showNextUser()
         }
     }
-    fun getAllUsersData() {
-        firebaseRefUsers.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val userList = mutableListOf<User>()
-                for (userSnapshot in dataSnapshot.children) {
-                    val user = userSnapshot.getValue(User::class.java)
-                    if (user != null) {
-                        userList.add(user)
 
-                    }
-                }
-                Log.d("Login", userList.toString())
-
-                _users.value = userList
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                _statusMessage.value = "Fehler beim Abrufen der Daten: ${databaseError.message}"
-            }
-        })
-    }
-
+//    // Funktion zum Speichern der Daten in Firebase
+//    fun saveData() {
+//        val nameValue = _name.value ?: ""
+//        val passwordValue = _password.value ?: ""
+//
+//        if (nameValue.isEmpty()) {
+//            // Handle empty name
+//            return
+//        }
+//        if (passwordValue.isEmpty()) {
+//            // Handle empty password
+//            return
+//        }
+//
+//        // Erstellen eines Kontaktobjekts
+//        val contactId = firebaseRef.push().key ?: ""
+//        val contact = Contact(contactId, nameValue, passwordValue)
+//
+//        // Daten in Firebase speichern
+//        firebaseRef.child(contactId).setValue(contact)
+//            .addOnCompleteListener {
+//                _statusMessage.value = "Daten erfolgreich gespeichert."
+//            }
+//            .addOnFailureListener {
+//                _statusMessage.value = "Fehler beim Speichern der Daten: ${it.message}"
+//            }
+//    }
+//    data class User2(
+//        var name: String = "",
+//        var email: String = "",
+//        var password: String = "",
+//        var confirmedPassword: String = "",
+//        var date: String = "",
+//        var gander: String = "",
+//        //var image: Bitmap? = null,
+//        var ganderLookingFor: String = "",
+//        var describes: String = "",
+//        // var interest: MutableSet<String> = mutableSetOf(),
+//    )
+//
+//
+//    fun saveRegData() {
+//        var user = User2("max","max@gmail.com","123456","123456","01.06.2021","Male","Woman","Der King")
+//
+//
+//        // Erstellen eines Kontaktobjekts
+//        val contactId = firebaseRefUsers.push().key ?: ""
+//        //val contact = Contact(contactId, nameValue, passwordValue)
+//
+//        // Daten in Firebase speichern
+//        firebaseRefUsers.child(contactId).setValue(user)
+//            .addOnCompleteListener {
+//                _statusMessage.value = "Daten erfolgreich gespeichert."
+//            }
+//            .addOnFailureListener {
+//                _statusMessage.value = "Fehler beim Speichern der Daten: ${it.message}"
+//            }
+//    }
 }
+

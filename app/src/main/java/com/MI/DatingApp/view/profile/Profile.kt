@@ -47,6 +47,8 @@ import com.MI.DatingApp.view.registieren.recyclable.GanderDialog
 import com.MI.DatingApp.view.registieren.recyclable.Interests
 import com.MI.DatingApp.view.registieren.recyclable.OutletAttribute
 import com.MI.DatingApp.view.registieren.recyclable.outletAttributeRegisPage2
+import com.MI.DatingApp.viewModel.home.FilterViewModel
+import com.MI.DatingApp.viewModel.home.HomeVM
 import com.MI.DatingApp.viewModel.profile.ProfileVM
 
 @Composable
@@ -54,7 +56,14 @@ fun ProfileScreen(
     navController: NavController,
     viewModel: ProfileVM = viewModel()
 ) {
-    val testUser = CurrentUser.getTestUser()
+    val testUser = CurrentUser.getUser()
+    val homeViewModel: HomeVM = viewModel()
+
+    if (testUser == null) {
+        // Falls der testUser null ist, navigiere zur Login-Seite
+        navController.navigate("login")
+        return
+    }
 
     val userEdit by viewModel.userchanges.observeAsState()
     val scrollState = rememberScrollState()
@@ -119,7 +128,7 @@ fun ProfileScreen(
                             modifier = Modifier
                                 .padding(16.dp)
                                 .fillMaxHeight()
-                                .clickable(onClick = { navController.navigate("login") })
+                                .clickable(onClick = {homeViewModel.handleLogout(navController)})
                                 .background(Color.White),
                             contentAlignment = Alignment.TopStart
                         ) {
@@ -366,16 +375,15 @@ fun Images(viewModel: ProfileVM, userEdit: User, index: Int = 0) {
             viewModel.setImage(imagePath, image, index)
         }
     }
+
     Box(
         modifier = Modifier
-            .clickable(onClick = {
-                launcher.launch("image/*")
-            })
             .padding(4.dp)
             .width(100.dp)
             .height(100.dp)
-            .border(BorderStroke(2.dp, Color.Gray), shape = RoundedCornerShape(50.dp))
-            .clip(RoundedCornerShape(50.dp))
+            .clickable(onClick = {
+                launcher.launch("image/*")
+            })
     ) {
         AsyncImage(
             model = image,
@@ -384,11 +392,31 @@ fun Images(viewModel: ProfileVM, userEdit: User, index: Int = 0) {
                 .padding(4.dp)
                 .width(100.dp)
                 .height(100.dp)
-                .clip(RoundedCornerShape(50.dp)),
+                .clip(RoundedCornerShape(50.dp))
+                .border(BorderStroke(2.dp, Color.Gray), shape = RoundedCornerShape(50.dp)),
             contentScale = ContentScale.Crop,
         )
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .offset(x = 4.dp, y = -4.dp) // Positioniert den Button außerhalb des Kreises
+                .size(30.dp)
+                .clickable(onClick = {
+                    viewModel.removeImage(index)
+                })
+                .background(Color.LightGray, shape = RoundedCornerShape(50.dp)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.delete),
+                contentDescription = "Back",
+                modifier = Modifier.size(20.dp)
+            )
+        }
     }
 }
+
 
 @Composable
 fun CurvedBox(

@@ -30,12 +30,8 @@ import com.MI.DatingApp.view.registieren.Registrieren
 @Composable
 
 fun AppNavigation(navController: NavHostController, startDestination: String, modifier: Modifier = Modifier) {
-<<<<<<< HEAD
-    NavHost(navController = navController, startDestination = "likes") {
-=======
     NavHost(navController = navController, startDestination = startDestination) {
 
->>>>>>> bug_fix_firebase
         composable("login") { Login(navController) }
         composable("registrieren") { Registrieren(navController = navController) }
         composable("test") { TestView(navController) }

@@ -18,6 +18,8 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -32,12 +34,16 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.MI.DatingApp.R
+import com.MI.DatingApp.viewModel.likes.LikesVM
 
 
 @Composable
-fun Likes() {
-    var likes = mutableListOf("1", "2", "1", "2", "1", "2", "7")
+fun Likes(likesVM: LikesVM = viewModel()) {
+    val receivedLikesUsers by likesVM.receivedLikesUsersLiveData.observeAsState(initial = emptyList())
+
+    var likes = receivedLikesUsers
     Text(text = "Text", color = Color.Black)
 
     Column(

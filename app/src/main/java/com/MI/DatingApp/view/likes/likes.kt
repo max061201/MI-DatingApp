@@ -129,11 +129,11 @@ fun Likes(likesVM: LikesVM = viewModel()) {
                             }
 
 
-                            Text(
-                                text = user.name,
-                                color = Color.White,
-                                modifier = Modifier.padding(top=150.dp, start = 40.dp),
-                                )
+//                            Text(
+//                                text = user.name,
+//                                color = Color.White,
+//                                modifier = Modifier.padding(top=150.dp, start = 40.dp),
+//                                )
 
                         }
                     }

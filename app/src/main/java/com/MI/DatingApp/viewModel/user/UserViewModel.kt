@@ -82,6 +82,9 @@ class UserViewModel: ViewModel() {
                 //füge den geliked user in likes von CurrentUser
                 momentanerUser.likes.add(currentShownUser.id)
                 changes["likes"] = momentanerUser.likes // Änderungen hinzufügen
+                momentanerUser.receivedLikes.remove(currentShownUser.id)
+                // Änderungen hinzufügen User mit den man Matched entfernen
+                changes["receivedLikes"] = momentanerUser.receivedLikes
                 firebaseIm.updateUserToDatabase(changes, momentanerUser.id) // Datenbank aktualisieren
                 CurrentUser.setUser(momentanerUser) // Lokal CurrentUser aktualisieren
                 changes.clear() // Veränderungen löschen

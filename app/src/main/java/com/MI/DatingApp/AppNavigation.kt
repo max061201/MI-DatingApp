@@ -23,6 +23,7 @@ import com.MI.DatingApp.view.Screen4
 import com.MI.DatingApp.view.Login
 import com.MI.DatingApp.view.TestView
 import com.MI.DatingApp.view.likes.Likes
+import com.MI.DatingApp.view.matches.Matches
 import com.MI.DatingApp.view.profile.ProfileScreen
 import com.MI.DatingApp.view.registieren.Registrieren
 
@@ -37,7 +38,7 @@ fun AppNavigation(navController: NavHostController, startDestination: String, mo
         composable("test") { TestView(navController) }
         composable("home") { Home(navController) }
         composable("likes") { Likes() }
-        composable("chat") { Chat(navController) }
+        composable("chat") { Matches() }
 
         composable("profile") { ProfileScreen(navController) }
         composable("screen2") { Detail(navController) }

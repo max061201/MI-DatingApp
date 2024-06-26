@@ -214,24 +214,21 @@ fun ControlButtons(
         }
     }
 }
-
 @Composable
 fun SwipeCardDemoList(userViewModel: UserViewModel = viewModel()) {
-    var currentIndex by rememberSaveable { mutableIntStateOf(0) }
+    var currentIndex by rememberSaveable { mutableStateOf(0) }
     val userList by userViewModel.usersListLiveData.observeAsState(initial = emptyList())
 
     // Reset currentIndex when the userList changes
     LaunchedEffect(userList) {
-       // currentIndex = 0
+        currentIndex = 0
         val userNames = userList.map { it.name }
-        Log.d("userList SwipeCardDemoList", userNames.joinToString(", "))
-
+        Log.d("SwipeCardDemoList", "UserList: ${userNames.joinToString(", ")}")
+        Log.d("SwipeCardDemoList", "CurrentIndex reset to $currentIndex")
     }
 
     val accounts = userList.map { user ->
-        val imageUrl = if (!user.imageUrls.isNullOrEmpty()) {
-            user.imageUrls!![0].toString()
-        } else {""}
+        val imageUrl = user.imageUrls?.firstOrNull()?.toString() ?: ""
 
         Item(
             imageUrl = imageUrl,
@@ -248,7 +245,7 @@ fun SwipeCardDemoList(userViewModel: UserViewModel = viewModel()) {
             modifier = Modifier
                 .height(500.dp)
                 .padding(top = 50.dp)
-        ){
+        ) {
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
@@ -265,24 +262,26 @@ fun SwipeCardDemoList(userViewModel: UserViewModel = viewModel()) {
                                     .zIndex(actualIndex.toFloat()),
                                 onSwipedLeft = {
                                     if (actualIndex == currentIndex) currentIndex++
-                                    val likedUser = userList[actualIndex]
-                                    userViewModel.dislike(likedUser)
-
+                                    val dislikedUser = userList.getOrNull(actualIndex)
+                                    dislikedUser?.let {
+                                        userViewModel.dislike(it)
+                                        Log.d("SwipeCardDemoList", "Swiped left on user: ${it.name}")
+                                        Log.d("SwipeCardDemoList", "CurrentIndex after swipe left: $currentIndex")
+                                    }
                                 },
                                 onSwipedRight = {
                                     if (actualIndex == currentIndex) currentIndex++
-                                    val likedUser = userList[actualIndex] // den gelikten Benutzer bekommen
-                                    userViewModel.like(likedUser) // like Funktion mit Benutzer aufrufen
-
+                                    val likedUser = userList.getOrNull(actualIndex)
+                                    likedUser?.let {
+                                        userViewModel.like(it)
+                                        Log.d("SwipeCardDemoList", "Swiped right on user: ${it.name}")
+                                        Log.d("SwipeCardDemoList", "CurrentIndex after swipe right: $currentIndex")
+                                    }
                                 }
                             )
-                            Log.d("userList currentIndex", currentIndex.toString())
-                            Log.d("userList actualIndex", actualIndex.toString())
-                            Log.d("userList userList actualIndex", "${userList[actualIndex]}")
-                            Log.d("userList userList currentIndex", "${userList[currentIndex]}")
-
+                            Log.d("SwipeCardDemoList", "Rendering card for user: ${item.name}")
+                            Log.d("SwipeCardDemoList", "ActualIndex: $actualIndex, CurrentIndex: $currentIndex")
                         }
-
                     }
                 } else {
                     Text("No more profiles to show", color = Color.Black, modifier = Modifier.align(Alignment.Center))
@@ -291,21 +290,23 @@ fun SwipeCardDemoList(userViewModel: UserViewModel = viewModel()) {
         }
 
         val swipeLeft: () -> Unit = {
-            if (-currentIndex < accounts.size +1) {
+            if (currentIndex < accounts.size) {
                 currentIndex++
+                Log.d("SwipeCardDemoList", "Swiped left, CurrentIndex: $currentIndex")
             }
-            println("CurrentIndex: $currentIndex < $accounts.size" )
         }
 
         val swipeRight: () -> Unit = {
-            if (-currentIndex  < accounts.size +1 ) {
+            if (currentIndex < accounts.size) {
                 currentIndex++
+                Log.d("SwipeCardDemoList", "Swiped right, CurrentIndex: $currentIndex")
             }
         }
 
         val undo: () -> Unit = {
             if (currentIndex > 0) {
                 currentIndex--
+                Log.d("SwipeCardDemoList", "Undo, CurrentIndex: $currentIndex")
             }
         }
 
@@ -315,8 +316,7 @@ fun SwipeCardDemoList(userViewModel: UserViewModel = viewModel()) {
                 .padding(top = 80.dp),
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally,
-
-        ){
+        ) {
             ControlButtons(
                 onLeftSwipe = swipeLeft,
                 onRightSwipe = swipeRight,
@@ -326,9 +326,10 @@ fun SwipeCardDemoList(userViewModel: UserViewModel = viewModel()) {
                     .padding(16.dp)
             )
         }
-
     }
 }
+
+
 
 @Preview(showBackground = true)
 @Composable

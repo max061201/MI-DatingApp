@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -43,6 +47,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.MI.DatingApp.R
+import com.MI.DatingApp.model.User
+import com.MI.DatingApp.view.home.Item
+import com.MI.DatingApp.view.home.UserDetail
 import com.MI.DatingApp.viewModel.likes.LikesVM
 
 
@@ -50,9 +57,16 @@ import com.MI.DatingApp.viewModel.likes.LikesVM
 fun Likes(likesVM: LikesVM = viewModel()) {
     val receivedLikesUsers by likesVM.receivedLikesUsersLiveData.observeAsState(initial = emptyList())
     Log.d("receivedLikesUsers", receivedLikesUsers.toString())
-    var likes = receivedLikesUsers
-    Text(text = "Text", color = Color.Black)
+    var showUserDetail by remember { mutableStateOf(false) }
+    var selectedItem by remember { mutableStateOf<User?>(null) }
 
+    var likes = receivedLikesUsers
+
+    if (showUserDetail) {
+        UserDetail(item = selectedItem!! , onBack = {
+            showUserDetail = false
+        })
+    } else {
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -97,6 +111,11 @@ fun Likes(likesVM: LikesVM = viewModel()) {
                                 .padding(8.dp)
                                 .aspectRatio(1f)
                                 .background(Color.White, RoundedCornerShape(8.dp))
+                                .clickable(onClick = {
+                                    showUserDetail = true
+                                    selectedItem = user
+
+                                })
                         ) {
 
                             Image(
@@ -142,7 +161,7 @@ fun Likes(likesVM: LikesVM = viewModel()) {
 
             }
         }
-
+}
     }
 }
 

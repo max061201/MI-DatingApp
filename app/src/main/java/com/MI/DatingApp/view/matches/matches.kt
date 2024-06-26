@@ -53,7 +53,6 @@ fun Matches(matchesVM: MatchesVM = viewModel()) {
     val receivedLikesUsers by matchesVM.matchLikesUsersLiveData.observeAsState(initial = emptyList())
     Log.d("receivedLikesUsers", receivedLikesUsers.toString())
     var likes = receivedLikesUsers
-    Text(text = "Text", color = Color.Black)
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -72,7 +71,7 @@ fun Matches(matchesVM: MatchesVM = viewModel()) {
             ) {
                 CurvedBox {
                     UnderlinedText(
-                        text = "Likes",
+                        text = "Matches",
                         color = Color.Black,
                         underlineColor = Color(0xFF58C3B6)
 

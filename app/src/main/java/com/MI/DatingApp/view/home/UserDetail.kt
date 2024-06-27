@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.unit.sp
 import com.MI.DatingApp.model.User
 /**
 UserDetail show more about the user
@@ -27,7 +28,7 @@ fun UserDetail(item: User, onBack: () -> Unit) {
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .height(500.dp)
-            .padding(top = 50.dp)
+            .padding(top = 50.dp, bottom = 50.dp, start = 20.dp, end = 20.dp )
             .pointerInput(Unit) {
                 detectTapGestures(onTap = {
                     onBack()
@@ -96,11 +97,14 @@ fun UserDetail(item: User, onBack: () -> Unit) {
         Text(
             text = "Description",
             style = MaterialTheme.typography.titleSmall,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 8.dp),
+            fontSize =  20.sp,
         )
         Text(
             text = item.description,
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.labelSmall,
+            color = Color.Black,
+            fontSize =  18.sp
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -108,7 +112,8 @@ fun UserDetail(item: User, onBack: () -> Unit) {
         Text(
             text = "Interests",
             style = MaterialTheme.typography.titleSmall,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 8.dp),
+            fontSize =  20.sp
         )
         Row(
             modifier = Modifier
@@ -118,6 +123,7 @@ fun UserDetail(item: User, onBack: () -> Unit) {
             item.interest.forEach { interest ->
                 Text(
                     text = interest,
+                    fontSize =  18.sp,
                     style = MaterialTheme.typography.labelSmall,
                     modifier = Modifier
                         .padding(end = 8.dp)

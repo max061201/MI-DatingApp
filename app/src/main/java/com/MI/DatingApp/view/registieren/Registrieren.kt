@@ -93,6 +93,7 @@ fun Registrieren(navController: NavHostController, viewModel: RegisteringVM = vi
                 composable("third") {
                     ThirdPage(
                         navController = navController,
+                        uservalue = uservalue,
                         registeringViewModel = viewModel
                     )
                 }
@@ -214,6 +215,7 @@ Third page for the user to enter description gender looking for and interests
 @Composable
 fun ThirdPage(
     navController: NavHostController,
+    uservalue: User?,
     registeringViewModel: RegisteringVM
 ) {
     Column(
@@ -233,7 +235,7 @@ fun ThirdPage(
         Interests(
             interest = registeringViewModel.user.value!!.interest,
             setInterestes = { registeringViewModel.setInterests(it) }
-            )
+        )
         ButtonCompose({
 
 

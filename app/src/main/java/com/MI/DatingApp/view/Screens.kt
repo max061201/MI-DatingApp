@@ -83,7 +83,6 @@ fun Screen4(navController: NavController, data: String) {
 @Composable
 fun Home(navController: NavController) {
 
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -95,7 +94,7 @@ fun Home(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            HomeScreen()
+            HomeScreen(navController)
 
         }
     }

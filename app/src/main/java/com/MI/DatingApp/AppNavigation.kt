@@ -2,11 +2,6 @@ package com.MI.DatingApp
 
 
 import Detail
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.MailOutline
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -21,13 +16,15 @@ import com.MI.DatingApp.view.Likes
 import com.MI.DatingApp.view.NavigationItem
 import com.MI.DatingApp.view.Screen3
 import com.MI.DatingApp.view.Screen4
+import com.MI.DatingApp.view.home.UserDetail
 import com.MI.DatingApp.view.profile.ProfileScreen
 import com.MI.DatingApp.view.registieren.Registrieren
+import com.MI.DatingApp.viewModel.user.UserViewModel
 
 
 @Composable
 
-fun AppNavigation(navController: NavHostController, startDestination: String, modifier: Modifier = Modifier) {
+fun AppNavigation(navController: NavHostController, startDestination: String,  modifier: Modifier = Modifier) {
     NavHost(navController = navController, startDestination = startDestination) {
 
         composable("login") { Login(navController) }
@@ -44,6 +41,7 @@ fun AppNavigation(navController: NavHostController, startDestination: String, mo
         composable("screen4/{data}", arguments = listOf(navArgument("data") { type = NavType.StringType })) { backStackEntry ->
             Screen4(navController, backStackEntry.arguments?.getString("data") ?: "")
         }
+
     }
 }
 

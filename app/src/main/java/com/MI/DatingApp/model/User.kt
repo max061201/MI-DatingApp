@@ -1,5 +1,8 @@
 package com.MI.DatingApp.model
 
+import java.text.SimpleDateFormat
+import java.util.*
+
 data class User(
     val id: String ="",
     var name: String = "",
@@ -43,4 +46,21 @@ data class User(
         return email.matches(emailPattern)
     }
 }
+
+fun User.calculateAge(): Int {
+    val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+    val dob = sdf.parse(this.yearOfBirth) ?: return 0 // Falls das Parsing fehlschlägt, 0 zurückgeben
+
+    val today = Calendar.getInstance()
+
+    val dobCalendar = Calendar.getInstance()
+    dobCalendar.time = dob
+
+    var age = today.get(Calendar.YEAR) - dobCalendar.get(Calendar.YEAR)
+    if (today.get(Calendar.DAY_OF_YEAR) < dobCalendar.get(Calendar.DAY_OF_YEAR)) {
+        age--
+    }
+    return age
+}
+
 

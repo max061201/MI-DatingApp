@@ -18,13 +18,13 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.MI.DatingApp.R
-import com.MI.DatingApp.view.recyclableGlobal.TitlePages
 import com.MI.DatingApp.viewModel.home.FilterViewModel
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.MI.DatingApp.model.CurrentUser
+import com.MI.DatingApp.view.recyclableGlobal.TitleGlobal
 
 
 @Composable
@@ -34,7 +34,7 @@ fun FilterBox(onDismiss: () -> Unit, filterViewModel: FilterViewModel = viewMode
 
     // MutableState für den ausgewählten Gender
     var selectedGender by remember {
-        mutableStateOf(currentUser?.genderLookingFor ?: "") // Standardmäßig "Male", falls currentUser null ist
+        mutableStateOf(currentUser?.genderLookingFor ?: "Male") // Standardmäßig "Male", falls currentUser null ist
     }
     Box(
         modifier = Modifier
@@ -58,7 +58,7 @@ fun FilterBox(onDismiss: () -> Unit, filterViewModel: FilterViewModel = viewMode
                     Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                 }
 
-                TitlePages("Filter", Modifier.padding(start = 16.dp, end = 16.dp))
+                TitleGlobal("Filter", Modifier.padding(start = 16.dp, end = 16.dp))
 
                 IconButton(onClick = {
                     filterViewModel.updateFilterData()

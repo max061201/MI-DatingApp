@@ -20,6 +20,8 @@ class UserViewModel: ViewModel() {
 
     private val _usersListLiveData = MutableLiveData<List<User>>()
     val usersListLiveData: LiveData<List<User>> get() = _usersListLiveData
+    private val _userLiveData = MutableLiveData<User?>()
+    val userLiveData: LiveData<User?> get() = _userLiveData
 
     val currentUserLiveData: LiveData<User?> = CurrentUser.userLiveData
 
@@ -31,9 +33,20 @@ class UserViewModel: ViewModel() {
         CurrentUser.initializeUser()
         getAllUsersData()
     }
-    fun setAgeRange() {
 
+    fun getUserById(id: String) {
+        firebaseRefUsers.child(id).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val user = snapshot.getValue(User::class.java)
+                _userLiveData.postValue(user)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("UserViewModel", "Error fetching user details", error.toException())
+            }
+        })
     }
+
     // Beispiel für den Zugriff auf die ageRange
     fun getAgeRange(): Pair<Int, Int> {
         return filterViewModel.filterData.value.ageRange
@@ -62,13 +75,11 @@ class UserViewModel: ViewModel() {
                 CurrentUser.setUser(momentanerUser) // Lokal CurrentUser aktualisieren
 
                 changes.clear() // Veränderungen löschen
-                Log.d("Righswipe CurrentUser", CurrentUser.getUser().toString())
 
                 currentShownUser.receivedLikes.add(momentanerUser.id)
                 changes["receivedLikes"] = currentShownUser.receivedLikes // Änderungen hinzufügen
                 firebaseIm.updateUserToDatabase(changes, currentShownUser.id) // Datenbank aktualisieren
                 changes.clear()
-                Log.d("Righswipe currentShownUser receivedLikes", currentShownUser.receivedLikes.toString())
 
 
                 // CurrentUser.setUser(momentanerUser) updated current userdata
@@ -77,11 +88,13 @@ class UserViewModel: ViewModel() {
             // hat einer der user denn anderen schonmal geliked?
             //vlt irgenwie pop up mit Match gefunden oder so?
             else if (currentShownUser.likes.contains(momentanerUser.id)){
-                Log.d("Righswipe MATCH", "es gibt ein mensch zwischen ${momentanerUser.name} und ${currentShownUser.name} ")
 
                 //füge den geliked user in likes von CurrentUser
                 momentanerUser.likes.add(currentShownUser.id)
                 changes["likes"] = momentanerUser.likes // Änderungen hinzufügen
+                momentanerUser.receivedLikes.remove(currentShownUser.id)
+                // Änderungen hinzufügen User mit den man Matched entfernen
+                changes["receivedLikes"] = momentanerUser.receivedLikes
                 firebaseIm.updateUserToDatabase(changes, momentanerUser.id) // Datenbank aktualisieren
                 CurrentUser.setUser(momentanerUser) // Lokal CurrentUser aktualisieren
                 changes.clear() // Veränderungen löschen
@@ -191,21 +204,5 @@ class UserViewModel: ViewModel() {
                // && userAge in ageRange.first..ageRange.second
     }
 
-    // Funktion zur Berechnung des Alters aus dem Geburtsdatum
-    private fun calculateAge(yearOfBirth: String): Int {
-        val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-        val dob = sdf.parse(yearOfBirth) ?: return 0 // Falls das Parsing fehlschlägt, 0 zurückgeben
 
-        val today = Calendar.getInstance()
-
-        val dobCalendar = Calendar.getInstance()
-        dobCalendar.time = dob
-
-        var age = today.get(Calendar.YEAR) - dobCalendar.get(Calendar.YEAR)
-        if (today.get(Calendar.DAY_OF_YEAR) < dobCalendar.get(Calendar.DAY_OF_YEAR)) {
-            age--
-        }
-
-        return age
-    }
 }

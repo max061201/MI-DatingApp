@@ -4,23 +4,19 @@ import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -28,44 +24,35 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.MI.DatingApp.R
-import com.MI.DatingApp.ui.theme.ComposeBottomNavigationExampleTheme
+import com.MI.DatingApp.model.User
+import com.MI.DatingApp.model.calculateAge
 import com.MI.DatingApp.viewModel.user.UserViewModel
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
-data class Item(
-    val imageUrl: String,
-    val name: String
-)
-
 
 @Composable
-fun SwipeCardDemo(viewModel: UserViewModel = viewModel()) {
-    SwipeCardDemoList()
+fun SwipeCardDemo(navController: NavController, viewModel: UserViewModel = viewModel()) {
+    SwipeCardDemoList(navController = navController)
 }
 
 @Composable
-fun CardContent(item: Item) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(5.dp)
-            .shadow(6.dp)
-
-    ) {
+fun CardContent(item: User) {
+    Box {
         Image(
-            painter = rememberAsyncImagePainter(model = item.imageUrl),
+            painter = rememberAsyncImagePainter(model = item.imageUrls?.get(0)),
             contentDescription = null,
-            ///modifier = Modifier.fillMaxSize(),
-            modifier = Modifier.height(400.dp).fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(500.dp),
             contentScale = ContentScale.Crop
         )
         Column(
@@ -75,14 +62,14 @@ fun CardContent(item: Item) {
                 .background(Color.Black.copy(alpha = 0.5f))
                 .padding(8.dp)
         ) {
-            Text(text = item.name, style = MaterialTheme.typography.labelSmall, color = Color.White)
+            Text(text =" ${item.name}, ${item.calculateAge()}", style = MaterialTheme.typography.titleLarge, color = Color.White)
         }
     }
 }
 
 @Composable
 fun SwipeableCard(
-    item: Item,
+    item: User,
     modifier: Modifier = Modifier,
     onSwipedLeft: () -> Unit,
     onSwipedRight: () -> Unit,
@@ -101,14 +88,14 @@ fun SwipeableCard(
 
     val handleSwipeEnd: () -> Unit = {
         coroutineScope.launch {
-            if (offsetX > screenWidth / 3) {
+            if (offsetX > screenWidth / 4) {
                 animatableOffsetX.animateTo(screenWidth, animationSpec)
-                animatableRotation.animateTo(10f, animationSpec)
+                animatableRotation.animateTo(7f, animationSpec)
                 onSwipedRight()
                 showRightIcon = false
-            } else if (offsetX < -screenWidth / 3) {
+            } else if (offsetX < -screenWidth / 4) {
                 animatableOffsetX.animateTo(-screenWidth, animationSpec)
-                animatableRotation.animateTo(-10f, animationSpec)
+                animatableRotation.animateTo(-7f, animationSpec)
                 onSwipedLeft()
                 showLeftIcon = false
             } else {
@@ -216,127 +203,62 @@ fun ControlButtons(
 }
 
 @Composable
-fun SwipeCardDemoList(userViewModel: UserViewModel = viewModel()) {
+fun SwipeCardDemoList(userViewModel: UserViewModel = viewModel(),navController: NavController) {
     var currentIndex by rememberSaveable { mutableIntStateOf(0) }
-    val userList by userViewModel.usersListLiveData.observeAsState(initial = emptyList())
+    val accounts by userViewModel.usersListLiveData.observeAsState(initial = emptyList())
+    var showUserDetail by remember { mutableStateOf(false) }
+    var selectedItem by remember { mutableStateOf<User?>(null) }
 
-    // Reset currentIndex when the userList changes
-    LaunchedEffect(userList) {
-       // currentIndex = 0
-        val userNames = userList.map { it.name }
-        Log.d("userList SwipeCardDemoList", userNames.joinToString(", "))
-
-    }
-
-    val accounts = userList.map { user ->
-        val imageUrl = if (!user.imageUrls.isNullOrEmpty()) {
-            user.imageUrls!![0].toString()
-        } else {""}
-
-        Item(
-            imageUrl = imageUrl,
-            name = "${user.name} (${user.yearOfBirth})"
-        )
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-    ) {
-        Column(
-            modifier = Modifier
-                .height(500.dp)
-                .padding(top = 50.dp)
-        ){
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                if (currentIndex < accounts.size) {
-                    accounts.asReversed().forEachIndexed { index, item ->
-                        val actualIndex = accounts.size - 1 - index
-                        if (actualIndex >= currentIndex) {
-                            SwipeableCard(
-                                item = item,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(400.dp)
-                                    .padding(16.dp)
-                                    .zIndex(actualIndex.toFloat()),
-                                onSwipedLeft = {
-                                    if (actualIndex == currentIndex) currentIndex++
-                                    val likedUser = userList[actualIndex]
-                                    userViewModel.dislike(likedUser)
-
-                                },
-                                onSwipedRight = {
-                                    if (actualIndex == currentIndex) currentIndex++
-                                    val likedUser = userList[actualIndex] // den gelikten Benutzer bekommen
-                                    userViewModel.like(likedUser) // like Funktion mit Benutzer aufrufen
-
-                                }
-                            )
-                            Log.d("userList currentIndex", currentIndex.toString())
-                            Log.d("userList actualIndex", actualIndex.toString())
-                            Log.d("userList userList actualIndex", "${userList[actualIndex]}")
-                            Log.d("userList userList currentIndex", "${userList[currentIndex]}")
-
-                        }
-
-                    }
-                } else {
-                    Text("No more profiles to show", color = Color.Black, modifier = Modifier.align(Alignment.Center))
-                }
-            }
-        }
-
-        val swipeLeft: () -> Unit = {
-            if (-currentIndex < accounts.size +1) {
-                currentIndex++
-            }
-            println("CurrentIndex: $currentIndex < $accounts.size" )
-        }
-
-        val swipeRight: () -> Unit = {
-            if (-currentIndex  < accounts.size +1 ) {
-                currentIndex++
-            }
-        }
-
-        val undo: () -> Unit = {
-            if (currentIndex > 0) {
-                currentIndex--
-            }
-        }
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 80.dp),
-            verticalArrangement = Arrangement.Bottom,
-            horizontalAlignment = Alignment.CenterHorizontally,
-
-        ){
-            ControlButtons(
-                onLeftSwipe = swipeLeft,
-                onRightSwipe = swipeRight,
-                onUndo = undo,
+                .verticalScroll(rememberScrollState())
+        ) {
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            )
-        }
+                    .height(600.dp)
+                    .padding(top = 50.dp)
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxSize()
 
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    val navController = rememberNavController()
-    ComposeBottomNavigationExampleTheme {
-        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-            SwipeCardDemo()
+                ) {
+                    if (currentIndex < accounts.size) {
+                        accounts.asReversed().forEachIndexed { index, item ->
+                            val actualIndex = accounts.size - 1 - index
+                            if (actualIndex >= currentIndex) {
+                                SwipeableCard(
+                                    item = accounts[actualIndex],
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp)
+                                        .zIndex(actualIndex.toFloat())
+                                        .pointerInput(Unit) {
+                                            detectTapGestures(onTap = {
+                                                selectedItem = accounts[actualIndex]
+                                                showUserDetail = true
+                                                //navController.navigate("detail/${item.id}")
+                                            })
+                                        },
+                                    onSwipedLeft = {
+                                        if (actualIndex == currentIndex) currentIndex++
+                                        val dislikedUser = accounts[actualIndex]
+                                        userViewModel.dislike(dislikedUser)
+                                    },
+                                    onSwipedRight = {
+                                        if (actualIndex == currentIndex) currentIndex++
+                                        val likedUser = accounts[actualIndex]
+                                        userViewModel.like(likedUser)
+                                    }
+                                )
+                            }
+                        }
+                    } else {
+                        Text("No more profiles to show", color = Color.Black, style = MaterialTheme.typography.titleLarge , modifier = Modifier.align(Alignment.Center))
+                    }
+                }
+            }
         }
     }
-}
+//}

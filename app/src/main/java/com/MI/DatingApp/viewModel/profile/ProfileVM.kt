@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import com.MI.DatingApp.model.CurrentUser
 import com.MI.DatingApp.model.User
 import com.MI.DatingApp.model.registieren.FirebaseIm
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
@@ -24,7 +25,7 @@ class ProfileVM : ViewModel() {
 
     val currentUserLiveData: LiveData<User?> = CurrentUser.userLiveData
 
-    val currentUser = CurrentUser.getTestUser()
+    val currentUser = CurrentUser.getUser()!!
     var deleteImages: MutableList<String> = mutableListOf()
     fun setUserValue(user: User) {
         val uservalue = currentUserLiveData.value!!.copy(
@@ -300,14 +301,15 @@ class ProfileVM : ViewModel() {
         }
         CurrentUser.clearUser()
 
-//        // Lösche Benutzer aus Firebase Authentication
-//        val firebaseUser = FirebaseAuth.getInstance().currentUser
-//        firebaseUser?.delete()?.addOnCompleteListener { task ->
-//            if (task.isSuccessful) {
-//                Log.d("Firebase", "User account deleted successfully")
-//            } else {
-//                Log.e("Firebase", "Error deleting user account: ${task.exception?.message}")
-//            }
-//        }
+        // Lösche Benutzer aus Firebase Authentication
+        val firebaseUser = FirebaseAuth.getInstance().currentUser
+        firebaseUser?.delete()?.addOnCompleteListener {
+            task ->
+            if (task.isSuccessful) {
+                Log.d("Firebase", "User account deleted successfully")
+            } else {
+                Log.e("Firebase", "Error deleting user account: ${task.exception?.message}")
+            }
+        }
     }
 }

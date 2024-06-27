@@ -51,7 +51,6 @@ fun HomeScreen() {
     Box(modifier = Modifier.fillMaxSize()) {
         Column {
             HeaderContent(onFilterClick = { filterViewModel.toggleFilterVisibility() })
-            Text("${currentUserLive?.name}  /  ${currentUserLive?.email}", color = Color.Black)
             SwipeCardDemo()
 
         }

@@ -16,11 +16,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.MI.DatingApp.view.Chat
 import com.MI.DatingApp.view.Home
-import com.MI.DatingApp.view.Likes
+
 import com.MI.DatingApp.view.NavigationItem
 import com.MI.DatingApp.view.Screen3
 import com.MI.DatingApp.view.Screen4
-import com.MI.DatingApp.view.signin.Login
+import com.MI.DatingApp.view.Login
+import com.MI.DatingApp.view.TestView
+import com.MI.DatingApp.view.likes.Likes
+import com.MI.DatingApp.view.matches.Matches
 import com.MI.DatingApp.view.profile.ProfileScreen
 import com.MI.DatingApp.view.registieren.Registrieren
 
@@ -34,8 +37,8 @@ fun AppNavigation(navController: NavHostController, startDestination: String, mo
         composable("registrieren") { Registrieren(navController = navController) }
         composable("test") { TestView(navController) }
         composable("home") { Home(navController) }
-        composable("likes") { Likes(navController) }
-        composable("chat") { Chat(navController) }
+        composable("likes") { Likes() }
+        composable("chat") { Matches() }
 
         composable("profile") { ProfileScreen(navController) }
         composable("screen2") { Detail(navController) }
@@ -47,16 +50,12 @@ fun AppNavigation(navController: NavHostController, startDestination: String, mo
     }
 }
 
-@Composable
-fun TestView(navController: NavHostController) {
-
-}
-
 val bottomNavigationItems = listOf(
     NavigationItem("home", "", R.drawable.home_button),
     NavigationItem("likes", "", R.drawable.herz),
     NavigationItem("chat", "", R.drawable.bote),
     NavigationItem("profile", "", R.drawable.profil)
 )
+
 
 val bottomBarRoutes = setOf("home", "likes","chat","profile")

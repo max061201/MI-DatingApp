@@ -34,7 +34,7 @@ fun FilterBox(onDismiss: () -> Unit, filterViewModel: FilterViewModel = viewMode
 
     // MutableState für den ausgewählten Gender
     var selectedGender by remember {
-        mutableStateOf(currentUser?.genderLookingFor ?: "") // Standardmäßig "Male", falls currentUser null ist
+        mutableStateOf(currentUser?.genderLookingFor ?: "Male") // Standardmäßig "Male", falls currentUser null ist
     }
     Box(
         modifier = Modifier

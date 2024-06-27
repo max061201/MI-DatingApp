@@ -20,8 +20,7 @@ import com.MI.DatingApp.view.Likes
 import com.MI.DatingApp.view.NavigationItem
 import com.MI.DatingApp.view.Screen3
 import com.MI.DatingApp.view.Screen4
-import com.MI.DatingApp.view.Login
-import com.MI.DatingApp.view.TestView
+import com.MI.DatingApp.view.signin.Login
 import com.MI.DatingApp.view.profile.ProfileScreen
 import com.MI.DatingApp.view.registieren.Registrieren
 
@@ -48,11 +47,16 @@ fun AppNavigation(navController: NavHostController, startDestination: String, mo
     }
 }
 
+@Composable
+fun TestView(navController: NavHostController) {
+
+}
+
 val bottomNavigationItems = listOf(
-    NavigationItem("home", "Screen 1", Icons.Filled.Home),
-    NavigationItem("likes", "Screen 2", Icons.Filled.Favorite),
-    NavigationItem("chat", "Screen 3", Icons.Filled.MailOutline),
-    NavigationItem("profile", "Screen 4", Icons.Filled.AccountCircle)
+    NavigationItem("home", "", R.drawable.home_button),
+    NavigationItem("likes", "", R.drawable.herz),
+    NavigationItem("chat", "", R.drawable.bote),
+    NavigationItem("profile", "", R.drawable.profil)
 )
 
 val bottomBarRoutes = setOf("home", "likes","chat","profile")

@@ -1,6 +1,7 @@
 package com.MI.DatingApp.view
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -11,9 +12,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.MI.DatingApp.AppNavigation
+import com.MI.DatingApp.R
 import com.MI.DatingApp.bottomBarRoutes
 import com.MI.DatingApp.bottomNavigationItems
 import com.MI.DatingApp.model.CurrentUser
@@ -39,7 +43,7 @@ fun MainScreen(navController: NavHostController) {
                 NavigationBar {
                     bottomNavigationItems.forEach { item ->
                         NavigationBarItem(
-                            icon = { Icon(item.icon, contentDescription = null) },
+                            icon = { Icon(painter = painterResource(id = item.iconId), contentDescription = null, modifier = Modifier.size(30.dp)) },
                             label = { Text(item.label) },
                             selected = currentRoute == item.route,
                             onClick = {
@@ -62,4 +66,4 @@ fun MainScreen(navController: NavHostController) {
     }
 }
 
-data class NavigationItem(val route: String, val label: String, val icon: ImageVector)
+data class NavigationItem(val route: String, val label: String, val iconId: Int)

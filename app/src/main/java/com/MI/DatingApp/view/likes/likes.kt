@@ -1,6 +1,6 @@
 package com.MI.DatingApp.view.likes
 
-import android.util.Log
+
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -8,13 +8,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,31 +33,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
-import com.MI.DatingApp.R
 import com.MI.DatingApp.model.User
-import com.MI.DatingApp.view.home.Item
 import com.MI.DatingApp.view.home.UserDetail
 import com.MI.DatingApp.viewModel.likes.LikesVM
 
-
+/**
+Create the received likes page to show realtime updates if someone like you
+ */
 @Composable
 fun Likes(likesVM: LikesVM = viewModel()) {
     val receivedLikesUsers by likesVM.receivedLikesUsersLiveData.observeAsState(initial = emptyList())
-    Log.d("receivedLikesUsers", receivedLikesUsers.toString())
     var showUserDetail by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf<User?>(null) }
-
     var likes = receivedLikesUsers
 
     if (showUserDetail) {
@@ -147,13 +136,6 @@ fun Likes(likesVM: LikesVM = viewModel()) {
                                     }
                                 }
 
-
-//                            Text(
-//                                text = user.name,
-//                                color = Color.White,
-//                                modifier = Modifier.padding(top=150.dp, start = 40.dp),
-//                                )
-
                             }
                         }
 
@@ -236,10 +218,4 @@ fun UnderlinedText(text: String, color: Color, underlineColor: Color) {
             )
         }
     }
-}
-
-@Preview
-@Composable
-fun prview() {
-    Likes()
 }

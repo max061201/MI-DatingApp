@@ -53,7 +53,9 @@ import com.MI.DatingApp.view.home.UserDetail
 import com.MI.DatingApp.viewModel.likes.LikesVM
 import com.MI.DatingApp.viewModel.likes.MatchesVM
 
-
+/**
+Create the Matches page to show realtime updates if someone you liked, liked you back
+ */
 @Composable
 fun Matches(matchesVM: MatchesVM = viewModel()) {
     val receivedLikesUsers by matchesVM.matchLikesUsersLiveData.observeAsState(initial = emptyList())
@@ -147,13 +149,6 @@ fun Matches(matchesVM: MatchesVM = viewModel()) {
                                     }
                                 }
 
-//
-//                            Text(
-//                                text = user.name,
-//                                color = Color.White,
-//                                modifier = Modifier.padding(top=150.dp, start = 40.dp),
-//                                )
-
                             }
                         }
 
@@ -236,10 +231,4 @@ fun UnderlinedText(text: String, color: Color, underlineColor: Color) {
             )
         }
     }
-}
-
-@Preview
-@Composable
-fun prview() {
-    Matches()
 }

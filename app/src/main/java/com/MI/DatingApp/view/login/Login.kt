@@ -1,4 +1,4 @@
-package com.MI.DatingApp.view
+package com.MI.DatingApp.view.login
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -7,20 +7,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -30,36 +24,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.MI.DatingApp.R
-import com.MI.DatingApp.ui.theme.ComposeBottomNavigationExampleTheme
 import com.MI.DatingApp.viewModel.LoginViewModel
 import com.MI.DatingApp.viewModel.LoginState
+
+/**
+All components that build the Login Page
+ */
 
 @Composable
 fun Login(navController: NavController, viewModel: LoginViewModel = viewModel()) {
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
     val loginState by viewModel.loginState.collectAsState()
-
-
-    LaunchedEffect(loginState) {
-        if (loginState is LoginState.Success) {
-            navController.navigate("test") {
-                popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                launchSingleTop = true
-            }
-        }
-    }
 
     Box(
         modifier = Modifier
@@ -87,6 +71,9 @@ fun Login(navController: NavController, viewModel: LoginViewModel = viewModel())
     }
 }
 
+/**
+LoginHeader
+ */
 @Composable
 fun LoginHeader() {
     Column(
@@ -123,6 +110,56 @@ fun LoginHeader() {
     }
 }
 
+
+/**
+Login button to call backend for Authentication Login
+*/
+@Composable
+fun LoginButtonAndSignUpText(onClick: () -> Unit, navController: NavController) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Bottom,
+        modifier = Modifier.fillMaxHeight()
+            .padding( top= 60.dp)
+    ) {
+        Button(
+            onClick = onClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .padding(horizontal = 16.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+        ) {
+            Text(
+                text = "Log In",
+                fontSize = 20.sp,
+                lineHeight = 16.sp,
+                color = Color.Black,
+                fontWeight = FontWeight.Medium
+            )
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        ClickableText(
+            text = buildAnnotatedString {
+                append("Don’t have account? ")
+                withStyle(style = SpanStyle(
+                    textDecoration = TextDecoration.Underline,
+                    color = Color.White,
+                    fontWeight = FontWeight.SemiBold
+                )) {
+                    append("Signup")
+                }
+            },
+            style = MaterialTheme.typography.labelSmall,
+            onClick = {
+                navController.navigate("registrieren")
+            }
+        )
+    }
+}
+/**
+TextFieldInput
+ */
 @Composable
 fun TextFieldInput(email: String,
                    password: String,
@@ -206,50 +243,9 @@ fun TextFieldInput(email: String,
 }
 
 
-@Composable
-fun LoginButtonAndSignUpText(onClick: () -> Unit, navController: NavController) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Bottom,
-        modifier = Modifier.fillMaxHeight()
-            .padding( top= 60.dp)
-    ) {
-        Button(
-            onClick = onClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .padding(horizontal = 16.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.White)
-        ) {
-            Text(
-                text = "Log In",
-                fontSize = 20.sp,
-                lineHeight = 16.sp,
-                color = Color.Black,
-                fontWeight = FontWeight.Medium
-            )
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        ClickableText(
-            text = buildAnnotatedString {
-                append("Don’t have account? ")
-                withStyle(style = SpanStyle(
-                    textDecoration = TextDecoration.Underline,
-                    color = Color.White,
-                    fontWeight = FontWeight.SemiBold
-                )) {
-                    append("Signup")
-                }
-            },
-            style = MaterialTheme.typography.labelSmall,
-            onClick = {
-                navController.navigate("registrieren")
-            }
-        )
-    }
-}
-
+/**
+Handles the navigation if Login Successful
+ */
 @Composable
 fun LoginStateHandler(loginState: LoginState, navController: NavController) {
     when (loginState) {
@@ -259,3 +255,4 @@ fun LoginStateHandler(loginState: LoginState, navController: NavController) {
         else -> {}
     }
 }
+

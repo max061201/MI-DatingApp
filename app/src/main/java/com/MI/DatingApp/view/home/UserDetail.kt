@@ -17,7 +17,9 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import androidx.compose.foundation.shape.RoundedCornerShape
 import com.MI.DatingApp.model.User
-
+/**
+UserDetail show more about the user
+ */
 @Composable
 fun UserDetail(item: User, onBack: () -> Unit) {
     Column(

@@ -46,7 +46,9 @@ data class Item(
     val name: String
 )
 
-
+/**
+SwipeCard Components
+ */
 @Composable
 fun SwipeCardDemo(viewModel: UserViewModel = viewModel()) {
     SwipeCardDemoList()
@@ -178,7 +180,9 @@ fun SwipeableCard(
         }
     }
 }
-
+/**
+ControlButtons That didnt work
+ */
 @Composable
 fun ControlButtons(
     onLeftSwipe: () -> Unit,

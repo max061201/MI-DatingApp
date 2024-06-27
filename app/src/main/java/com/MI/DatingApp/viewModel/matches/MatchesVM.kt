@@ -15,24 +15,23 @@ import com.google.firebase.database.ValueEventListener
 class MatchesVM  : ViewModel() {
 
     val currentUserLiveData: LiveData<User?> = CurrentUser.userLiveData
-    private var firebaseRefUsers: DatabaseReference = FirebaseDatabase.getInstance().getReference("Users")
-    private val firebaseRefMatches: DatabaseReference = FirebaseDatabase.getInstance().getReference("Matches")
 
     private val _matchUsersLiveData = MutableLiveData<List<User>>()
     val matchLikesUsersLiveData: LiveData<List<User>> = _matchUsersLiveData
-
+    /**
+    Call getUsersMatches when viewmodel called
+     */
     init {
         getUsersMatches()
     }
-    val userList = mutableListOf<User>()
 
-
+    /**
+    Get all Users that matched with Current user
+     */
     fun getUsersMatches() {
         val currentUserId = currentUserLiveData.value?.id ?: return
 
         val matchesRef = FirebaseDatabase.getInstance().getReference("Matches")
-        val usersRef = FirebaseDatabase.getInstance().getReference("Users")
-
         matchesRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val matchesList = mutableListOf<String>()
@@ -76,7 +75,7 @@ class MatchesVM  : ViewModel() {
                     remainingQueries--
                     if (remainingQueries == 0) {
                         _matchUsersLiveData.value = userList
-                        Log.d("UserMatches", userList.joinToString(", ") { it.name })
+                       // Log.d("UserMatches", userList.joinToString(", ") { it.name })
                     }
                 }
 

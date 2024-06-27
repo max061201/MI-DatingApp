@@ -1,20 +1,19 @@
 package com.MI.DatingApp.viewModel.user
 
-import android.icu.text.SimpleDateFormat
-import android.icu.util.Calendar
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.MI.DatingApp.model.CurrentUser
+import com.MI.DatingApp.model.Match
 import com.MI.DatingApp.model.User
 import com.MI.DatingApp.model.registieren.FirebaseIm
 import com.MI.DatingApp.viewModel.home.FilterViewModel
-import com.google.firebase.database.*
-import java.time.LocalDate
-import java.time.Period
-import java.time.format.DateTimeFormatter
-import java.util.Locale
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 class UserViewModel: ViewModel() {
 
@@ -24,74 +23,64 @@ class UserViewModel: ViewModel() {
     val currentUserLiveData: LiveData<User?> = CurrentUser.userLiveData
 
     private var firebaseRefUsers: DatabaseReference = FirebaseDatabase.getInstance().getReference("Users")
+    private var firebaseRefRealTimeMatch :DatabaseReference = FirebaseDatabase.getInstance().getReference("Matches")
 
-    private val filterViewModel = FilterViewModel()
-
+    /**
+    Call CurrentUser.initialize UsergetAllUsersData when viewmodel called
+     */
     init {
         CurrentUser.initializeUser()
         getAllUsersData()
-    }
-    fun setAgeRange() {
-
-    }
-    // Beispiel für den Zugriff auf die ageRange
-    fun getAgeRange(): Pair<Int, Int> {
-        return filterViewModel.filterData.value.ageRange
     }
 
     private val changes = mutableMapOf<String, Any>()
     private var firebaseIm = FirebaseIm()
 
+    /**
+    Handle like if Current user liked a User And Create Match if they both liked each other
+     */
     fun like(user: User) {
         Log.d("Righswipe", "like")
-       // Log.d("_currentShownUser", user.toString())
-       // Log.d("momentanerUser", currentUserLiveData.value.toString())
-
         user.let { currentShownUser ->
             var momentanerUser = currentUserLiveData.value!!
 
             //hat der user den anderen schonmal geliked/ gedisliked
             if (!momentanerUser.likes.contains(currentShownUser.id)
                 && !momentanerUser.dislikes.contains(currentShownUser.id) && !momentanerUser.receivedLikes.contains(currentShownUser.id) ) {
-
                 //füge den geliked user in likes von CurrentUser
                 momentanerUser.likes.add(currentShownUser.id)
 
-                changes["likes"] = momentanerUser.likes // Änderungen hinzufügen
-                firebaseIm.updateUserToDatabase(changes, momentanerUser.id) // Datenbank aktualisieren
-                CurrentUser.setUser(momentanerUser) // Lokal CurrentUser aktualisieren
+                changes["likes"] = momentanerUser.likes
+                firebaseIm.updateUserToDatabase(changes, momentanerUser.id)
+                CurrentUser.setUser(momentanerUser)
 
                 changes.clear() // Veränderungen löschen
-                Log.d("Righswipe CurrentUser", CurrentUser.getUser().toString())
+               // Log.d("Righswipe CurrentUser", CurrentUser.getUser().toString())
 
                 currentShownUser.receivedLikes.add(momentanerUser.id)
-                changes["receivedLikes"] = currentShownUser.receivedLikes // Änderungen hinzufügen
-                firebaseIm.updateUserToDatabase(changes, currentShownUser.id) // Datenbank aktualisieren
+                changes["receivedLikes"] = currentShownUser.receivedLikes
+                firebaseIm.updateUserToDatabase(changes, currentShownUser.id)
                 changes.clear()
-                Log.d("Righswipe currentShownUser receivedLikes", currentShownUser.receivedLikes.toString())
+            //    Log.d("Righswipe currentShownUser receivedLikes", currentShownUser.receivedLikes.toString())
 
-
-                // CurrentUser.setUser(momentanerUser) updated current userdata
             }
 
-            // hat einer der user denn anderen schonmal geliked?
-            //vlt irgenwie pop up mit Match gefunden oder so?
             else if (currentShownUser.likes.contains(momentanerUser.id)){
                 Log.d("Righswipe MATCH", "es gibt ein mensch zwischen ${momentanerUser.name} und ${currentShownUser.name} ")
 
-                //füge den geliked user in likes von CurrentUser
+
                 momentanerUser.likes.add(currentShownUser.id)
-                changes["likes"] = momentanerUser.likes // Änderungen hinzufügen
+                changes["likes"] = momentanerUser.likes
                 momentanerUser.receivedLikes.remove(currentShownUser.id)
-                // Änderungen hinzufügen User mit den man Matched entfernen
+
                 changes["receivedLikes"] = momentanerUser.receivedLikes
-                firebaseIm.updateUserToDatabase(changes, momentanerUser.id) // Datenbank aktualisieren
-                CurrentUser.setUser(momentanerUser) // Lokal CurrentUser aktualisieren
-                changes.clear() // Veränderungen löschen
-                Log.d("Righswipe CurrentUser", CurrentUser.getUser().toString())
+                firebaseIm.updateUserToDatabase(changes, momentanerUser.id)
+                CurrentUser.setUser(momentanerUser)
+                changes.clear()
+               // Log.d("Righswipe CurrentUser", CurrentUser.getUser().toString())
 
                 //erstelle ein Match
-                firebaseIm.createMatch(momentanerUser.id,currentShownUser.id)
+                createMatch(momentanerUser.id,currentShownUser.id)
             }
             else{
                 Log.d("Righswipe User", "User wurde schon geliked oder gedisliked $currentShownUser.id")
@@ -99,7 +88,9 @@ class UserViewModel: ViewModel() {
         }
 
     }
-
+    /**
+    Handle Dislike if Current user disliked a User
+     */
     fun dislike(user: User) {
         Log.d("leftswipe", "dislike")
         // Prüfen, ob der aktuelle Benutzer angezeigt wird und wenn ja, Änderungen hinzufügen
@@ -107,17 +98,18 @@ class UserViewModel: ViewModel() {
              var momentanerUser = CurrentUser.getUser()!!
 
             if (!momentanerUser.likes.contains(currentShownUser.id) && !momentanerUser.dislikes.contains(currentShownUser.id)) {                momentanerUser.dislikes.add(currentShownUser.id)
-                changes["dislikes"] = momentanerUser.dislikes // Änderungen hinzufügen
-                firebaseIm.updateUserToDatabase(changes, momentanerUser.id) // Datenbank aktualisieren
+                changes["dislikes"] = momentanerUser.dislikes
+                firebaseIm.updateUserToDatabase(changes, momentanerUser.id)
                 Log.d("changes", changes.toString())
                 Log.d("momentanerUser", momentanerUser.toString())
-                // CurrentUser.setUser(momentanerUser) updated current userdata
             }else{
                 Log.d("User", "User wurde schon geliked oder gedisliked $currentShownUser.id")
             }
         }
     }
-
+    /**
+    Get All user for the Swipe and add a filter shouldShowUser what the user wants to display
+     */
     fun getAllUsersData() {
         lateinit var gender1: String
         var count = 0
@@ -130,13 +122,11 @@ class UserViewModel: ViewModel() {
                         val userList = mutableListOf<User>()
                         for (userSnapshot in snapshot.children) {
                             val user = userSnapshot.getValue(User::class.java)
-                            val userFemale = userSnapshot.getValue(User::class.java)
 
                             // Füge Benutzer zur Liste hinzu, wenn sie den Kriterien entsprechen
                             if (user != null && shouldShowUser(currentUser, user)) {
                                 userList.add(user)
                             }
-
 
                         }
                         // Logge die Liste der Benutzernamen
@@ -148,19 +138,15 @@ class UserViewModel: ViewModel() {
                             // Aktualisiere die LiveData mit der gefilterten Benutzerliste
                             _usersListLiveData.value = userList
                             count++
-                            //MALE
                             gender1 = currentUser.genderLookingFor
                             Log.d("userList count 1", userList.toString() + gender1 )
 
                         }                           //Female      //Female
                         if (gender1.isNotEmpty() && gender1 != currentUser.genderLookingFor){
-                            // Aktualisiere die LiveData mit der gefilterten Benutzerliste
                             //Log.d("userList gender", "gender1: $_usersListLiveData.value ")
                             _usersListLiveData.value = userList
-                            // Hole die aktuelle Benutzerliste aus LiveData
                             val currentUserList = _usersListLiveData.value ?: emptyList()
 
-                            // Extrahiere die Namen der Benutzer
                             val userNames = currentUserList.map { it.name }
 
                             // Logge die Namen der Benutzer
@@ -194,21 +180,38 @@ class UserViewModel: ViewModel() {
                // && userAge in ageRange.first..ageRange.second
     }
 
-    // Funktion zur Berechnung des Alters aus dem Geburtsdatum
-    private fun calculateAge(yearOfBirth: String): Int {
-        val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-        val dob = sdf.parse(yearOfBirth) ?: return 0 // Falls das Parsing fehlschlägt, 0 zurückgeben
 
-        val today = Calendar.getInstance()
+    fun createMatch(userId1: String, userId2: String) {
+        val match = Match("", userId1, userId2) // Erstellen Sie das Match-Objekt mit leerer ID
+        val newMatchRef = firebaseRefRealTimeMatch.push() // Erzeugen Sie eine neue Referenz mit automatisch generierter ID
+        match.id = newMatchRef.key ?: "" // Setzen Sie die ID des Matches auf die automatisch generierte ID
 
-        val dobCalendar = Calendar.getInstance()
-        dobCalendar.time = dob
-
-        var age = today.get(Calendar.YEAR) - dobCalendar.get(Calendar.YEAR)
-        if (today.get(Calendar.DAY_OF_YEAR) < dobCalendar.get(Calendar.DAY_OF_YEAR)) {
-            age--
-        }
-
-        return age
+        newMatchRef.setValue(match)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("Firebase", "Match created successfully with ID: ${match.id}")
+                } else {
+                    Log.d("Firebase", "Error creating match: ${task.exception?.message}")
+                }
+            }
     }
+
+
+//    // Funktion zur Berechnung des Alters aus dem Geburtsdatum
+//    private fun calculateAge(yearOfBirth: String): Int {
+//        val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+//        val dob = sdf.parse(yearOfBirth) ?: return 0 // Falls das Parsing fehlschlägt, 0 zurückgeben
+//
+//        val today = Calendar.getInstance()
+//
+//        val dobCalendar = Calendar.getInstance()
+//        dobCalendar.time = dob
+//
+//        var age = today.get(Calendar.YEAR) - dobCalendar.get(Calendar.YEAR)
+//        if (today.get(Calendar.DAY_OF_YEAR) < dobCalendar.get(Calendar.DAY_OF_YEAR)) {
+//            age--
+//        }
+//
+//        return age
+//    }
 }

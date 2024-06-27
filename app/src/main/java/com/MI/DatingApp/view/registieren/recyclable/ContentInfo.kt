@@ -3,6 +3,10 @@ package com.MI.DatingApp.view.registieren.recyclable
 import androidx.compose.ui.graphics.Color
 import com.MI.DatingApp.R
 
+
+/**
+Base Components that are used in Regestrieren
+ */
 data class TextRegistering(val title: String = "", val subTitle: String)
 
 
@@ -11,10 +15,6 @@ val RegisteringTexts = TextRegistering(
     subTitle = "start chating with people close to you \n signing up to our chat application"
 )
 
-val RegisteringImageText = TextRegistering(
-    subTitle = "You can already select your first \n              profile photo"
-
-)
 
 data class OutletAttribute(
     val text: String,

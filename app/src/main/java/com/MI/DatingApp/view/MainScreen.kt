@@ -74,5 +74,3 @@ fun MainScreen(navController: NavHostController) {
         AppNavigation(navController = navController, startDestination = startDestination, modifier = Modifier.padding(innerPadding) )
     }
 }
-
-data class NavigationItem(val route: String, val label: String, val iconId: Int)

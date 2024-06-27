@@ -11,6 +11,10 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
+/**
+CurrentUser is Used to save the logged in user to get his live data and also save in Preferences
+ So the user dont have to login always
+ */
 object CurrentUser {
     private var user: User? = null
     private const val PREFERENCES_NAME = "MyAppPreferences"
@@ -39,7 +43,6 @@ object CurrentUser {
         user?.let {
             // Starte den ValueEventListener, um Änderungen am Benutzer in der Datenbank zu überwachen
             listenToUserChanges(it.id)
-
             // Aktualisiere den LiveData-Wert, damit die UI-Komponenten darüber informiert werden
             _userLiveData.postValue(it)
 
@@ -56,7 +59,6 @@ object CurrentUser {
         // if (newUser != user){firebaseRealTimeDB.child(newUser.id).setValue(newUser)}
         user = newUser
 
-        //  listenToUserChanges(newUser.id) // Start the listener when the user is set
     }
     
 

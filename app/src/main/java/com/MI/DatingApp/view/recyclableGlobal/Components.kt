@@ -23,6 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.MI.DatingApp.R
 
+/**
+Base Components that are used in Home and filter
+ */
 @Composable
 fun TitlePages(titleText: String, modifier: Modifier = Modifier){
     Box {

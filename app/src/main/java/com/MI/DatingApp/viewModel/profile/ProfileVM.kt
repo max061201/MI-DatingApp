@@ -88,6 +88,9 @@ class ProfileVM : ViewModel() {
         _userchanges.value = uservalue
     }
     var setOneImage: Boolean = false
+    /**
+    Set the images the user wants ti changes
+     */
     fun setImage(imageUri: String, imageToDelete: String = "", index: Int) {
         val uservalue = _userchanges.value!!
         val newImages = uservalue.imageUrls!!.toMutableList().apply {
@@ -105,6 +108,9 @@ class ProfileVM : ViewModel() {
         setOneImage = true
     }
     var removedOneImage: Boolean = false
+    /**
+    Remove the images
+     */
     fun removeImage(index: Int) {
 
         Log.d("removeImage", "removeImage $index")

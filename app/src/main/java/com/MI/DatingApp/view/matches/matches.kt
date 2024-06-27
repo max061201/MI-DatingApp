@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -44,107 +48,115 @@ import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.MI.DatingApp.R
 import com.MI.DatingApp.model.Match
+import com.MI.DatingApp.model.User
+import com.MI.DatingApp.view.home.UserDetail
 import com.MI.DatingApp.viewModel.likes.LikesVM
 import com.MI.DatingApp.viewModel.likes.MatchesVM
 
-
+/**
+Create the Matches page to show realtime updates if someone you liked, liked you back
+ */
 @Composable
 fun Matches(matchesVM: MatchesVM = viewModel()) {
     val receivedLikesUsers by matchesVM.matchLikesUsersLiveData.observeAsState(initial = emptyList())
     Log.d("receivedLikesUsers", receivedLikesUsers.toString())
+    var showUserDetail by remember { mutableStateOf(false) }
+    var selectedItem by remember { mutableStateOf<User?>(null) }
     var likes = receivedLikesUsers
-    Text(text = "Text", color = Color.Black)
 
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(Color(0xFFFCF7F7), Color(0xFFAA3FEC))
-                    )
-                )
+    if (showUserDetail) {
+        UserDetail(item = selectedItem!! , onBack = {
+            showUserDetail = false
+        })
+    } else {
+        Column(
+            modifier = Modifier.fillMaxSize()
         ) {
-            Column(
-                modifier = Modifier.fillMaxSize()
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(Color(0xFFFCF7F7), Color(0xFFAA3FEC))
+                        )
+                    )
             ) {
-                CurvedBox {
-                    UnderlinedText(
-                        text = "Likes",
-                        color = Color.Black,
-                        underlineColor = Color(0xFF58C3B6)
+                Column(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    CurvedBox {
+                        UnderlinedText(
+                            text = "Matches",
+                            color = Color.Black,
+                            underlineColor = Color(0xFF58C3B6)
 
+                        )
+
+                    }
+
+                    Text(
+                        text = "${likes.size} Likes",
+                        color = Color.Black,
+                        modifier = Modifier.padding(16.dp),
+                        fontWeight = FontWeight.Bold,
                     )
 
-                }
-
-                Text(
-                    text = "${likes.size} Likes",
-                    color = Color.Black,
-                    modifier = Modifier.padding(16.dp),
-                    fontWeight = FontWeight.Bold,
-                )
-
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    modifier = Modifier.padding(8.dp)
-                ) {
-                    items(likes.size) { index  ->
-                        val user = likes[index]
-                        val imageUrl = user.imageUrls?.firstOrNull()
-                        Box(
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .aspectRatio(1f)
-                                .background(Color.White, RoundedCornerShape(8.dp))
-                        ) {
-
-                            Image(
-                                painter = rememberAsyncImagePainter(model = imageUrl),
-                                contentDescription = null,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.fillMaxSize()
-                            )
-
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        modifier = Modifier.padding(8.dp)
+                    ) {
+                        items(likes.size) { index ->
+                            val user = likes[index]
+                            val imageUrl = user.imageUrls?.firstOrNull()
                             Box(
                                 modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(5.dp)
-                                    .shadow(6.dp)
+                                    .padding(8.dp)
+                                    .aspectRatio(1f)
+                                    .background(Color.White, RoundedCornerShape(8.dp))
+                                    .clickable(onClick = {
+                                        showUserDetail = true
+                                        selectedItem = user
 
+                                    })
                             ) {
-                                Column(
+
+                                Image(
+                                    painter = rememberAsyncImagePainter(model = imageUrl),
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.fillMaxSize()
+                                )
+
+                                Box(
                                     modifier = Modifier
-                                        .align(Alignment.BottomStart)
-                                        .fillMaxWidth()
-                                        .background(Color.Black.copy(alpha = 0.5f))
-                                        .padding(8.dp)
+                                        .fillMaxSize()
+                                        .padding(5.dp)
+                                        .shadow(6.dp)
+
                                 ) {
-                                    androidx.compose.material3.Text(
-                                        text = user.name,
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = Color.White
-                                    )
+                                    Column(
+                                        modifier = Modifier
+                                            .align(Alignment.BottomStart)
+                                            .fillMaxWidth()
+                                            .background(Color.Black.copy(alpha = 0.5f))
+                                            .padding(8.dp)
+                                    ) {
+                                        androidx.compose.material3.Text(
+                                            text = user.name,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = Color.White
+                                        )
+                                    }
                                 }
+
                             }
-
-//
-//                            Text(
-//                                text = user.name,
-//                                color = Color.White,
-//                                modifier = Modifier.padding(top=150.dp, start = 40.dp),
-//                                )
-
                         }
+
                     }
 
                 }
-
             }
         }
-
     }
 }
 
@@ -219,10 +231,4 @@ fun UnderlinedText(text: String, color: Color, underlineColor: Color) {
             )
         }
     }
-}
-
-@Preview
-@Composable
-fun prview() {
-    Matches()
 }

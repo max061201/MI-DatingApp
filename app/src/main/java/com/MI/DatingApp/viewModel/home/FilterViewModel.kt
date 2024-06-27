@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 
 class FilterViewModel : ViewModel() {
     private val database: DatabaseReference = FirebaseDatabase.getInstance().reference
+    var firebaseRealTimeDB = FirebaseDatabase.getInstance().getReference("Users")
 
     private val _filterData = MutableStateFlow(FilterData())
     val filterData: StateFlow<FilterData> = _filterData
@@ -26,34 +27,19 @@ class FilterViewModel : ViewModel() {
     val currentUserLiveData: LiveData<User?> = CurrentUser.userLiveData
 
 
-
     fun setGender(gender: String) {
         _filterData.value = _filterData.value.copy(gender = gender)
-    }
-
-    private val _ageRangeLiveData = MutableLiveData<Pair<Int, Int>>()
-    val ageRangeLiveData: LiveData<Pair<Int, Int>>
-        get() = _ageRangeLiveData
-
-    fun getAgeRange(): Pair<Int, Int> {
-        return filterData.value.ageRange
-    }
-
-    fun setAgeRange(ageRange: Pair<Int, Int>) {
-        _filterData.value = _filterData.value.copy(ageRange = ageRange)
-        _ageRangeLiveData.postValue(ageRange)
     }
 
     fun toggleFilterVisibility() {
         _isFilterVisible.value = !_isFilterVisible.value
     }
-    var firebaseRealTimeDB = FirebaseDatabase.getInstance().getReference("Users")
 
+    /**
+    Set the gender the user is looking for selected in the filter in the Realtime firebase
+     */
     fun updateFilterData() {
         val currentFilterData = _filterData.value
-        Log.d("updateFilterData", "Selected Gender: ${currentFilterData.gender}")
-        Log.d("updateFilterData", "Selected range: ${currentFilterData.ageRange}")
-
         // Update CurrentUser gender
         currentUserLiveData.let { currentUser ->
             val updatedUser = currentUser.value?.copy(genderLookingFor = currentFilterData.gender)
@@ -64,11 +50,5 @@ class FilterViewModel : ViewModel() {
             }
         }
 
-    }
-
-    fun saveFilterData(userId: String) {
-        viewModelScope.launch {
-            database.child("Users").child(userId).child("filter").setValue(_filterData.value)
-        }
     }
 }

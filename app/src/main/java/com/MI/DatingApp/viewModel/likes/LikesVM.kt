@@ -1,6 +1,5 @@
 package com.MI.DatingApp.viewModel.likes
 
-import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -12,9 +11,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class LikesVM  : ViewModel() {
 
@@ -23,48 +19,51 @@ class LikesVM  : ViewModel() {
 
     private val _receivedLikesUsersLiveData = MutableLiveData<List<User>>()
     val receivedLikesUsersLiveData: LiveData<List<User>> = _receivedLikesUsersLiveData
+    /**
+    Call getReceivedLikes when viewmodel called
+     */
     init {
         getReceivedLikes()
     }
-    val userList = mutableListOf<User>()
+    /**
+    Get all Users that liked Current user to show his received likes for the realtime DB
+     */
+    fun getReceivedLikes() {
+        val receivedLikesIds = currentUserLiveData.value?.receivedLikes ?: return
 
+        // Entferne null-Werte aus der Liste
+        val nonNullReceivedLikesIds = receivedLikesIds.filterNotNull()
 
-        fun getReceivedLikes() {
-            val receivedLikesIds = currentUserLiveData.value?.receivedLikes ?: return
+        val userList = mutableListOf<User>()
+        var remainingQueries = nonNullReceivedLikesIds.size
 
-            // Entferne null-Werte aus der Liste
-            val nonNullReceivedLikesIds = receivedLikesIds.filterNotNull()
+        nonNullReceivedLikesIds.forEach { userId ->
+            firebaseRefUsers.child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val user = snapshot.getValue(User::class.java)
+                //    Log.d("userListuserList1", userList.toString())
 
-            val userList = mutableListOf<User>()
-            var remainingQueries = nonNullReceivedLikesIds.size
+                    if (user != null) {
+                        userList.add(user)
+                    //    Log.d("userListuserList2", userList.toString())
 
-            nonNullReceivedLikesIds.forEach { userId ->
-                firebaseRefUsers.child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        val user = snapshot.getValue(User::class.java)
-                        Log.d("userListuserList1", userList.toString())
-
-                        if (user != null) {
-                            userList.add(user)
-                            Log.d("userListuserList2", userList.toString())
-
-                        }
-                        remainingQueries--
-                        if (remainingQueries == 0) {
-                            _receivedLikesUsersLiveData.value = userList
-                            Log.d("ReceivedLikesUsers", userList.joinToString(", ") { it.name })
-                        }
                     }
-
-                    override fun onCancelled(error: DatabaseError) {
-                        remainingQueries--
-                        if (remainingQueries == 0) {
-                            _receivedLikesUsersLiveData.value = userList
-                        }
-                        Log.e("ReceivedLikesUsers", "Failed to load user with ID $userId", error.toException())
+                    remainingQueries--
+                    if (remainingQueries == 0) {
+                        _receivedLikesUsersLiveData.value = userList
+                    //    Log.d("ReceivedLikesUsers", userList.joinToString(", ") { it.name })
                     }
-                })
-            }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    remainingQueries--
+                    if (remainingQueries == 0) {
+                        _receivedLikesUsersLiveData.value = userList
+                    }
+                    Log.e("ReceivedLikesUsers", "Failed to load user with ID $userId", error.toException())
+                }
+            })
         }
+    }
 
 }

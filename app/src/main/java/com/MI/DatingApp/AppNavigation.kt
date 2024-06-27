@@ -1,60 +1,43 @@
 package com.MI.DatingApp
 
-
-import Detail
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.MailOutline
+import ProfileDetail
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
-import com.MI.DatingApp.view.Chat
-import com.MI.DatingApp.view.Home
-
-import com.MI.DatingApp.view.NavigationItem
-import com.MI.DatingApp.view.Screen3
-import com.MI.DatingApp.view.Screen4
-import com.MI.DatingApp.view.Login
-import com.MI.DatingApp.view.TestView
+import com.MI.DatingApp.view.login.Login
+import com.MI.DatingApp.view.home.Home
 import com.MI.DatingApp.view.likes.Likes
 import com.MI.DatingApp.view.matches.Matches
 import com.MI.DatingApp.view.profile.ProfileScreen
 import com.MI.DatingApp.view.registieren.Registrieren
 
-
+/**
+Navigation throughout the entire APP
+ */
 @Composable
-
 fun AppNavigation(navController: NavHostController, startDestination: String, modifier: Modifier = Modifier) {
     NavHost(navController = navController, startDestination = startDestination) {
-
         composable("login") { Login(navController) }
         composable("registrieren") { Registrieren(navController = navController) }
-        composable("test") { TestView(navController) }
-        composable("home") { Home(navController) }
+        composable("home") { Home() }
         composable("likes") { Likes() }
-        composable("chat") { Matches() }
-
+        composable("matches") { Matches() }
         composable("profile") { ProfileScreen(navController) }
-        composable("screen2") { Detail(navController) }
-
-        composable("screen3") { Screen3(navController) }
-        composable("screen4/{data}", arguments = listOf(navArgument("data") { type = NavType.StringType })) { backStackEntry ->
-            Screen4(navController, backStackEntry.arguments?.getString("data") ?: "")
-        }
+        composable("screen2") { ProfileDetail(navController) }
     }
 }
 
-val bottomNavigationItems = listOf(
-    NavigationItem("home", "Screen 1", Icons.Filled.Home),
-    NavigationItem("likes", "Screen 2", Icons.Filled.Favorite),
-    NavigationItem("chat", "Screen 3", Icons.Filled.MailOutline),
-    NavigationItem("profile", "Screen 4", Icons.Filled.AccountCircle)
-)
+/**
+Navigation Bar throughout the APP
+ */
+data class NavigationItem(val route: String, val label: String, val iconId: Int)
 
-val bottomBarRoutes = setOf("home", "likes","chat","profile")
+val bottomNavigationItems = listOf(
+    NavigationItem("home", "", R.drawable.home_button),
+    NavigationItem("likes", "", R.drawable.herz),
+    NavigationItem("matches", "", R.drawable.bote),
+    NavigationItem("profile", "", R.drawable.profil)
+)
+val bottomBarRoutes = setOf("home", "likes","matches","profile")

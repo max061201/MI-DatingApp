@@ -47,7 +47,12 @@ import com.MI.DatingApp.view.registieren.recyclable.outletAttributeRegisPage2
 import com.MI.DatingApp.view.registieren.recyclable.outletAttributeRegisPage3
 import com.MI.DatingApp.viewModel.registering.Error
 import com.MI.DatingApp.viewModel.registering.RegisteringVM
-import java.util.Date
+
+
+
+/**
+All components that build the Registrieren Page
+ */
 
 @Composable
 fun Registrieren(navController: NavHostController, viewModel: RegisteringVM = viewModel()) {
@@ -120,6 +125,9 @@ fun Registrieren(navController: NavHostController, viewModel: RegisteringVM = vi
     }
 }
 
+/**
+First page for the user to enter name, email, password if done navigate to second page
+ */
 @Composable
 fun FirstPage(
     navController: NavController,
@@ -167,7 +175,9 @@ fun FirstPage(
 
     }
 }
-
+/**
+second page for the user to enter Picture date of birth and gender
+ */
 @Composable
 fun secondRPage(
     navController: NavHostController,
@@ -199,7 +209,9 @@ fun secondRPage(
     }
 }
 
-
+/**
+Third page for the user to enter description gender looking for and interests
+ */
 @Composable
 fun ThirdPage(
     navController: NavHostController,
@@ -222,8 +234,8 @@ fun ThirdPage(
         DescribesYouSection(registeringViewModel, outletAttributeRegisPage3[1])
         Interests(
             interest = registeringViewModel.user.value!!.interest,
-            setInterestes = { registeringViewModel.setInterestes(it) }
-            )
+            setInterestes = { registeringViewModel.setInterests(it) }
+        )
         ButtonCompose({
 
 

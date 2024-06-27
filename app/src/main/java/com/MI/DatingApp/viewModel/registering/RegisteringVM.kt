@@ -1,7 +1,6 @@
 package com.MI.DatingApp.viewModel.registering
 
 
-import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.util.Log
@@ -29,10 +28,8 @@ class RegisteringVM : ViewModel() {
     val errorField: LiveData<MutableList<Error>> = _errorField
 
     var firebaseIm = FirebaseIm()
-
-
-
-
+    private var firebaseRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("Users")
+    private var storageRef: StorageReference = FirebaseStorage.getInstance().getReference("UsersImages")
 
     fun setId(id: String) {
         val updatedUser = _user.value?.copy(id = id)
@@ -83,7 +80,7 @@ class RegisteringVM : ViewModel() {
     }
 
 
-    fun setInterestes(interest: String) {
+    fun setInterests(interest: String) {
         _user.value?.let { currentUser ->
             val updatedInterests = currentUser.interest.toMutableList().apply {
                 if (this.contains(interest)) {
@@ -109,7 +106,9 @@ class RegisteringVM : ViewModel() {
         val updatedUser = _user.value?.copy(yearOfBirth = date)
         _user.value = updatedUser
     }
-
+    /**
+    Check if all Entry requirement are true
+     */
     fun checkErrorForFirstPage(): Boolean {
 
         val check = _user.value!!.emptyFields().isEmpty()
@@ -141,7 +140,9 @@ class RegisteringVM : ViewModel() {
             return true
         }
     }
-
+    /**
+    Check if all Entry requirement are true
+     */
     fun checkErrorForSecondPage(): Boolean {
         val check = _user.value!!.yearOfBirth.isNotEmpty() && _user.value!!.gender.isNotEmpty()
         if (!check) {
@@ -155,15 +156,9 @@ class RegisteringVM : ViewModel() {
         return true
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun checkDate(date: String) {
-        // TODO check if date in future
-        //  return (Date.from(Instant.now()) > DateTimeFormatter.ofPattern())
-    }
-
-    private var firebaseRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("Users")
-    private var storageRef: StorageReference = FirebaseStorage.getInstance().getReference("UsersImages")
-
+    /**
+    Save email and password to Firebase Authentication
+     */
     fun saveUserInFirebaseAuth() {
         val user = _user.value!!
         val imageUris = user.imageUrls?.map { Uri.parse(it) } ?: emptyList()
@@ -180,6 +175,9 @@ class RegisteringVM : ViewModel() {
         firebaseIm.saveUserAuth(user)
     }
 
+    /**
+    Save user in realtime DB and save Pictures in firebase Storage
+     */
     private fun uploadImagesAndSaveUser(imageUris: List<Uri>, contactId: String) {
         val uploadedImageUrls = mutableListOf<String>()
         val timestamp = System.currentTimeMillis() // Zeitstempel hinzufügen
@@ -200,6 +198,9 @@ class RegisteringVM : ViewModel() {
         }
     }
 
+    /**
+    Save User with Images URL in realtime DB
+     */
     private fun saveUserToDatabase(imageUrls: List<String>?, contactId: String) {
         val user = _user.value!!
         val userWithImages = user.copy(imageUrls = imageUrls?.toMutableList())
@@ -212,7 +213,6 @@ class RegisteringVM : ViewModel() {
                 Log.d("Firebase", "Error saving user: ${it.message}")
             }
     }
-
 }
 
 private fun findErrorTextAndRemove(mutableList: MutableList<Error>, error: String) {

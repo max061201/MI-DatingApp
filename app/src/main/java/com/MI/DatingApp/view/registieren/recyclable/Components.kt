@@ -4,8 +4,6 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,32 +17,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material3.IconButton
-
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Visibility
@@ -57,15 +37,31 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import com.MI.DatingApp.R
@@ -74,35 +70,12 @@ import com.MI.DatingApp.viewModel.registering.RegisteringVM
 import com.MI.DatingApp.viewModel.registering.formatAndToString
 import java.util.Date
 
+
+/**
+Base Components that are used in Regestrieren
+ */
 @Composable
-fun Registering(stepByStep: Int) {
-    var twoCycle: Boolean = stepByStep == 2 || stepByStep == 3
-    val thirdCycle = stepByStep == 3
-    Text(
-        fontSize = 20.sp,
-        text = RegisteringTexts.title,
-        color = Color.White
-    )
-    Text(
-        text = RegisteringTexts.subTitle,
-        modifier = Modifier.padding(16.dp),
-        color = Color.White
-    )
-
-    Row(
-    ) {
-        Circle(true)
-        Spacer(modifier = Modifier.width(30.dp))
-        Circle(twoCycle)
-        Spacer(modifier = Modifier.width(30.dp))
-        Circle(thirdCycle)
-    }
-
-
-}
-
-@Composable
-fun Text(textUnit: TextUnit, text: String, color: Color) {
+fun BaseText(textUnit: TextUnit, text: String, color: Color) {
     Text(
         fontSize = textUnit,
         text = text,
@@ -114,8 +87,8 @@ fun Text(textUnit: TextUnit, text: String, color: Color) {
 @Composable
 fun RegistFirstItems(fullCycle: Int = 1) {
     AppIcon()
-    Text(textUnit = 20.sp, text = RegisteringTexts.title, color = Color.White)
-    Text(textUnit = 16.sp, text = RegisteringTexts.subTitle, color = Color.White)
+    BaseText(textUnit = 20.sp, text = RegisteringTexts.title, color = Color.White)
+    BaseText(textUnit = 16.sp, text = RegisteringTexts.subTitle, color = Color.White)
     Circles(fullCycle)
 
 }

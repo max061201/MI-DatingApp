@@ -46,7 +46,9 @@ data class Item(
     val name: String
 )
 
-
+/**
+SwipeCard Components
+ */
 @Composable
 fun SwipeCardDemo(viewModel: UserViewModel = viewModel()) {
     SwipeCardDemoList()
@@ -61,11 +63,13 @@ fun CardContent(item: Item) {
             .shadow(6.dp)
 
     ) {
+
         Image(
             painter = rememberAsyncImagePainter(model = item.imageUrl),
             contentDescription = null,
-            ///modifier = Modifier.fillMaxSize(),
-            modifier = Modifier.height(400.dp).fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(500.dp),
             contentScale = ContentScale.Crop
         )
         Column(
@@ -75,8 +79,9 @@ fun CardContent(item: Item) {
                 .background(Color.Black.copy(alpha = 0.5f))
                 .padding(8.dp)
         ) {
-            Text(text = item.name, style = MaterialTheme.typography.labelSmall, color = Color.White)
+            Text(text = item.name, style = MaterialTheme.typography.titleLarge, color = Color.White)
         }
+
     }
 }
 
@@ -175,7 +180,9 @@ fun SwipeableCard(
         }
     }
 }
-
+/**
+ControlButtons That didnt work
+ */
 @Composable
 fun ControlButtons(
     onLeftSwipe: () -> Unit,
@@ -317,14 +324,14 @@ fun SwipeCardDemoList(userViewModel: UserViewModel = viewModel()) {
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            ControlButtons(
-                onLeftSwipe = swipeLeft,
-                onRightSwipe = swipeRight,
-                onUndo = undo,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            )
+//            ControlButtons(
+//                onLeftSwipe = swipeLeft,
+//                onRightSwipe = swipeRight,
+//                onUndo = undo,
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(16.dp)
+//            )
         }
     }
 }

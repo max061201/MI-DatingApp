@@ -42,6 +42,9 @@ class LoginViewModel : ViewModel() {
         _password.value = newPassword
     }
 
+    /**
+    Handel Login with FirebaseAuth
+     */
     fun login() {
         val emailValue = email.value.trim()
         val passwordValue = password.value.trim()
@@ -52,10 +55,8 @@ class LoginViewModel : ViewModel() {
             auth.signInWithEmailAndPassword(emailValue, passwordValue)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
+                        //Get User Data from Realtime firebase to use in APP
                         fetchUserByEmail(emailValue)
-
-                      //  _loginState.value = LoginState.Success
-
                     } else {
                         _loginState.value = LoginState.Error(task.exception?.message ?: "Unknown error")
                     }
@@ -67,6 +68,7 @@ class LoginViewModel : ViewModel() {
         firebaseRealTimeDB.orderByChild("email").equalTo(emailValue).addListenerForSingleValueEvent(
             object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
+                    //handleSnapshot
                     handleSnapshot(snapshot)
                 }
 
@@ -77,6 +79,10 @@ class LoginViewModel : ViewModel() {
         )
     }
 
+    /**
+    Set User in CurrentUser to have all Data from the loged in User
+     And switch LoginState to Success
+     */
     private fun handleSnapshot(snapshot: DataSnapshot) {
         if (snapshot.exists()) {
             var foundUser: User? = null
@@ -103,9 +109,6 @@ class LoginViewModel : ViewModel() {
     }
 
 
-    fun getUser() {
-        auth.currentUser?.email?.let { fetchUserByEmail(it) }
-    }
 }
 
 sealed class LoginState {
